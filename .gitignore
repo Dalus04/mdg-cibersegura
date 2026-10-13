@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Variables y credenciales
+.env
+.env.*
+!.env.example
+
+# Flask y datos locales
+instance/
+*.sqlite3
+*.db
+
+# Pruebas y cobertura
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editores y sistema operativo
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
