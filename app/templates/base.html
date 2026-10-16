@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}MDG Cibersegura{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+  </head>
+  <body>
+    <a class="saltar-contenido" href="#contenido-principal">Saltar al contenido</a>
+    <header>
+      <p class="marca"><a href="{{ url_for('main.index') }}">MDG Cibersegura</a></p>
+      <nav aria-label="Principal">
+        <ul>
+          <li><a href="{{ url_for('main.index') }}">Inicio</a></li>
+          {% if current_user.is_authenticated %}
+            <li>
+              <form action="{{ url_for('auth.logout') }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit">Cerrar sesión</button>
+              </form>
+            </li>
+          {% else %}
+            <li><a href="{{ url_for('auth.login') }}">Iniciar sesión</a></li>
+            <li><a href="{{ url_for('auth.registro') }}">Registrarse</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </header>
+    <main id="contenido-principal">
+      {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% if mensajes %}
+          <ul class="mensajes" aria-live="polite">
+            {% for categoria, mensaje in mensajes %}
+              <li class="mensaje mensaje-{{ categoria }}" role="alert">{{ mensaje }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>

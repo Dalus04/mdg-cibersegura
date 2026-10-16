@@ -1,38 +1,17 @@
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>MDG Cibersegura</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
-  </head>
-  <body>
-    <header>
-      <h1>MDG Cibersegura</h1>
-      <p>La aplicación Flask responde correctamente.</p>
-    </header>
-    <main>
-      <section aria-labelledby="modelo-titulo">
-        <h2 id="modelo-titulo">Modelo inicial de datos</h2>
-        <p>Tablas creadas en la base de datos:</p>
-        <ul>
-          {% for tabla in tablas %}
-            <li>{{ tabla }}</li>
-          {% else %}
-            <li>No se encontraron tablas.</li>
-          {% endfor %}
-        </ul>
-      </section>
-      <section aria-labelledby="roles-titulo">
-        <h2 id="roles-titulo">Roles iniciales</h2>
-        <ul>
-          {% for rol in roles %}
-            <li>{{ rol.nombre }}: {{ rol.descripcion }}</li>
-          {% else %}
-            <li>Aún no hay roles registrados.</li>
-          {% endfor %}
-        </ul>
-      </section>
-    </main>
-  </body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Inicio · MDG Cibersegura{% endblock %}
+
+{% block content %}
+  <h1>MDG Cibersegura</h1>
+  {% if current_user.is_authenticated %}
+    <p>Sesión iniciada como {{ current_user.nombres }} {{ current_user.apellidos }} ({{ current_user.correo }}).</p>
+  {% else %}
+    <p>Plataforma educativa de ciberseguridad de la Municipalidad Distrital de Guadalupe.</p>
+    <p>
+      <a href="{{ url_for('auth.registro') }}">Crear cuenta</a>
+      o
+      <a href="{{ url_for('auth.login') }}">iniciar sesión</a>.
+    </p>
+  {% endif %}
+{% endblock %}
