@@ -5,9 +5,18 @@ from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationE
 from app.models import Usuario
 
 
+def _limpiar_texto(valor: str | None) -> str:
+    return valor.strip() if isinstance(valor, str) else ""
+
+
+def _limpiar_correo(valor: str | None) -> str:
+    return valor.strip().lower() if isinstance(valor, str) else ""
+
+
 class RegistroForm(FlaskForm):
     nombres = StringField(
         "Nombres",
+        filters=[_limpiar_texto],
         validators=[
             DataRequired(message="Ingresa tus nombres."),
             Length(min=2, max=100, message="Los nombres deben tener entre 2 y 100 caracteres."),
@@ -15,6 +24,7 @@ class RegistroForm(FlaskForm):
     )
     apellidos = StringField(
         "Apellidos",
+        filters=[_limpiar_texto],
         validators=[
             DataRequired(message="Ingresa tus apellidos."),
             Length(min=2, max=100, message="Los apellidos deben tener entre 2 y 100 caracteres."),
@@ -22,6 +32,7 @@ class RegistroForm(FlaskForm):
     )
     correo = EmailField(
         "Correo electrónico",
+        filters=[_limpiar_correo],
         validators=[
             DataRequired(message="Ingresa tu correo electrónico."),
             Email(message="Ingresa un correo electrónico válido."),
@@ -52,6 +63,7 @@ class RegistroForm(FlaskForm):
 class LoginForm(FlaskForm):
     correo = EmailField(
         "Correo electrónico",
+        filters=[_limpiar_correo],
         validators=[
             DataRequired(message="Ingresa tu correo electrónico."),
             Email(message="Ingresa un correo electrónico válido."),

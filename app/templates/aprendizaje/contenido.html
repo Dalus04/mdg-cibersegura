@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}{{ contenido.titulo }} · {{ tema.titulo }} · MDG Cibersegura{% endblock %}
+
+{% block content %}
+  <nav aria-label="Ruta de navegación">
+    <ol class="migas">
+      <li><a href="{{ url_for('main.index') }}">Inicio</a></li>
+      <li><a href="{{ url_for('aprendizaje.lista_temas') }}">Temas educativos</a></li>
+      <li><a href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">{{ tema.titulo }}</a></li>
+      <li aria-current="page">{{ contenido.titulo }}</li>
+    </ol>
+  </nav>
+
+  <article class="leccion-lectura">
+    <header class="encabezado-leccion">
+      <div class="metadatos-leccion">
+        <span class="etiqueta-tema">{{ tema.titulo }}</span>
+        <span class="contador-leccion">Lección {{ indice }} de {{ total_lecciones }}</span>
+      </div>
+      <h1>{{ contenido.titulo }}</h1>
+    </header>
+
+    <div class="cuerpo-leccion">
+      {% for parrafo in parrafos %}
+        <p class="parrafo-leccion">{{ parrafo }}</p>
+      {% endfor %}
+    </div>
+
+    <nav class="navegacion-lecciones" aria-label="Navegación entre lecciones">
+      <div class="control-navegacion anterior">
+        {% if anterior %}
+          <a class="boton-nav" href="{{ url_for('aprendizaje.ver_contenido', id_tema=tema.id_tema, id_contenido=anterior.id_contenido) }}" rel="prev">
+            <span class="direccion" aria-hidden="true">← Anterior</span>
+            <span class="titulo-nav">{{ anterior.titulo }}</span>
+          </a>
+        {% endif %}
+      </div>
+
+      <div class="control-navegacion indice">
+        <a class="enlace-indice" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
+          Índice del tema
+        </a>
+      </div>
+
+      <div class="control-navegacion siguiente">
+        {% if siguiente %}
+          <a class="boton-nav" href="{{ url_for('aprendizaje.ver_contenido', id_tema=tema.id_tema, id_contenido=siguiente.id_contenido) }}" rel="next">
+            <span class="direccion" aria-hidden="true">Siguiente →</span>
+            <span class="titulo-nav">{{ siguiente.titulo }}</span>
+          </a>
+        {% else %}
+          <div class="caja-fin-tema">
+            <p><strong>¡Has completado todas las lecciones de este tema!</strong></p>
+            <a class="enlace-accion" href="{{ url_for('aprendizaje.lista_temas') }}">Explorar más temas</a>
+          </div>
+        {% endif %}
+      </div>
+    </nav>
+  </article>
+{% endblock %}

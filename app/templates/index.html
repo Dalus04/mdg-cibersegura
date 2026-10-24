@@ -3,15 +3,38 @@
 {% block title %}Inicio · MDG Cibersegura{% endblock %}
 
 {% block content %}
-  <h1>MDG Cibersegura</h1>
-  {% if current_user.is_authenticated %}
-    <p>Sesión iniciada como {{ current_user.nombres }} {{ current_user.apellidos }} ({{ current_user.correo }}).</p>
-  {% else %}
-    <p>Plataforma educativa de ciberseguridad de la Municipalidad Distrital de Guadalupe.</p>
-    <p>
-      <a href="{{ url_for('auth.registro') }}">Crear cuenta</a>
-      o
-      <a href="{{ url_for('auth.login') }}">iniciar sesión</a>.
+  <header class="hero-inicio">
+    <h1>MDG Cibersegura</h1>
+    <p class="subtitulo-inicio">
+      Plataforma educativa de capacitación en ciberseguridad para la ciudadanía de la Municipalidad Distrital de Guadalupe.
     </p>
+  </header>
+
+  {% if current_user.is_authenticated %}
+    <section class="tarjeta-bienvenida" aria-labelledby="bienvenida-titulo">
+      <h2 id="bienvenida-titulo">¡Hola, {{ current_user.nombres }}!</h2>
+      <p>Sesión iniciada como {{ current_user.nombres }} {{ current_user.apellidos }} ({{ current_user.correo }}). Puedes acceder a todas las lecciones y recursos formativos.</p>
+      <p>
+        <a class="enlace-accion" href="{{ url_for('aprendizaje.lista_temas') }}">
+          Explorar temas educativos →
+        </a>
+      </p>
+    </section>
+  {% else %}
+    <section class="tarjeta-bienvenida" aria-labelledby="bienvenida-titulo">
+      <h2 id="bienvenida-titulo">Aprende a protegerte en el entorno digital</h2>
+      <p>
+        Aprende sobre contraseñas seguras, detección de enlaces fraudulentos (phishing),
+        protección de tus datos personales y navegación segura en internet.
+      </p>
+      <p class="acciones-inicio">
+        <a class="enlace-accion" href="{{ url_for('aprendizaje.lista_temas') }}">
+          Explorar temas educativos →
+        </a>
+        <a class="enlace-secundario" href="{{ url_for('auth.registro') }}">
+          Crear una cuenta
+        </a>
+      </p>
+    </section>
   {% endif %}
 {% endblock %}

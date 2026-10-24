@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}{{ tema.titulo }} · MDG Cibersegura{% endblock %}
+
+{% block content %}
+  <nav aria-label="Ruta de navegación">
+    <ol class="migas">
+      <li><a href="{{ url_for('main.index') }}">Inicio</a></li>
+      <li><a href="{{ url_for('aprendizaje.lista_temas') }}">Temas educativos</a></li>
+      <li aria-current="page">{{ tema.titulo }}</li>
+    </ol>
+  </nav>
+
+  <article class="tema-detalle">
+    <header class="encabezado-tema">
+      <span class="etiqueta-orden">Tema {{ tema.orden }}</span>
+      <h1>{{ tema.titulo }}</h1>
+      {% if tema.descripcion %}
+        <p class="introduccion-tema">{{ tema.descripcion }}</p>
+      {% endif %}
+    </header>
+
+    <section aria-labelledby="titulo-lecciones">
+      <h2 id="titulo-lecciones">Lecciones del tema</h2>
+
+      {% if contenidos %}
+        <ol class="lista-lecciones">
+          {% for contenido in contenidos %}
+            <li class="item-leccion">
+              <div class="info-leccion">
+                <span class="orden-leccion" aria-hidden="true">{{ loop.index }}</span>
+                <div class="cuerpo-item-leccion">
+                  <h3>
+                    <a href="{{ url_for('aprendizaje.ver_contenido', id_tema=tema.id_tema, id_contenido=contenido.id_contenido) }}">
+                      {{ contenido.titulo }}
+                    </a>
+                  </h3>
+                </div>
+              </div>
+              <a class="enlace-accion" href="{{ url_for('aprendizaje.ver_contenido', id_tema=tema.id_tema, id_contenido=contenido.id_contenido) }}">
+                Leer lección
+              </a>
+            </li>
+          {% endfor %}
+        </ol>
+      {% else %}
+        <p>No hay lecciones publicadas para este tema todavía.</p>
+      {% endif %}
+    </section>
+
+    <footer class="pie-navegacion-tema">
+      <p>
+        <a class="enlace-secundario" href="{{ url_for('aprendizaje.lista_temas') }}">
+          ← Volver a todos los temas
+        </a>
+      </p>
+    </footer>
+  </article>
+{% endblock %}

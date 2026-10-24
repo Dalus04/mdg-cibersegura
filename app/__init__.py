@@ -27,16 +27,20 @@ def create_app(config_class=Config) -> Flask:
         return db.session.get(Usuario, int(user_id))
 
     from app.routes import main_bp
+    from app.routes.aprendizaje import aprendizaje_bp
     from app.routes.auth import auth_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(aprendizaje_bp)
 
     with app.app_context():
         from app import models  # noqa: F401
+        from app.seeds import seed_contenidos_iniciales
 
         db.create_all()
         _seed_roles()
+        seed_contenidos_iniciales()
 
     return app
 

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Temas educativos · MDG Cibersegura{% endblock %}
+
+{% block content %}
+  <nav aria-label="Ruta de navegación">
+    <ol class="migas">
+      <li><a href="{{ url_for('main.index') }}">Inicio</a></li>
+      <li aria-current="page">Temas educativos</li>
+    </ol>
+  </nav>
+
+  <header class="encabezado-seccion">
+    <h1>Temas educativos de ciberseguridad</h1>
+    <p>
+      Explora los módulos formativos diseñados para fortalecer tus habilidades de protección digital. 
+      Selecciona un tema para acceder a sus lecciones explicativas.
+    </p>
+  </header>
+
+  <section aria-labelledby="titulo-catalogo">
+    <h2 id="titulo-catalogo" class="sr-only">Catálogo de módulos disponibles</h2>
+
+    <div class="grid-temas">
+      {% for tema in temas %}
+        <article class="tarjeta-tema">
+          <header>
+            <span class="etiqueta-orden">Tema {{ tema.orden }}</span>
+            <h2>
+              <a href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
+                {{ tema.titulo }}
+              </a>
+            </h2>
+          </header>
+          <p class="descripcion-tema">{{ tema.descripcion }}</p>
+          <footer class="pie-tarjeta">
+            {% set total = tema.contenidos|selectattr("estado", "equalto", "publicado")|list|length %}
+            <span class="indicador-lecciones">{{ total }} {{ 'lección' if total == 1 else 'lecciones' }}</span>
+            <a class="enlace-accion" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
+              Explorar lecciones
+            </a>
+          </footer>
+        </article>
+      {% else %}
+        <p>Aún no hay temas educativos disponibles.</p>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}
