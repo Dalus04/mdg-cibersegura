@@ -202,3 +202,48 @@ def seed_contenidos_iniciales() -> None:
                 db.session.add(contenido)
 
     db.session.commit()
+
+
+USUARIOS_INICIALES = [
+    {
+        "nombres": "Administrador",
+        "apellidos": "Municipal",
+        "correo": "admin@guadalupe.gob.pe",
+        "password": "Admin1234!",
+        "rol_nombre": "administrador",
+    },
+    {
+        "nombres": "Ciudadano",
+        "apellidos": "Ejemplo",
+        "correo": "ciudadano@ejemplo.com",
+        "password": "Ciudadano123!",
+        "rol_nombre": "ciudadano",
+    },
+]
+
+
+def seed_usuarios_iniciales() -> None:
+    """Inserta usuarios semilla para cada rol de forma idempotente."""
+    from app.models import Rol, Usuario
+
+    roles = {rol.nombre: rol for rol in db.session.scalars(select(Rol)).all()}
+
+    for data in USUARIOS_INICIALES:
+        correo_norm = Usuario.normalizar_correo(data["correo"])
+        usuario = db.session.scalar(
+            select(Usuario).where(Usuario.correo == correo_norm)
+        )
+        if usuario is None:
+            rol = roles.get(data["rol_nombre"])
+            if rol:
+                nuevo_usuario = Usuario(
+                    id_rol=rol.id_rol,
+                    nombres=data["nombres"],
+                    apellidos=data["apellidos"],
+                    correo=correo_norm,
+                    estado="activo",
+                )
+                nuevo_usuario.set_password(data["password"])
+                db.session.add(nuevo_usuario)
+
+    db.session.commit()

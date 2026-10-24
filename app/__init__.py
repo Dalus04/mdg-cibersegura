@@ -36,11 +36,12 @@ def create_app(config_class=Config) -> Flask:
 
     with app.app_context():
         from app import models  # noqa: F401
-        from app.seeds import seed_contenidos_iniciales
+        from app.seeds import seed_contenidos_iniciales, seed_usuarios_iniciales
 
         db.create_all()
         _seed_roles()
         seed_contenidos_iniciales()
+        seed_usuarios_iniciales()
 
     return app
 

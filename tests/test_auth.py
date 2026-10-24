@@ -244,3 +244,27 @@ def test_proteccion_csrf_bloquea_post_sin_token(client_with_csrf):
     )
     assert response.status_code == 400
     assert "CSRF" in response.get_data(as_text=True)
+
+
+def test_login_usuario_semilla_administrador(client):
+    response = client.post(
+        "/login",
+        data={"correo": "admin@guadalupe.gob.pe", "contrasena": "Admin1234!"},
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "Bienvenido o bienvenida, Administrador." in html
+    assert "admin@guadalupe.gob.pe" in html
+
+
+def test_login_usuario_semilla_ciudadano(client):
+    response = client.post(
+        "/login",
+        data={"correo": "ciudadano@ejemplo.com", "contrasena": "Ciudadano123!"},
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "Bienvenido o bienvenida, Ciudadano." in html
+    assert "ciudadano@ejemplo.com" in html
