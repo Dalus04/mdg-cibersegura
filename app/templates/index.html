@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio · MDG Cibersegura{% endblock %}
+
+{% block content %}
+  <h1>MDG Cibersegura</h1>
+  {% if current_user.is_authenticated %}
+    <p>Sesión iniciada como {{ current_user.nombres }} {{ current_user.apellidos }} ({{ current_user.correo }}).</p>
+  {% else %}
+    <p>Plataforma educativa de ciberseguridad de la Municipalidad Distrital de Guadalupe.</p>
+    <p>
+      <a href="{{ url_for('auth.registro') }}">Crear cuenta</a>
+      o
+      <a href="{{ url_for('auth.login') }}">iniciar sesión</a>.
+    </p>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,13 @@
+{% macro campo(field, autocomplete="") %}
+  <div class="campo">
+    {{ field.label }}
+    {% if field.errors %}
+      {{ field(autocomplete=autocomplete, aria_invalid="true", aria_describedby=field.id ~ "-error") }}
+      <p class="error-campo" id="{{ field.id }}-error" role="alert">
+        {{ field.errors[0] }}
+      </p>
+    {% else %}
+      {{ field(autocomplete=autocomplete, aria_invalid="false") }}
+    {% endif %}
+  </div>
+{% endmacro %}
