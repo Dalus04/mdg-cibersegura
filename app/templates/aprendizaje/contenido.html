@@ -19,6 +19,13 @@
         <span class="contador-leccion">Lección {{ indice }} de {{ total_lecciones }}</span>
       </div>
       <h1>{{ contenido.titulo }}</h1>
+      <div class="contenedor-banner-leccion">
+        <img 
+          src="{{ url_for('static', filename='img/tema-' ~ tema.orden ~ '.jpg') }}" 
+          alt="Ilustración formativa de {{ tema.titulo }}" 
+          class="imagen-banner-leccion"
+        >
+      </div>
     </header>
 
     <div class="cuerpo-leccion">

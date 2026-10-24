@@ -12,15 +12,24 @@
   </nav>
 
   <article class="tema-detalle">
-    <header class="encabezado-tema">
-      <span class="etiqueta-orden">Tema {{ tema.orden }}</span>
-      <h1>{{ tema.titulo }}</h1>
-      {% if tema.descripcion %}
-        <p class="introduccion-tema">{{ tema.descripcion }}</p>
-      {% endif %}
+    <header class="encabezado-tema-hero">
+      <div class="texto-encabezado-tema">
+        <span class="etiqueta-orden">Tema {{ tema.orden }}</span>
+        <h1>{{ tema.titulo }}</h1>
+        {% if tema.descripcion %}
+          <p class="introduccion-tema">{{ tema.descripcion }}</p>
+        {% endif %}
+      </div>
+      <div class="grafico-encabezado-tema">
+        <img 
+          src="{{ url_for('static', filename='img/tema-' ~ tema.orden ~ '.jpg') }}" 
+          alt="Ilustración temática sobre {{ tema.titulo }}" 
+          class="imagen-banner-tema"
+        >
+      </div>
     </header>
 
-    <section aria-labelledby="titulo-lecciones">
+    <section aria-labelledby="titulo-lecciones" class="seccion-lecciones-tema">
       <h2 id="titulo-lecciones">Lecciones del tema</h2>
 
       {% if contenidos %}

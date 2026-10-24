@@ -11,9 +11,10 @@
   </nav>
 
   <header class="encabezado-seccion">
+    <span class="insignia-institucional">Plan formativo ciudadano</span>
     <h1>Temas educativos de ciberseguridad</h1>
-    <p>
-      Explora los módulos formativos diseñados para fortalecer tus habilidades de protección digital. 
+    <p class="descripcion-seccion">
+      Explora los módulos formativos diseñados por la Municipalidad Distrital de Guadalupe para fortalecer tus habilidades de protección digital. 
       Selecciona un tema para acceder a sus lecciones explicativas.
     </p>
   </header>
@@ -24,22 +25,32 @@
     <div class="grid-temas">
       {% for tema in temas %}
         <article class="tarjeta-tema">
-          <header>
-            <span class="etiqueta-orden">Tema {{ tema.orden }}</span>
-            <h2>
-              <a href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
-                {{ tema.titulo }}
+          <div class="contenedor-imagen-tema">
+            <img 
+              src="{{ url_for('static', filename='img/tema-' ~ tema.orden ~ '.jpg') }}" 
+              alt="Ilustración representativa de {{ tema.titulo }}" 
+              class="imagen-tarjeta-tema"
+              loading="lazy"
+            >
+          </div>
+          <div class="cuerpo-tarjeta-tema">
+            <header>
+              <span class="etiqueta-orden">Tema {{ tema.orden }}</span>
+              <h2>
+                <a href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
+                  {{ tema.titulo }}
+                </a>
+              </h2>
+            </header>
+            <p class="descripcion-tema">{{ tema.descripcion }}</p>
+            <footer class="pie-tarjeta">
+              {% set total = tema.contenidos|selectattr("estado", "equalto", "publicado")|list|length %}
+              <span class="indicador-lecciones">{{ total }} {{ 'lección' if total == 1 else 'lecciones' }}</span>
+              <a class="enlace-accion" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
+                Explorar lecciones
               </a>
-            </h2>
-          </header>
-          <p class="descripcion-tema">{{ tema.descripcion }}</p>
-          <footer class="pie-tarjeta">
-            {% set total = tema.contenidos|selectattr("estado", "equalto", "publicado")|list|length %}
-            <span class="indicador-lecciones">{{ total }} {{ 'lección' if total == 1 else 'lecciones' }}</span>
-            <a class="enlace-accion" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
-              Explorar lecciones
-            </a>
-          </footer>
+            </footer>
+          </div>
         </article>
       {% else %}
         <p>Aún no hay temas educativos disponibles.</p>
