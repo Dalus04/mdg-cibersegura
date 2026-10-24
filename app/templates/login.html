@@ -4,13 +4,22 @@
 {% block title %}Iniciar sesión · MDG Cibersegura{% endblock %}
 
 {% block content %}
-  <h1>Iniciar sesión</h1>
-  <p>Ingresa con el correo y la contraseña de tu cuenta de ciudadano.</p>
-  <form method="post" novalidate>
-    {{ form.hidden_tag() }}
-    {{ campo(form.correo, "username") }}
-    {{ campo(form.contrasena, "current-password") }}
-    <p>{{ form.enviar }}</p>
-  </form>
-  <p>¿No tienes cuenta? <a href="{{ url_for('auth.registro') }}">Regístrate</a>.</p>
+  <div class="contenedor-formulario-auth">
+    <div class="tarjeta-formulario">
+      <header class="encabezado-formulario">
+        <span class="insignia-institucional">Acceso ciudadano</span>
+        <h1>Iniciar sesión</h1>
+        <p>Ingresa con el correo y la contraseña de tu cuenta de ciudadano.</p>
+      </header>
+      <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+        {{ campo(form.correo, "username") }}
+        {{ campo(form.contrasena, "current-password") }}
+        <p class="fila-submit">{{ form.enviar }}</p>
+      </form>
+      <footer class="pie-formulario">
+        <p>¿No tienes cuenta? <a href="{{ url_for('auth.registro') }}">Regístrate</a>.</p>
+      </footer>
+    </div>
+  </div>
 {% endblock %}

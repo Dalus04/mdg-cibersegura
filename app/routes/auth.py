@@ -1,4 +1,6 @@
-from flask import Blueprint, flash, redirect, render_template, url_for
+from urllib.parse import urlsplit
+
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
 from app.forms import LoginForm, RegistroForm
@@ -8,6 +10,13 @@ auth_bp = Blueprint("auth", __name__)
 
 MENSAJE_CREDENCIALES = "Correo o contraseña incorrectos."
 MENSAJE_CUENTA_INACTIVA = "Tu cuenta no está activa. Contacta a la administración."
+
+
+def _es_url_segura(target: str | None) -> bool:
+    if not target:
+        return False
+    url = urlsplit(target)
+    return not url.netloc and url.path.startswith("/") and not url.path.startswith("//")
 
 
 @auth_bp.route("/registro", methods=["GET", "POST"])
@@ -43,6 +52,9 @@ def login():
             flash(MENSAJE_CUENTA_INACTIVA, "error")
         elif login_user(usuario):
             flash(f"Bienvenido o bienvenida, {usuario.nombres}.", "exito")
+            next_page = request.args.get("next")
+            if _es_url_segura(next_page):
+                return redirect(next_page)
             return redirect(url_for("main.index"))
         else:
             flash(MENSAJE_CREDENCIALES, "error")
