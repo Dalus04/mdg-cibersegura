@@ -164,6 +164,192 @@ DATOS_TEMAS_INICIALES = [
             },
         ],
     },
+  sergio
+    {
+        "titulo": "Seguridad en Compras Online y Billeteras Digitales (Yape/Plin)",
+        "descripcion": (
+            "Aprende a verificar tiendas virtuales, evitar comprobantes falsos en billeteras digitales y proteger tus tarjetas bancarias."
+        ),
+        "orden": 5,
+        "contenidos": [
+            {
+                "titulo": "Prevención de capturas y comprobantes falsos en Yape y Plin",
+                "orden": 1,
+                "contenido": (
+                    "Las billeteras digitales son muy populares en comercios locales, pero los delincuentes suelen utilizar aplicaciones simuladoras o capturas modadas para fingir pagos.\n\n"
+                    "Regla de oro: Nunca te confíes de la imagen que te muestra el comprador en su celular. Revisa siempre el saldo y la notificación directamente en tu propia aplicación oficial antes de entregar un producto o servicio.\n\n"
+                    "Desconfía de supuestos mensajes de texto (SMS) o correos que afirman que recibiste un abono."
+                ),
+            },
+            {
+                "titulo": "Verificación de tiendas virtuales y compras seguras",
+                "orden": 2,
+                "contenido": (
+                    "Antes de realizar una compra por internet o redes sociales:\n\n"
+                    "1. Verifica que la página web tenga el candado de seguridad (HTTPS) y una dirección URL correcta.\n"
+                    "2. Investiga la reputación del vendedor, comentarios de otros usuarios y la antigüedad de la página.\n"
+                    "3. Desconfía de precios exageradamente bajos u 'ofertas relámpago' que te presionen a transferir dinero rápidamente."
+                ),
+            },
+            {
+                "titulo": "Uso seguro de tarjetas de débito y crédito",
+                "orden": 3,
+                "contenido": (
+                    "Para evitar la clonación o compras no autorizadas:\n\n"
+                    "- Utiliza tarjetas virtuales con límite diario o tarjetas de crédito antes que la tarjeta de débito donde guardas tus ahorros principales.\n"
+                    "- En tiendas físicas, jamás pierdas de vista tu tarjeta ni entregues el código CVV (los 3 dígitos al reverso).\n"
+                    "- Activa en la aplicación de tu banco la opción de requerir clave o huella para compras por internet."
+                ),
+            },
+            {
+                "titulo": "Qué hacer si fuiste víctima de un fraude en línea",
+                "orden": 4,
+                "contenido": (
+                    "Si realizaste un pago y no recibiste el producto o sospechas de una estafa:\n\n"
+                    "1. Bloquea tu tarjeta o cuenta bancaria inmediatamente desde la app de tu banco o por vía telefónica.\n"
+                    "2. Guarda todas las evidencias: capturas de chat, números de teléfono, vouchers y enlaces.\n"
+                    "3. Presenta la denuncia correspondiente ante la Policía Nacional (Divindat) o la comisaría de tu distrito."
+                ),
+            },
+        ],
+    },
+    {
+        "titulo": "Ingeniería Social y Llamadas Extorsivas",
+        "descripcion": (
+            "Estrategias para identificar manipulación psicológica, responder ante llamadas de extorsión y evitar engaños por mensajes."
+        ),
+        "orden": 6,
+        "contenidos": [
+            {
+                "titulo": "Análisis de la ingeniería social y la manipulación psicológica",
+                "orden": 1,
+                "contenido": (
+                    "La ingeniería social es la técnica de manipular a las personas para que entreguen voluntariamente información confidencial o dinero.\n\n"
+                    "Los atacantes utilizan dos emociones principales: el MIEDO (miedo a perder una cuenta, ser detenido) y la CODICIA (ganar un premio fácil o un bono del estado).\n\n"
+                    "Si un mensaje o llamada te genera pánico o mucha emoción, detente a pensar antes de actuar."
+                ),
+            },
+            {
+                "titulo": "Protocolo frente a llamadas extorsivas y falsas emergencias (Vishing)",
+                "orden": 2,
+                "contenido": (
+                    "Las llamadas extorsivas buscan perturbar tu tranquilidad con gritos o falsas acusaciones.\n\n"
+                    "Pasos de acción inmediata:\n"
+                    "1. MANTÉN LA CALMA y no entregues nombres de familiares ni información personal.\n"
+                    "2. CUELGA DE INMEDIATO. No entables discusión con el extorsionador.\n"
+                    "3. VERIFICA la situación llamando directamente al familiar presuntamente afectado o al banco correspondiente."
+                ),
+            },
+            {
+                "titulo": "Mensajes engañosos por SMS y WhatsApp (Smishing)",
+                "orden": 3,
+                "contenido": (
+                    "Los delincuentes envían mensajes masivos anunciando 'paquetes retenidos', 'bonos del gobierno' o 'cuentas suspendidas'.\n\n"
+                    "Recomendaciones clave:\n"
+                    "- Nunca hagas clic en enlaces acortados o sospechosos.\n"
+                    "- Las entidades oficiales y bancos nunca solicitan contraseñas o claves dinámicas por WhatsApp o SMS.\n"
+                    "- Bloquea y reporta el número sospechoso."
+                ),
+            },
+            {
+                "titulo": "Medidas de seguridad en WhatsApp y canales de comunicación",
+                "orden": 4,
+                "contenido": (
+                    "Para evitar que secuestren tu cuenta de WhatsApp y suplanten tu identidad:\n\n"
+                    "1. Activa la 'Verificación en dos pasos' desde los ajustes de la aplicación e ingresa un PIN de 6 dígitos.\n"
+                    "2. Configura tu foto de perfil para que solo sea visible por tus contactos guardados.\n"
+                    "3. Jamás compartas el código de 6 dígitos que te llega por SMS al intentar registrar la app."
+                ),
+            },
+        ],
+    },
+    {
+        "titulo": "Uso Seguro de Inteligencia Artificial y Deepfakes",
+        "descripcion": (
+            "Comprende los riesgos de la clonación de voz, generación de contenidos falsos y cómo proteger tu privacidad al usar herramientas de IA."
+        ),
+        "orden": 7,
+        "contenidos": [
+            {
+                "titulo": "Clonación de voz y videos falsos (Deepfakes)",
+                "orden": 1,
+                "contenido": (
+                    "Hoy en día, herramientas de Inteligencia Artificial pueden clonar la voz de una persona con solo unos segundos de audio extraídos de sus redes sociales.\n\n"
+                    "Cómo detectarlo:\n"
+                    "- Escucha con atención: las voces clonadas a veces carecen de pausas naturales de respiración o entonación emocional adecuada.\n"
+                    "- En videollamadas, observa si hay parpadeos anormales, bordes borrosos alrededor del rostro o descoordinación al hablar."
+                ),
+            },
+            {
+                "titulo": "Creación de un 'Código Familiar' para emergencias",
+                "orden": 2,
+                "contenido": (
+                    "Ante la amenaza de la clonación de voz por IA, la mejor defensa comunitaria es la prevención familiar.\n\n"
+                    "Acuerda con tu familia una 'Palabra Clave' o frase secreta que solo ustedes conozcan. Si alguien llama afirmando ser un familiar en apuros, pídeles que te diga la palabra clave para validar su identidad."
+                ),
+            },
+            {
+                "titulo": "Privacidad de datos personales al usar chatbots e IA",
+                "orden": 3,
+                "contenido": (
+                    "Al utilizar chatbots o generadores de texto e imágenes en línea:\n\n"
+                    "1. Evita ingresar nombres completos, números de DNI, dirección, fotos privadas o documentos institucionales.\n"
+                    "2. Las conversaciones en plataformas públicas pueden ser almacenadas y utilizadas para entrenar futuros modelos.\n"
+                    "3. Revisa los términos de privacidad antes de subir fotografías a aplicaciones de retoque por IA."
+                ),
+            },
+            {
+                "titulo": "Verificación de noticias falsas y contenidos manipulados por IA",
+                "orden": 4,
+                "contenido": (
+                    "La IA facilita la creación rápida de noticias o comunicados falsos atribuibles a autoridades o instituciones.\n\n"
+                    "- No reenvíes información alarmista sin antes consultar las fuentes u canales oficiales de la Municipalidad u organismo correspondiente.\n"
+                    "- Utiliza herramientas de búsqueda inversa de imágenes para verificar si una foto es real o generada por computadora."
+                ),
+            },
+        ],
+    },
+    {
+        "titulo": "Seguridad Familiar y Control Parental",
+        "descripcion": (
+            "Guía práctica para proteger a niños, adolescentes y adultos mayores en el entorno digital, configurando filtros y acompañamiento."
+        ),
+        "orden": 8,
+        "contenidos": [
+            {
+                "titulo": "Protección de niños y adolescentes frente a riesgos en línea",
+                "orden": 1,
+                "contenido": (
+                    "Los menores están expuestos a ciberbullying, exposición a contenidos no aptos y acoso por parte de adultos (Grooming).\n\n"
+                    "Buenas prácticas de prevención:\n"
+                    "- Fomenta la confianza para que te cuenten sobre sus interacciones y amistades virtuales.\n"
+                    "- Enseña a los niños a nunca compartir fotos vistiendo el uniforme escolar, su ubicación en tiempo real ni datos del hogar."
+                ),
+            },
+            {
+                "titulo": "Herramientas de Control Parental y gestión de tiempo",
+                "orden": 2,
+                "contenido": (
+                    "Configurar límites en los dispositivos de los niños ayuda a mantener un uso equilibrado y seguro:\n\n"
+                    "1. Utiliza aplicaciones gratuitas como Google Family Link para gestionar el tiempo de pantalla y aprobar descargas.\n"
+                    "2. Activa el 'Modo Restringido' o 'Búsqueda Segura' (SafeSearch) en Google y YouTube.\n"
+                    "3. Mantén las computadoras y consolas en áreas comunes de la casa."
+                ),
+            },
+            {
+                "titulo": "Acompañamiento y alfabetización digital para adultos mayores",
+                "orden": 3,
+                "contenido": (
+                    "Los adultos mayores son un blanco frecuente para estafadores por su menor familiaridad con la tecnología.\n\n"
+                    "Estrategias de apoyo:\n"
+                    "- Configura la autenticación en dos pasos en sus correos y redes sociales.\n"
+                    "- Explícales detenidamente que ningún banco solicitará sus claves secretas o token por llamada telefónica.\n"
+                    "- Ayúdales a identificar mensajes fraudulentos antes de que realicen cualquier clic o llamada."
+                ),
+            },
+        ],
+    },
+main
 ]
 
 
