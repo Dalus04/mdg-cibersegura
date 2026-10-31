@@ -1,0 +1,185 @@
+/* ==========================================================================
+   03-LAYOUT / LAYOUT.CSS
+   Estructura general de la plataforma: Contenedores, Cabecera, Navegación,
+   Migas de pan y Pie de página institucional.
+   ========================================================================== */
+
+/* Contenedor principal responsive con amplitud */
+.contenedor {
+  width: 100%;
+  max-width: var(--ancho-maximo);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.contenido-principal {
+  flex: 1;
+  padding-top: 2rem;
+  padding-bottom: 3.5rem;
+}
+
+/* Cabecera Institucional */
+.cabecera-principal {
+  background: #ffffff;
+  border-bottom: 2px solid var(--borde);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.contenedor-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-top: 0.85rem;
+  padding-bottom: 0.85rem;
+}
+
+.identidad-marca .marca {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.identidad-marca .marca a {
+  color: var(--enlace);
+  text-decoration: none;
+}
+
+.subtitulo-institucional {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--texto-secundario);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+
+.nav-principal ul {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-principal a {
+  font-weight: 600;
+  text-decoration: none;
+  color: #334155;
+  padding: 0.45rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.nav-principal a:hover,
+.nav-principal a:focus {
+  color: var(--enlace);
+  background: #eef4fb;
+}
+
+.boton-nav-registro {
+  background: var(--enlace) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--enlace);
+}
+
+.boton-nav-registro:hover,
+.boton-nav-registro:focus {
+  background: var(--enlace-hover) !important;
+  color: #ffffff !important;
+}
+
+.form-logout {
+  display: inline;
+}
+
+.boton-logout {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.boton-logout:hover,
+.boton-logout:focus {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* Migas de pan accesibles */
+.migas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  font-size: 0.9rem;
+  color: var(--texto-secundario);
+}
+
+.migas li:not(:last-child)::after {
+  content: "›";
+  margin-left: 0.5rem;
+  color: #94a3b8;
+  font-weight: bold;
+}
+
+.migas [aria-current="page"] {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* Pie de página institucional */
+.pie-principal {
+  background: #ffffff;
+  border-top: 1px solid var(--borde);
+  margin-top: auto;
+  padding: 2.5rem 0 1.75rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.contenedor-pie {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.info-pie p {
+  margin: 0 0 0.35rem;
+}
+
+.pie-institucion {
+  color: #0f172a;
+  font-size: 0.98rem;
+}
+
+.pie-descripcion {
+  font-size: 0.85rem;
+  color: #64748b;
+  max-width: 32rem;
+}
+
+.pie-creditos {
+  font-size: 0.85rem;
+}
