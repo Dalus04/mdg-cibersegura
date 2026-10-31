@@ -8,26 +8,33 @@
   </head>
   <body>
     <a class="saltar-contenido" href="#contenido-principal">Saltar al contenido</a>
-    <header>
-      <p class="marca"><a href="{{ url_for('main.index') }}">MDG Cibersegura</a></p>
-      <nav aria-label="Principal">
-        <ul>
-          <li><a href="{{ url_for('main.index') }}">Inicio</a></li>
-          {% if current_user.is_authenticated %}
-            <li>
-              <form action="{{ url_for('auth.logout') }}" method="post">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit">Cerrar sesión</button>
-              </form>
-            </li>
-          {% else %}
-            <li><a href="{{ url_for('auth.login') }}">Iniciar sesión</a></li>
-            <li><a href="{{ url_for('auth.registro') }}">Registrarse</a></li>
-          {% endif %}
-        </ul>
-      </nav>
+    <header class="cabecera-principal">
+      <div class="contenedor contenedor-cabecera">
+        <div class="identidad-marca">
+          <p class="marca"><a href="{{ url_for('main.index') }}">MDG Cibersegura</a></p>
+          <span class="subtitulo-institucional">Municipalidad Distrital de Guadalupe</span>
+        </div>
+        <nav aria-label="Principal" class="nav-principal">
+          <ul>
+            <li><a href="{{ url_for('main.index') }}">Inicio</a></li>
+            <li><a href="{{ url_for('aprendizaje.lista_temas') }}">Temas educativos</a></li>
+            {% if current_user.is_authenticated %}
+              <li>
+                <form action="{{ url_for('auth.logout') }}" method="post" class="form-logout">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="boton-logout">Cerrar sesión</button>
+                </form>
+              </li>
+            {% else %}
+              <li><a href="{{ url_for('auth.login') }}">Iniciar sesión</a></li>
+              <li><a href="{{ url_for('auth.registro') }}" class="boton-nav-registro">Registrarse</a></li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
     </header>
-    <main id="contenido-principal">
+
+    <main id="contenido-principal" class="contenedor contenido-principal">
       {% with mensajes = get_flashed_messages(with_categories=true) %}
         {% if mensajes %}
           <ul class="mensajes" aria-live="polite">
@@ -39,5 +46,18 @@
       {% endwith %}
       {% block content %}{% endblock %}
     </main>
+
+    <footer class="pie-principal">
+      <div class="contenedor contenedor-pie">
+        <div class="info-pie">
+          <p class="pie-institucion"><strong>Municipalidad Distrital de Guadalupe</strong></p>
+          <p class="pie-area">Subgerencia de Informática y Tecnologías de la Información</p>
+          <p class="pie-descripcion">Plataforma educativa orientada a fortalecer las competencias de la ciudadanía en ciberseguridad.</p>
+        </div>
+        <div class="pie-creditos">
+          <p>&copy; 2026 MDG Cibersegura · Guadalupe, Pacasmayo, La Libertad.</p>
+        </div>
+      </div>
+    </footer>
   </body>
 </html>

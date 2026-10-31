@@ -4,16 +4,25 @@
 {% block title %}Registro · MDG Cibersegura{% endblock %}
 
 {% block content %}
-  <h1>Crear cuenta</h1>
-  <p>Regístrate para acceder a los contenidos educativos de ciberseguridad.</p>
-  <form method="post" novalidate>
-    {{ form.hidden_tag() }}
-    {{ campo(form.nombres, "given-name") }}
-    {{ campo(form.apellidos, "family-name") }}
-    {{ campo(form.correo, "email") }}
-    {{ campo(form.contrasena, "new-password") }}
-    {{ campo(form.confirmar_contrasena, "new-password") }}
-    <p>{{ form.enviar }}</p>
-  </form>
-  <p>¿Ya tienes cuenta? <a href="{{ url_for('auth.login') }}">Inicia sesión</a>.</p>
+  <div class="contenedor-formulario-auth">
+    <div class="tarjeta-formulario">
+      <header class="encabezado-formulario">
+        <span class="insignia-institucional">Nueva cuenta</span>
+        <h1>Crear cuenta</h1>
+        <p>Regístrate para acceder a los contenidos educativos de ciberseguridad.</p>
+      </header>
+      <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+        {{ campo(form.nombres, "given-name") }}
+        {{ campo(form.apellidos, "family-name") }}
+        {{ campo(form.correo, "email") }}
+        {{ campo(form.contrasena, "new-password") }}
+        {{ campo(form.confirmar_contrasena, "new-password") }}
+        <p class="fila-submit">{{ form.enviar }}</p>
+      </form>
+      <footer class="pie-formulario">
+        <p>¿Ya tienes cuenta? <a href="{{ url_for('auth.login') }}">Inicia sesión</a>.</p>
+      </footer>
+    </div>
+  </div>
 {% endblock %}
