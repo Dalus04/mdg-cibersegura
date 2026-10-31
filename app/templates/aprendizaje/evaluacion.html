@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}{{ evaluacion.titulo }} · {{ tema.titulo }} · MDG Cibersegura{% endblock %}
+
+{% block content %}
+  <nav aria-label="Ruta de navegación">
+    <ol class="migas">
+      <li><a href="{{ url_for('main.index') }}">Inicio</a></li>
+      <li><a href="{{ url_for('aprendizaje.lista_temas') }}">Temas educativos</a></li>
+      <li><a href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">{{ tema.titulo }}</a></li>
+      <li aria-current="page">Evaluación</li>
+    </ol>
+  </nav>
+
+  <article class="evaluacion-contenedor">
+    <header class="encabezado-evaluacion">
+      <div class="metadatos-evaluacion">
+        <span class="insignia-tipo-evaluacion">
+          📝 Evaluación formal
+        </span>
+        <span class="etiqueta-tema-padre">{{ tema.titulo }}</span>
+      </div>
+
+      <h1>{{ evaluacion.titulo }}</h1>
+      <p class="introduccion-evaluacion">
+        Comprueba tus conocimientos sobre este tema educativo. Responde con atención cada una de las 
+        preguntas de opción múltiple para medir tu aprendizaje y registrar tu avance.
+      </p>
+
+      <div class="tarjeta-reglas-evaluacion">
+        <div class="item-regla">
+          <strong>Puntaje máximo:</strong> 
+          <span>{{ evaluacion.puntaje_maximo|round(0)|int }} puntos</span>
+        </div>
+        <div class="item-regla">
+          <strong>Nota mínima de aprobación:</strong> 
+          <span>{{ evaluacion.puntaje_minimo|round(0)|int }} puntos</span>
+        </div>
+        <div class="item-regla">
+          <strong>Preguntas:</strong> 
+          <span>{{ evaluacion.preguntas|length }} enunciados</span>
+        </div>
+      </div>
+
+      {% if mejor_intento %}
+        <div class="aviso-intento-previo {% if mejor_intento.aprobado %}previo-aprobado{% else %}previo-desaprobado{% endif %}" role="status">
+          {% if mejor_intento.aprobado %}
+            <span class="icono-estado-eval" aria-hidden="true">✓</span>
+            <div>
+              <strong>¡Ya has aprobado esta evaluación!</strong>
+              <p>Tu mejor calificación registrada es de <strong>{{ mejor_intento.puntaje_obtenido|round(1) }} puntos</strong> el {{ mejor_intento.fecha_intento.strftime('%d/%m/%Y') }}. Puedes volver a rendirla para mejorar tu puntaje.</p>
+            </div>
+          {% else %}
+            <span class="icono-estado-eval" aria-hidden="true">⚠️</span>
+            <div>
+              <strong>Aún no has superado el puntaje mínimo</strong>
+              <p>Tu mejor calificación actual es de <strong>{{ mejor_intento.puntaje_obtenido|round(1) }} puntos</strong> (necesitas al menos {{ evaluacion.puntaje_minimo|round(0)|int }} puntos). ¡Vuelve a intentarlo!</p>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+    </header>
+
+    {% if current_user.is_authenticated %}
+      <form action="{{ url_for('aprendizaje.enviar_evaluacion', id_tema=tema.id_tema) }}" method="post" class="form-evaluacion-cuestionario">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="lista-preguntas-evaluacion">
+          {% for pregunta in evaluacion.preguntas %}
+            <fieldset class="tarjeta-pregunta-evaluacion">
+              <legend class="cabecera-pregunta-evaluacion">
+                <span class="numero-pregunta">Pregunta {{ loop.index }} de {{ evaluacion.preguntas|length }}</span>
+                <span class="valor-pregunta">{{ pregunta.puntaje|round(0)|int }} pts</span>
+              </legend>
+
+              <p class="enunciado-pregunta">{{ pregunta.enunciado }}</p>
+
+              <div class="lista-alternativas-pregunta">
+                {% for alt in pregunta.alternativas %}
+                  <label class="tarjeta-alternativa-item" for="alt_{{ alt.id_alternativa }}">
+                    <input 
+                      type="radio" 
+                      name="pregunta_{{ pregunta.id_pregunta }}" 
+                      id="alt_{{ alt.id_alternativa }}" 
+                      value="{{ alt.id_alternativa }}" 
+                      required
+                    >
+                    <span class="radio-alternativa-custom" aria-hidden="true"></span>
+                    <span class="texto-alternativa">{{ alt.texto }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </fieldset>
+          {% endfor %}
+        </div>
+
+        <div class="pie-formulario-evaluacion">
+          <button type="submit" class="boton-enviar-evaluacion">
+            Enviar respuestas y calificar evaluación →
+          </button>
+          <a class="enlace-secundario" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
+            Volver a lecciones del tema
+          </a>
+        </div>
+      </form>
+    {% else %}
+      <div class="caja-login-requerido">
+        <p>
+          <strong>Para responder la evaluación formal y registrar tu calificación:</strong>
+        </p>
+        <div class="acciones-hero">
+          <a class="enlace-accion" href="{{ url_for('auth.login', next=request.path) }}">Iniciar sesión</a>
+          <a class="enlace-secundario" href="{{ url_for('auth.registro') }}">Registrarse</a>
+        </div>
+      </div>
+    {% endif %}
+  </article>
+{% endblock %}

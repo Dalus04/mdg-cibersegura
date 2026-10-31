@@ -51,6 +51,12 @@
         <p class="subtexto-metrica">Retos y simulaciones superados</p>
       </div>
 
+      <div class="tarjeta-metrica-progreso">
+        <span class="etiqueta-metrica">Evaluaciones formales</span>
+        <div class="valor-metrica">{{ resumen.evaluaciones_aprobadas }} / {{ resumen.total_evaluaciones }}</div>
+        <p class="subtexto-metrica">Cuestionarios aprobados (≥ 14 pts)</p>
+      </div>
+
     </div>
   </section>
 
@@ -58,7 +64,7 @@
   <section class="seccion-desglose-temas" aria-labelledby="titulo-desglose">
     <header class="encabezado-desglose">
       <h2 id="titulo-desglose">Progreso detallado por tema</h2>
-      <p>Revisa qué lecciones has completado y cuáles tienes pendientes en cada área temática.</p>
+      <p>Revisa qué lecciones has completado, cuáles tienes pendientes y el estado de tus evaluaciones en cada área temática.</p>
     </header>
 
     <div class="lista-progreso-temas">
@@ -85,11 +91,27 @@
               </div>
               <div class="insignia-estado-contenedor">
                 {% if item.estado == 'completado' %}
-                  <span class="badge-progreso badge-completado" role="status">✓ Completado</span>
+                  <span class="badge-progreso badge-completado" role="status">✓ Lecciones completadas</span>
                 {% elif item.estado == 'en_progreso' %}
                   <span class="badge-progreso badge-en-progreso" role="status">En progreso</span>
                 {% else %}
                   <span class="badge-progreso badge-no-iniciado" role="status">No iniciado</span>
+                {% endif %}
+
+                {% if item.evaluacion_info %}
+                  {% if item.evaluacion_info.aprobado %}
+                    <span class="badge-progreso badge-evaluacion-aprobada" title="Evaluación aprobada con {{ item.evaluacion_info.mejor_intento.puntaje_obtenido|round(1) }} pts">
+                      🎓 Evaluación: {{ item.evaluacion_info.mejor_intento.puntaje_obtenido|round(1) }} pts
+                    </span>
+                  {% elif item.evaluacion_info.mejor_intento %}
+                    <span class="badge-progreso badge-evaluacion-desaprobada" title="Evaluación no superada: {{ item.evaluacion_info.mejor_intento.puntaje_obtenido|round(1) }} pts">
+                      ⚠️ Evaluación: {{ item.evaluacion_info.mejor_intento.puntaje_obtenido|round(1) }} pts
+                    </span>
+                  {% else %}
+                    <span class="badge-progreso badge-evaluacion-pendiente">
+                      📝 Evaluación pendiente
+                    </span>
+                  {% endif %}
                 {% endif %}
               </div>
             </header>
@@ -115,9 +137,15 @@
               {% else %}
                 <div class="accion-recomendada">
                   <span class="texto-completado-exito">¡Has completado todas las lecciones de este tema!</span>
-                  <a class="enlace-secundario" href="{{ url_for('aprendizaje.detalle_tema', id_tema=item.tema.id_tema) }}">
-                    Repasar lecciones
-                  </a>
+                  {% if item.evaluacion_info and not item.evaluacion_info.aprobado %}
+                    <a class="enlace-accion enlace-evaluacion-destacado" href="{{ url_for('aprendizaje.ver_evaluacion', id_tema=item.tema.id_tema) }}">
+                      Rendir evaluación formal →
+                    </a>
+                  {% else %}
+                    <a class="enlace-secundario" href="{{ url_for('aprendizaje.detalle_tema', id_tema=item.tema.id_tema) }}">
+                      Repasar lecciones
+                    </a>
+                  {% endif %}
                 </div>
               {% endif %}
             </footer>

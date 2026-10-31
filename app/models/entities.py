@@ -173,6 +173,41 @@ class Evaluacion(db.Model):
     preguntas: Mapped[list["Pregunta"]] = relationship(back_populates="evaluacion")
     intentos: Mapped[list["IntentoEvaluacion"]] = relationship(back_populates="evaluacion")
 
+    @property
+    def puntaje_maximo(self) -> float:
+        """Calcula el puntaje total sumando los puntos de sus preguntas."""
+        return sum(p.puntaje for p in self.preguntas)
+
+    def obtener_mejor_intento(self, id_usuario: int) -> "IntentoEvaluacion | None":
+        """Retorna el intento con mayor puntaje obtenido por el usuario."""
+        return db.session.scalar(
+            select(IntentoEvaluacion)
+            .where(
+                IntentoEvaluacion.id_evaluacion == self.id_evaluacion,
+                IntentoEvaluacion.id_usuario == id_usuario,
+            )
+            .order_by(
+                IntentoEvaluacion.puntaje_obtenido.desc(),
+                IntentoEvaluacion.fecha_intento.desc(),
+            )
+        )
+
+    def obtener_ultimo_intento(self, id_usuario: int) -> "IntentoEvaluacion | None":
+        """Retorna el intento cronológicamente más reciente del usuario."""
+        return db.session.scalar(
+            select(IntentoEvaluacion)
+            .where(
+                IntentoEvaluacion.id_evaluacion == self.id_evaluacion,
+                IntentoEvaluacion.id_usuario == id_usuario,
+            )
+            .order_by(IntentoEvaluacion.fecha_intento.desc())
+        )
+
+    def ha_aprobado(self, id_usuario: int) -> bool:
+        """Determina si el usuario alcanzó o superó el puntaje mínimo en algún intento."""
+        mejor = self.obtener_mejor_intento(id_usuario)
+        return mejor is not None and mejor.puntaje_obtenido >= self.puntaje_minimo
+
 
 class Pregunta(db.Model):
     __tablename__ = "pregunta"
@@ -263,6 +298,7 @@ class ProgresoContenido(db.Model):
             .options(
                 selectinload(Tema.contenidos),
                 selectinload(Tema.actividades),
+                selectinload(Tema.evaluaciones).selectinload(Evaluacion.preguntas),
             )
             .order_by(Tema.orden)
         ).all()
@@ -283,6 +319,8 @@ class ProgresoContenido(db.Model):
         total_completadas_global = 0
         total_actividades_global = 0
         total_actividades_completadas_global = 0
+        total_evaluaciones_global = 0
+        evaluaciones_aprobadas_global = 0
         temas_resumen = []
 
         for tema in temas:
@@ -321,6 +359,21 @@ class ProgresoContenido(db.Model):
             total_actividades_global += tot_act
             total_actividades_completadas_global += comp_act
 
+            # Evaluación del tema
+            evaluacion_pub = next((e for e in tema.evaluaciones if e.estado == "publicado"), None)
+            eval_info = None
+            if evaluacion_pub:
+                total_evaluaciones_global += 1
+                mejor_intento = evaluacion_pub.obtener_mejor_intento(id_usuario)
+                aprobado = mejor_intento is not None and mejor_intento.puntaje_obtenido >= evaluacion_pub.puntaje_minimo
+                if aprobado:
+                    evaluaciones_aprobadas_global += 1
+                eval_info = {
+                    "evaluacion": evaluacion_pub,
+                    "mejor_intento": mejor_intento,
+                    "aprobado": aprobado,
+                }
+
             temas_resumen.append(
                 {
                     "tema": tema,
@@ -328,6 +381,7 @@ class ProgresoContenido(db.Model):
                     "lecciones_completadas": completadas_tema,
                     "total_actividades": tot_act,
                     "actividades_completadas": comp_act,
+                    "evaluacion_info": eval_info,
                     "porcentaje": porcentaje,
                     "estado": estado,
                     "siguiente_leccion": siguiente,
@@ -346,6 +400,8 @@ class ProgresoContenido(db.Model):
             "lecciones_completadas": total_completadas_global,
             "total_actividades": total_actividades_global,
             "actividades_completadas": total_actividades_completadas_global,
+            "total_evaluaciones": total_evaluaciones_global,
+            "evaluaciones_aprobadas": evaluaciones_aprobadas_global,
             "porcentaje_global": porcentaje_global,
             "total_temas": len(temas),
             "temas_completados": temas_completados,
@@ -393,6 +449,60 @@ class IntentoEvaluacion(db.Model):
     usuario: Mapped[Usuario] = relationship(back_populates="intentos_evaluacion")
     evaluacion: Mapped[Evaluacion] = relationship(back_populates="intentos")
     respuestas: Mapped[list["Respuesta"]] = relationship(back_populates="intento")
+
+    @property
+    def aprobado(self) -> bool:
+        """Indica si el puntaje obtenido alcanza el mínimo aprobatorio."""
+        return self.puntaje_obtenido >= self.evaluacion.puntaje_minimo
+
+    @classmethod
+    def registrar_intento(
+        cls, id_usuario: int, evaluacion: Evaluacion, respuestas_dict: dict[int, int]
+    ) -> "IntentoEvaluacion":
+        """Registra un intento formal validando la correspondencia estricta pregunta-alternativa."""
+        preguntas_map = {p.id_pregunta: p for p in evaluacion.preguntas}
+        puntaje_total = 0.0
+        respuestas_a_guardar = []
+
+        for id_pregunta, id_alternativa in respuestas_dict.items():
+            pregunta = preguntas_map.get(id_pregunta)
+            if pregunta is None:
+                raise ValueError(f"La pregunta ID {id_pregunta} no pertenece a esta evaluación.")
+
+            alternativa = next(
+                (a for a in pregunta.alternativas if a.id_alternativa == id_alternativa),
+                None,
+            )
+            if alternativa is None:
+                raise ValueError(
+                    f"La alternativa ID {id_alternativa} no corresponde a la pregunta ID {id_pregunta}."
+                )
+
+            if alternativa.es_correcta:
+                puntaje_total += pregunta.puntaje
+
+            respuestas_a_guardar.append((id_pregunta, id_alternativa))
+
+        intento = cls(
+            id_usuario=id_usuario,
+            id_evaluacion=evaluacion.id_evaluacion,
+            puntaje_obtenido=round(puntaje_total, 2),
+            fecha_intento=utc_now(),
+        )
+        db.session.add(intento)
+        db.session.flush()
+
+        for id_pregunta, id_alternativa in respuestas_a_guardar:
+            db.session.add(
+                Respuesta(
+                    id_intento_evaluacion=intento.id_intento_evaluacion,
+                    id_pregunta=id_pregunta,
+                    id_alternativa=id_alternativa,
+                )
+            )
+
+        db.session.commit()
+        return intento
 
 
 class Respuesta(db.Model):

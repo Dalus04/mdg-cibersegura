@@ -3,7 +3,14 @@ import json
 from sqlalchemy import select
 
 from app.extensions import db
-from app.models import Actividad, Contenido, Tema
+from app.models import (
+    Actividad,
+    Alternativa,
+    Contenido,
+    Evaluacion,
+    Pregunta,
+    Tema,
+)
 
 DATOS_TEMAS_INICIALES = [
     {
@@ -660,5 +667,206 @@ def seed_actividades_iniciales() -> None:
                 estado="publicado",
             )
             db.session.add(nueva_actividad)
+
+    db.session.commit()
+
+
+EVALUACIONES_INICIALES = [
+    {
+        "tema_orden": 1,
+        "titulo": "Evaluación formativa: Contraseñas seguras y autenticación",
+        "puntaje_minimo": 14.0,
+        "preguntas": [
+            {
+                "enunciado": "¿Cuál es la característica técnica más determinante para la resistencia de una contraseña frente a ataques automatizados de fuerza bruta?",
+                "puntaje": 5.0,
+                "alternativas": [
+                    {"texto": "La cantidad de símbolos especiales sustituyendo vocales simples.", "es_correcta": False},
+                    {"texto": "La longitud total de la contraseña o frase de contraseña (passphrase).", "es_correcta": True},
+                    {"texto": "Cambiar la contraseña cada semana utilizando secuencias numéricas consecutivas.", "es_correcta": False},
+                    {"texto": "Utilizar el nombre de una mascota combinado con la fecha de nacimiento.", "es_correcta": False},
+                ],
+            },
+            {
+                "enunciado": "¿Por qué la reutilización de una misma contraseña en múltiples plataformas representa un peligro grave de seguridad digital?",
+                "puntaje": 5.0,
+                "alternativas": [
+                    {"texto": "Porque las plataformas bloquean de forma automática a los usuarios con contraseñas similares.", "es_correcta": False},
+                    {"texto": "Por el efecto dominó: si un servicio sufre una filtración, los atacantes probarán esa misma clave en el resto de tus cuentas.", "es_correcta": True},
+                    {"texto": "Porque reduce la velocidad de conexión a internet del dispositivo.", "es_correcta": False},
+                    {"texto": "Porque impide el envío de mensajes y correos electrónicos.", "es_correcta": False},
+                ],
+            },
+            {
+                "enunciado": "¿Qué barrera defensiva proporciona la autenticación en dos pasos (2FA o MFA)?",
+                "puntaje": 5.0,
+                "alternativas": [
+                    {"texto": "Evita que recibas correo no deseado (spam) en tu bandeja de entrada.", "es_correcta": False},
+                    {"texto": "Añade un cerrojo adicional requiriendo un código temporal en tu teléfono móvil además de tu contraseña para iniciar sesión.", "es_correcta": True},
+                    {"texto": "Permite recuperar contraseñas olvidadas sin necesidad de verificar tu identidad.", "es_correcta": False},
+                    {"texto": "Aumenta la memoria RAM de tu teléfono o computadora.", "es_correcta": False},
+                ],
+            },
+            {
+                "enunciado": "Si un ciudadano de Guadalupe utiliza una computadora de uso público en una cabina o biblioteca, ¿cuál es la medida obligatoria antes de retirarse?",
+                "puntaje": 5.0,
+                "alternativas": [
+                    {"texto": "Dejar la ventana del navegador minimizada para el siguiente usuario.", "es_correcta": False},
+                    {"texto": "Cerrar sesión de forma explícita en todas las cuentas y borrar el historial y datos de navegación de la sesión.", "es_correcta": True},
+                    {"texto": "Apagar únicamente la pantalla del monitor.", "es_correcta": False},
+                    {"texto": "Guardar la contraseña en el navegador para no olvidarla.", "es_correcta": False},
+                ],
+            },
+        ],
+    },
+    {
+        "tema_orden": 2,
+        "titulo": "Evaluación formativa: Detección de phishing y fraudes digitales",
+        "puntaje_minimo": 14.0,
+        "preguntas": [
+            {
+                "enunciado": "¿Cuál es el objetivo principal de un ataque de phishing?",
+                "puntaje": 5.0,
+                "alternativas": [
+                    {"texto": "Comprobar la calidad de la conexión de fibra óptica en el distrito.", "es_correcta": False},
+                    {"texto": "Engañar a la víctima suplantando una entidad legítima para robar credenciales, dinero o datos confidenciales.", "es_correcta": True},
+                    {"texto": "Actualizar automáticamente las aplicaciones de un teléfono inteligente.", "es_correcta": False},
+                    {"texto": "Proporcionar asistencia técnica municipal gratuita.", "es_correcta": False},
+                ],
+            },
+            {
+                "enunciado": "Si recibes un correo supuestamente bancario que amenaza con el 'bloqueo inminente de tu cuenta en 2 horas', ¿cuál es el primer indicio de fraude?",
+                "puntaje": 5.0,
+                "alternativas": [
+                    {"texto": "Que el mensaje utilice un tono formal de saludo.", "es_correcta": False},
+                    {"texto": "El sentido de extrema urgencia y amenaza de sanción para forzar una decisión impulsiva sin verificar.", "es_correcta": True},
+                    {"texto": "Que la entidad financiera tenga oficinas físicas en el país.", "es_correcta": False},
+                    {"texto": "Que el correo se haya enviado durante la mañana.", "es_correcta": False},
+                ],
+            },
+            {
+                "enunciado": "Antes de hacer clic en un enlace recibido por mensaje o correo, ¿qué verificación técnica debes realizar siempre?",
+                "puntaje": 5.0,
+                "alternativas": [
+                    {"texto": "Verificar que el enlace aparezca subrayado en color azul.", "es_correcta": False},
+                    {"texto": "Inspeccionar el dominio real de la URL, confirmando que coincida exactamente con el portal oficial (.gob.pe o .com.pe) y use HTTPS.", "es_correcta": True},
+                    {"texto": "Reenviar el mensaje por grupos de redes sociales para pedir opiniones.", "es_correcta": False},
+                    {"texto": "Hacer clic rápido y cerrar la ventana si parece sospechosa.", "es_correcta": False},
+                ],
+            },
+            {
+                "enunciado": "¿Cuál es la recomendación correcta si sospechas que un mensaje o notificación es phishing?",
+                "puntaje": 5.0,
+                "alternativas": [
+                    {"texto": "Descargar y abrir los archivos adjuntos para verificar si son reales.", "es_correcta": False},
+                    {"texto": "No pulsar el enlace, no responder con datos y verificar directamente por canales oficiales de atención al cliente.", "es_correcta": True},
+                    {"texto": "Responder al correo solicitando que llamen a tu número personal.", "es_correcta": False},
+                    {"texto": "Ingresar tu documento de identidad para consultar el estado.", "es_correcta": False},
+                ],
+            },
+        ],
+    },
+    {
+        "tema_orden": 3,
+        "titulo": "Evaluación formativa: Privacidad y Protección de Datos (Ley 29733)",
+        "puntaje_minimo": 14.0,
+        "preguntas": [
+            {
+                "enunciado": "De acuerdo con la Ley N.° 29733 (Ley de Protección de Datos Personales del Perú), ¿qué exige el principio de consentimiento?",
+                "puntaje": 5.0,
+                "alternativas": [
+                    {"texto": "Que las empresas pueden vender bases de datos si los usuarios no reclaman en un año.", "es_correcta": False},
+                    {"texto": "Que todo tratamiento de datos personales requiere la autorización previa, expresa, informada e inequívoca de su titular.", "es_correcta": True},
+                    {"texto": "Que las contraseñas deben ser públicas para facilitar auditorías.", "es_correcta": False},
+                    {"texto": "Que los datos personales se transfieran automáticamente a redes sociales.", "es_correcta": False},
+                ],
+            },
+            {
+                "enunciado": "¿Qué establece el principio de proporcionalidad en el tratamiento de datos personales?",
+                "puntaje": 5.0,
+                "alternativas": [
+                    {"texto": "Que las aplicaciones deben solicitar todos los permisos posibles por si se ocupan después.", "es_correcta": False},
+                    {"texto": "Que los datos solicitados deben ser únicamente los adecuados, pertinentes y no excesivos en relación con la finalidad determinada.", "es_correcta": True},
+                    {"texto": "Que los usuarios deben pagar un costo proporcional al tamaño de su cuenta.", "es_correcta": False},
+                    {"texto": "Que la contraseña debe ser proporcional al número de letras del nombre del usuario.", "es_correcta": False},
+                ],
+            },
+            {
+                "enunciado": "¿Qué representan los derechos ARCO reconocidos por el marco normativo peruano?",
+                "puntaje": 5.0,
+                "alternativas": [
+                    {"texto": "Archivar, Renombrar, Comprimir y Optimizar carpetas digitales.", "es_correcta": False},
+                    {"texto": "Acceso, Rectificación, Cancelación y Oposición respecto al uso de tus datos personales.", "es_correcta": True},
+                    {"texto": "Autenticación Rápida con Códigos de Operación bancaria.", "es_correcta": False},
+                    {"texto": "Apertura de Redes y Conexiones Oficiales.", "es_correcta": False},
+                ],
+            },
+            {
+                "enunciado": "Si una aplicación de calculadora solicita permiso para acceder a tu libreta de contactos y ubicación GPS en tu teléfono móvil, debes:",
+                "puntaje": 5.0,
+                "alternativas": [
+                    {"texto": "Aceptar todos los permisos sin dudar para que no se bloquee.", "es_correcta": False},
+                    {"texto": "Denegar los permisos innecesarios o desinstalar la app por solicitar accesos desproporcionados a tu información privada.", "es_correcta": True},
+                    {"texto": "Publicar tus contactos en línea para que nadie los robe.", "es_correcta": False},
+                    {"texto": "Dejar la pantalla encendida permanentemente.", "es_correcta": False},
+                ],
+            },
+        ],
+    },
+]
+
+
+def seed_evaluaciones_iniciales() -> None:
+    """Inserta evaluaciones, preguntas y alternativas pedagógicas para los temas correspondientes."""
+    from app.models import Alternativa, Evaluacion, Pregunta, Tema
+
+    temas = {tema.orden: tema for tema in db.session.scalars(select(Tema)).all()}
+
+    for data_eval in EVALUACIONES_INICIALES:
+        tema = temas.get(data_eval["tema_orden"])
+        if tema is None:
+            continue
+
+        evaluacion = db.session.scalar(
+            select(Evaluacion).where(
+                Evaluacion.id_tema == tema.id_tema,
+                Evaluacion.titulo == data_eval["titulo"],
+            )
+        )
+        if evaluacion is None:
+            evaluacion = Evaluacion(
+                id_tema=tema.id_tema,
+                titulo=data_eval["titulo"],
+                puntaje_minimo=data_eval["puntaje_minimo"],
+                estado="publicado",
+            )
+            db.session.add(evaluacion)
+            db.session.flush()
+
+        # Sembrar preguntas de la evaluación
+        for data_preg in data_eval["preguntas"]:
+            pregunta = db.session.scalar(
+                select(Pregunta).where(
+                    Pregunta.id_evaluacion == evaluacion.id_evaluacion,
+                    Pregunta.enunciado == data_preg["enunciado"],
+                )
+            )
+            if pregunta is None:
+                pregunta = Pregunta(
+                    id_evaluacion=evaluacion.id_evaluacion,
+                    enunciado=data_preg["enunciado"],
+                    puntaje=data_preg["puntaje"],
+                )
+                db.session.add(pregunta)
+                db.session.flush()
+
+                # Sembrar alternativas de la pregunta
+                for data_alt in data_preg["alternativas"]:
+                    alt = Alternativa(
+                        id_pregunta=pregunta.id_pregunta,
+                        texto=data_alt["texto"],
+                        es_correcta=data_alt["es_correcta"],
+                    )
+                    db.session.add(alt)
 
     db.session.commit()

@@ -3,9 +3,21 @@ from urllib.parse import urlsplit
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from app.extensions import db
-from app.models import Actividad, Contenido, IntentoActividad, ProgresoContenido, Tema
+from app.models import (
+    Actividad,
+    Alternativa,
+    Contenido,
+    Evaluacion,
+    IntentoActividad,
+    IntentoEvaluacion,
+    Pregunta,
+    ProgresoContenido,
+    Respuesta,
+    Tema,
+)
 
 aprendizaje_bp = Blueprint("aprendizaje", __name__)
 
@@ -89,6 +101,18 @@ def detalle_tema(id_tema: int):
                 current_user.id_usuario
             )
 
+    evaluacion = db.session.scalar(
+        select(Evaluacion)
+        .where(Evaluacion.id_tema == tema.id_tema, Evaluacion.estado == "publicado")
+        .options(selectinload(Evaluacion.preguntas))
+    )
+
+    mejor_intento_eval = None
+    ultimo_intento_eval = None
+    if evaluacion and current_user.is_authenticated:
+        mejor_intento_eval = evaluacion.obtener_mejor_intento(current_user.id_usuario)
+        ultimo_intento_eval = evaluacion.obtener_ultimo_intento(current_user.id_usuario)
+
     return render_template(
         "aprendizaje/tema_detalle.html",
         tema=tema,
@@ -97,6 +121,9 @@ def detalle_tema(id_tema: int):
         progreso_tema=progreso_tema,
         actividades=actividades,
         intentos_actividades=intentos_actividades,
+        evaluacion=evaluacion,
+        mejor_intento_eval=mejor_intento_eval,
+        ultimo_intento_eval=ultimo_intento_eval,
     )
 
 
@@ -340,4 +367,144 @@ def resolver_actividad(id_tema: int, id_actividad: int):
         opcion_elegida=opcion_elegida,
         es_correcta=es_correcta,
         intento=intento,
+    )
+
+
+@aprendizaje_bp.get("/temas/<int:id_tema>/evaluacion")
+def ver_evaluacion(id_tema: int):
+    """Presenta el cuestionario formal de evaluación del tema."""
+    tema = db.session.scalar(
+        select(Tema).where(Tema.id_tema == id_tema, Tema.estado == "publicado")
+    )
+    if tema is None:
+        abort(404)
+
+    evaluacion = db.session.scalar(
+        select(Evaluacion)
+        .where(Evaluacion.id_tema == tema.id_tema, Evaluacion.estado == "publicado")
+        .options(
+            selectinload(Evaluacion.preguntas).selectinload(Pregunta.alternativas)
+        )
+    )
+    if evaluacion is None:
+        abort(404)
+
+    mejor_intento = None
+    ultimo_intento = None
+    if current_user.is_authenticated:
+        mejor_intento = evaluacion.obtener_mejor_intento(current_user.id_usuario)
+        ultimo_intento = evaluacion.obtener_ultimo_intento(current_user.id_usuario)
+
+    return render_template(
+        "aprendizaje/evaluacion.html",
+        tema=tema,
+        evaluacion=evaluacion,
+        mejor_intento=mejor_intento,
+        ultimo_intento=ultimo_intento,
+    )
+
+
+@aprendizaje_bp.post("/temas/<int:id_tema>/evaluacion/enviar")
+@login_required
+def enviar_evaluacion(id_tema: int):
+    """Califica las respuestas del ciudadano y persiste el intento con sus respuestas."""
+    tema = db.session.scalar(
+        select(Tema).where(Tema.id_tema == id_tema, Tema.estado == "publicado")
+    )
+    if tema is None:
+        abort(404)
+
+    evaluacion = db.session.scalar(
+        select(Evaluacion)
+        .where(Evaluacion.id_tema == tema.id_tema, Evaluacion.estado == "publicado")
+        .options(
+            selectinload(Evaluacion.preguntas).selectinload(Pregunta.alternativas)
+        )
+    )
+    if evaluacion is None:
+        abort(404)
+
+    # Validar que se hayan respondido todas las preguntas
+    respuestas_dict = {}
+    faltan_preguntas = False
+
+    for pregunta in evaluacion.preguntas:
+        nombre_campo = f"pregunta_{pregunta.id_pregunta}"
+        valor_alt = request.form.get(nombre_campo)
+        if not valor_alt or not valor_alt.isdigit():
+            faltan_preguntas = True
+            break
+        respuestas_dict[pregunta.id_pregunta] = int(valor_alt)
+
+    if faltan_preguntas or len(respuestas_dict) != len(evaluacion.preguntas):
+        flash(
+            "Por favor, responde todas las preguntas del cuestionario antes de enviar tu evaluación.",
+            "error",
+        )
+        return redirect(url_for("aprendizaje.ver_evaluacion", id_tema=tema.id_tema))
+
+    try:
+        intento = IntentoEvaluacion.registrar_intento(
+            id_usuario=current_user.id_usuario,
+            evaluacion=evaluacion,
+            respuestas_dict=respuestas_dict,
+        )
+    except ValueError as e:
+        flash(f"Error de validación al procesar las respuestas: {e}", "error")
+        return redirect(url_for("aprendizaje.ver_evaluacion", id_tema=tema.id_tema))
+
+    if intento.aprobado:
+        flash(
+            f"¡Felicitaciones! Aprobaste la evaluación con una nota de {intento.puntaje_obtenido:.1f} puntos.",
+            "exito",
+        )
+    else:
+        flash(
+            f"Obtuviste {intento.puntaje_obtenido:.1f} puntos (mínimo aprobatorio: {evaluacion.puntaje_minimo:.1f}). Puedes repasar las lecciones y volver a intentarlo.",
+            "error",
+        )
+
+    return redirect(
+        url_for(
+            "aprendizaje.resultado_evaluacion",
+            id_tema=tema.id_tema,
+            id_intento=intento.id_intento_evaluacion,
+        )
+    )
+
+
+@aprendizaje_bp.get("/temas/<int:id_tema>/evaluacion/resultado/<int:id_intento>")
+@login_required
+def resultado_evaluacion(id_tema: int, id_intento: int):
+    """Muestra la retroalimentación detallada y el desglose de preguntas de un intento."""
+    tema = db.session.scalar(
+        select(Tema).where(Tema.id_tema == id_tema, Tema.estado == "publicado")
+    )
+    if tema is None:
+        abort(404)
+
+    intento = db.session.scalar(
+        select(IntentoEvaluacion)
+        .where(
+            IntentoEvaluacion.id_intento_evaluacion == id_intento,
+            IntentoEvaluacion.id_usuario == current_user.id_usuario,
+        )
+        .options(
+            selectinload(IntentoEvaluacion.evaluacion)
+            .selectinload(Evaluacion.preguntas)
+            .selectinload(Pregunta.alternativas),
+            selectinload(IntentoEvaluacion.respuestas).selectinload(Respuesta.alternativa),
+        )
+    )
+    if intento is None or intento.evaluacion.id_tema != tema.id_tema:
+        abort(404)
+
+    respuestas_por_pregunta = {r.id_pregunta: r.alternativa for r in intento.respuestas}
+
+    return render_template(
+        "aprendizaje/evaluacion_resultado.html",
+        tema=tema,
+        evaluacion=intento.evaluacion,
+        intento=intento,
+        respuestas_por_pregunta=respuestas_por_pregunta,
     )

@@ -126,6 +126,80 @@
       </section>
     {% endif %}
 
+    {% if evaluacion %}
+      <section aria-labelledby="titulo-evaluacion-tema" class="seccion-evaluacion-tema">
+        <header class="cabecera-seccion-evaluaciones">
+          <span class="insignia-institucional">Evaluación formativa</span>
+          <h2 id="titulo-evaluacion-tema">Evaluación formal del tema</h2>
+          <p>Mide tus competencias de ciberseguridad completando el cuestionario oficial de comprobación.</p>
+        </header>
+
+        <article class="tarjeta-evaluacion-tema">
+          <header class="cabecera-tarjeta-eval">
+            <h3>{{ evaluacion.titulo }}</h3>
+            <span class="insignia-tipo-evaluacion">Oficial MDG</span>
+          </header>
+
+          <div class="cuerpo-tarjeta-eval">
+            {% if evaluacion.descripcion %}
+              <p class="descripcion-evaluacion">{{ evaluacion.descripcion }}</p>
+            {% else %}
+              <p class="descripcion-evaluacion">Cuestionario individual de opción múltiple diseñado para validar los conocimientos adquiridos a lo largo de este módulo formativo.</p>
+            {% endif %}
+
+            <div class="detalles-evaluacion-grid">
+              <div class="info-evaluacion-bloque">
+                <span class="etiqueta-bloque">Preguntas</span>
+                <span class="valor-bloque">{{ evaluacion.preguntas|length }} enunciados</span>
+              </div>
+              <div class="info-evaluacion-bloque">
+                <span class="etiqueta-bloque">Puntaje máximo</span>
+                <span class="valor-bloque">{{ evaluacion.puntaje_maximo|round(0)|int }} pts</span>
+              </div>
+              <div class="info-evaluacion-bloque">
+                <span class="etiqueta-bloque">Puntaje mínimo</span>
+                <span class="valor-bloque">{{ evaluacion.puntaje_minimo|round(0)|int }} / {{ evaluacion.puntaje_maximo|round(0)|int }} pts</span>
+              </div>
+            </div>
+
+            {% if mejor_intento_eval %}
+              <div class="estado-eval-usuario">
+                <div class="badge-calificacion-obtenida {% if mejor_intento_eval.aprobado %}nota-aprobada{% else %}nota-desaprobada{% endif %}" role="status">
+                  <span class="icono-resultado" aria-hidden="true">{% if mejor_intento_eval.aprobado %}🎓{% else %}⚠️{% endif %}</span>
+                  <div>
+                    <span class="etiqueta-bloque">Tu mejor calificación:</span>
+                    <div class="nota-destacada">
+                      {{ mejor_intento_eval.puntaje_obtenido|round(1) }} / {{ evaluacion.puntaje_maximo|round(0)|int }} pts
+                    </div>
+                  </div>
+                  <span class="nota-leyenda">
+                    {% if mejor_intento_eval.aprobado %}✓ Aprobado{% else %}Requiere repaso{% endif %}
+                  </span>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+
+          <footer class="pie-tarjeta-eval">
+            {% if mejor_intento_eval %}
+              <a class="boton-reintentar-evaluacion" href="{{ url_for('aprendizaje.ver_evaluacion', id_tema=tema.id_tema) }}">
+                Repetir evaluación
+              </a>
+              {% if ultimo_intento_eval %}
+                <a class="enlace-ver-resultado" href="{{ url_for('aprendizaje.resultado_evaluacion', id_tema=tema.id_tema, id_intento=ultimo_intento_eval.id_intento_evaluacion) }}">
+                  Ver último resultado →
+                </a>
+              {% endif %}
+            {% else %}
+              <a class="boton-iniciar-evaluacion" href="{{ url_for('aprendizaje.ver_evaluacion', id_tema=tema.id_tema) }}">
+                Rendir evaluación →
+              </a>
+            {% endif %}
+          </footer>
+        </article>
+      </section>
+    {% endif %}
+
     <footer class="pie-navegacion-tema">
       <p>
         <a class="enlace-secundario" href="{{ url_for('aprendizaje.lista_temas') }}">

@@ -39,6 +39,7 @@ def create_app(config_class=Config) -> Flask:
         from app.seeds import (
             seed_actividades_iniciales,
             seed_contenidos_iniciales,
+            seed_evaluaciones_iniciales,
             seed_usuarios_iniciales,
         )
 
@@ -47,6 +48,7 @@ def create_app(config_class=Config) -> Flask:
         seed_contenidos_iniciales()
         seed_usuarios_iniciales()
         seed_actividades_iniciales()
+        seed_evaluaciones_iniciales()
 
     return app
 
