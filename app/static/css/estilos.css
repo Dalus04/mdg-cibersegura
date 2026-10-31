@@ -22,6 +22,7 @@
 @import "05-pages/actividades.css";
 @import "05-pages/evaluaciones.css";
 @import "05-pages/progreso.css";
+@import "05-pages/admin.css";
 
 /* 6. Diseño adaptable y media queries */
 @import "06-responsive/responsive.css";

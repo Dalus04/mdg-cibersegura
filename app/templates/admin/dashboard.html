@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Panel de Administración — MDG Cibersegura{% endblock %}
+
+{% block content %}
+<section class="seccion-admin" aria-labelledby="titulo-admin">
+  <div class="encabezado-seccion">
+    <h1 id="titulo-admin">Panel de Administración</h1>
+    <p class="descripcion-seccion">
+      Métricas institucionales, supervisión de avance ciudadano y control de recursos de ciberseguridad.
+    </p>
+  </div>
+
+  {% include "admin/nav_admin.html" %}
+
+  <div class="rejilla-kpis" role="region" aria-label="Indicadores cuantitativos clave">
+    <div class="tarjeta-kpi">
+      <span class="kpi-etiqueta">Usuarios Registrados</span>
+      <p class="kpi-valor">{{ metricas.usuarios.total }}</p>
+      <span class="kpi-detalle">{{ metricas.usuarios.ciudadanos }} ciudadanos · {{ metricas.usuarios.administradores }} admin</span>
+    </div>
+
+    <div class="tarjeta-kpi">
+      <span class="kpi-etiqueta">Lecturas Completadas</span>
+      <p class="kpi-valor">{{ metricas.contenidos.total_lecturas_completadas }}</p>
+      <span class="kpi-detalle">En {{ metricas.contenidos.total_lecciones_publicadas }} lecciones activas</span>
+    </div>
+
+    <div class="tarjeta-kpi">
+      <span class="kpi-etiqueta">Efectividad en Actividades</span>
+      <p class="kpi-valor">{{ metricas.actividades.tasa_exito }}%</p>
+      <span class="kpi-detalle">{{ metricas.actividades.intentos_exitosos }} aciertos de {{ metricas.actividades.total_intentos }} intentos</span>
+    </div>
+
+    <div class="tarjeta-kpi">
+      <span class="kpi-etiqueta">Aprobación de Evaluaciones</span>
+      <p class="kpi-valor">{{ metricas.evaluaciones.tasa_aprobacion }}%</p>
+      <span class="kpi-detalle">Nota promedio: {{ metricas.evaluaciones.promedio_general }} / 20</span>
+    </div>
+  </div>
+
+  <div class="panel-admin-bloque">
+    <h2>Rendimiento Académico por Eje Temático</h2>
+    <div class="tabla-contenedor" tabindex="0" role="region" aria-label="Tabla de rendimiento formativo por tema">
+      <table class="tabla-admin">
+        <thead>
+          <tr>
+            <th scope="col">Orden</th>
+            <th scope="col">Tema Institucional</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Lecciones</th>
+            <th scope="col">Lecturas</th>
+            <th scope="col">Intentos Act.</th>
+            <th scope="col">Eval. Intentos</th>
+            <th scope="col">Nota Promedio</th>
+            <th scope="col">Aprobados</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in metricas.temas %}
+            <tr>
+              <td><strong>#{{ t.orden }}</strong></td>
+              <td>{{ t.titulo }}</td>
+              <td>
+                <span class="insignia-estado insignia-{{ t.estado }}">{{ t.estado | capitalize }}</span>
+              </td>
+              <td>{{ t.lecciones_publicadas }}</td>
+              <td>{{ t.total_lecturas_completadas }}</td>
+              <td>{{ t.intentos_actividades }}</td>
+              <td>{{ t.intentos_evaluacion }}</td>
+              <td><strong>{{ t.promedio_evaluacion }}</strong> / 20</td>
+              <td>{{ t.aprobados_evaluacion }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel-admin-bloque">
+    <h2>Últimos Ciudadanos Registrados</h2>
+    <div class="tabla-contenedor" tabindex="0" role="region" aria-label="Tabla de usuarios recientes">
+      <table class="tabla-admin">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nombres y Apellidos</th>
+            <th scope="col">Correo Institucional / Personal</th>
+            <th scope="col">Rol</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Fecha Registro</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in metricas.usuarios.ultimos_registros %}
+            <tr>
+              <td>{{ u.id_usuario }}</td>
+              <td>{{ u.nombres }} {{ u.apellidos }}</td>
+              <td><code>{{ u.correo }}</code></td>
+              <td><span class="insignia-rol">{{ u.rol }}</span></td>
+              <td><span class="insignia-estado insignia-{{ u.estado }}">{{ u.estado | capitalize }}</span></td>
+              <td>{{ u.fecha_registro[:10] if u.fecha_registro else '—' }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6">No hay registros recientes disponibles.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

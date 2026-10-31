@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Contenidos y Temas — Panel de Administración{% endblock %}
+
+{% block content %}
+<section class="seccion-admin" aria-labelledby="titulo-contenidos">
+  <div class="encabezado-seccion">
+    <h1 id="titulo-contenidos">Gestión de Contenidos y Temas</h1>
+    <p class="descripcion-seccion">
+      Administración del catálogo pedagógico institucional, lecciones y estados de publicación.
+    </p>
+  </div>
+
+  {% include "admin/nav_admin.html" %}
+
+  <div class="lista-temas-admin">
+    {% for tema in temas %}
+      <article class="tarjeta-tema-admin" aria-labelledby="tema-encabezado-{{ tema.id_tema }}">
+        <header class="tema-admin-header">
+          <div class="tema-admin-titulo-bloque">
+            <span class="insignia-orden">Eje #{{ tema.orden }}</span>
+            <h2 id="tema-encabezado-{{ tema.id_tema }}">{{ tema.titulo }}</h2>
+          </div>
+          <div class="tema-admin-acciones">
+            <span class="insignia-estado insignia-{{ tema.estado }}">{{ tema.estado | capitalize }}</span>
+            <form action="{{ url_for('admin.cambiar_estado_tema', id_tema=tema.id_tema) }}" method="post" class="form-accion-inline">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              {% if tema.estado == 'publicado' %}
+                <input type="hidden" name="estado" value="borrador">
+                <button type="submit" class="boton-tabla-desactivar" aria-label="Pasar tema {{ tema.titulo }} a borrador">Mover a borrador</button>
+              {% else %}
+                <input type="hidden" name="estado" value="publicado">
+                <button type="submit" class="boton-tabla-activar" aria-label="Publicar tema {{ tema.titulo }}">Publicar</button>
+              {% endif %}
+            </form>
+          </div>
+        </header>
+
+        {% if tema.descripcion %}
+          <p class="tema-admin-descripcion">{{ tema.descripcion }}</p>
+        {% endif %}
+
+        <div class="bloque-lecciones-admin">
+          <h3>Lecciones del tema ({{ tema.contenidos | length }})</h3>
+          <div class="tabla-contenedor" tabindex="0" role="region" aria-label="Tabla de lecciones del tema {{ tema.titulo }}">
+            <table class="tabla-admin">
+              <thead>
+                <tr>
+                  <th scope="col">Orden</th>
+                  <th scope="col">Título de la Lección</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for c in tema.contenidos %}
+                  <tr>
+                    <td>{{ c.orden }}</td>
+                    <td>{{ c.titulo }}</td>
+                    <td><span class="insignia-estado insignia-{{ c.estado }}">{{ c.estado | capitalize }}</span></td>
+                    <td>
+                      <form action="{{ url_for('admin.cambiar_estado_contenido', id_contenido=c.id_contenido) }}" method="post" class="form-accion-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        {% if c.estado == 'publicado' %}
+                          <input type="hidden" name="estado" value="borrador">
+                          <button type="submit" class="boton-tabla-desactivar" aria-label="Pasar lección {{ c.titulo }} a borrador">Ocultar</button>
+                        {% else %}
+                          <input type="hidden" name="estado" value="publicado">
+                          <button type="submit" class="boton-tabla-activar" aria-label="Publicar lección {{ c.titulo }}">Publicar</button>
+                        {% endif %}
+                      </form>
+                    </td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td colspan="4">Este tema no cuenta con lecciones registradas.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

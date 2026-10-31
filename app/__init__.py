@@ -28,12 +28,18 @@ def create_app(config_class=Config) -> Flask:
         return db.session.get(Usuario, int(user_id))
 
     from app.routes import main_bp
+    from app.routes.admin import admin_bp
+    from app.routes.api.v1 import api_v1_bp
     from app.routes.aprendizaje import aprendizaje_bp
     from app.routes.auth import auth_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(aprendizaje_bp)
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(api_v1_bp)
+
+    csrf.exempt(api_v1_bp)
 
     @app.cli.command("seed")
     def seed_command():

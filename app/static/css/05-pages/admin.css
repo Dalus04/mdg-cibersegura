@@ -1,0 +1,365 @@
+/* ==========================================================================
+   MDG CIBERSEGURA - 05-PAGES / ADMIN.CSS
+   Estilos institucionales accesibles para el Módulo de Administración (Fase 5)
+   Cumplimiento WCAG 2.2 AA (contraste > 4.5:1, foco visible).
+   ========================================================================== */
+
+.seccion-admin {
+  margin: var(--espacio-lg, 2rem) 0;
+}
+
+/* Sub-navegación administrativa */
+.nav-admin {
+  margin: var(--espacio-md, 1.5rem) 0 var(--espacio-xl, 2.5rem);
+  border-bottom: 2px solid var(--color-borde, #e2e8f0);
+}
+
+.nav-admin-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-admin-enlace {
+  display: inline-block;
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+  color: var(--color-texto-suave, #4a5568);
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+  border-radius: 4px 4px 0 0;
+}
+
+.nav-admin-enlace:hover {
+  color: var(--color-primario, #084c8d);
+  background-color: rgba(8, 76, 141, 0.05);
+}
+
+.nav-admin-enlace.activo {
+  color: var(--color-primario, #084c8d);
+  border-bottom-color: var(--color-primario, #084c8d);
+  background-color: rgba(8, 76, 141, 0.08);
+}
+
+.nav-admin-enlace:focus-visible {
+  outline: 3px solid var(--color-foco, #0c66be);
+  outline-offset: 2px;
+}
+
+/* Rejilla de KPIs */
+.rejilla-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--espacio-md, 1.5rem);
+  margin-bottom: var(--espacio-xl, 2.5rem);
+}
+
+.tarjeta-kpi {
+  background-color: var(--color-superficie, #ffffff);
+  border: 1px solid var(--color-borde, #e2e8f0);
+  border-left: 5px solid var(--color-primario, #084c8d);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tarjeta-kpi:nth-child(2) {
+  border-left-color: #0284c7;
+}
+
+.tarjeta-kpi:nth-child(3) {
+  border-left-color: #059669;
+}
+
+.tarjeta-kpi:nth-child(4) {
+  border-left-color: #7c3aed;
+}
+
+.kpi-etiqueta {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-texto-suave, #4a5568);
+  margin-bottom: 0.5rem;
+}
+
+.kpi-valor {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--color-texto, #1a202c);
+  line-height: 1.1;
+  margin: 0 0 0.5rem 0;
+}
+
+.kpi-detalle {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--color-texto-suave, #4a5568);
+}
+
+/* Bloques de paneles y tablas */
+.panel-admin-bloque {
+  background-color: var(--color-superficie, #ffffff);
+  border: 1px solid var(--color-borde, #e2e8f0);
+  border-radius: 8px;
+  padding: 1.75rem;
+  margin-bottom: var(--espacio-xl, 2.5rem);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.panel-admin-bloque h2 {
+  font-size: 1.35rem;
+  color: var(--color-primario-oscuro, #063868);
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--color-borde, #e2e8f0);
+  padding-bottom: 0.75rem;
+}
+
+/* Tabla administrativa accesible */
+.tabla-contenedor {
+  overflow-x: auto;
+  border: 1px solid var(--color-borde, #e2e8f0);
+  border-radius: 6px;
+}
+
+.tabla-contenedor:focus-visible {
+  outline: 3px solid var(--color-foco, #0c66be);
+}
+
+.tabla-admin {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.tabla-admin th {
+  background-color: #f8fafc;
+  color: var(--color-texto, #1a202c);
+  font-weight: 700;
+  padding: 0.875rem 1rem;
+  border-bottom: 2px solid var(--color-borde, #e2e8f0);
+  white-space: nowrap;
+}
+
+.tabla-admin td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--color-borde, #e2e8f0);
+  color: var(--color-texto, #1a202c);
+  vertical-align: middle;
+}
+
+.tabla-admin tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Insignias de estado y roles */
+.insignia-estado {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+}
+
+.insignia-activo,
+.insignia-publicado {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.insignia-inactivo,
+.insignia-desactivado {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.insignia-borrador {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.insignia-rol,
+.insignia-tipo,
+.insignia-orden {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border-radius: 4px;
+}
+
+/* Botones de acción en tablas */
+.form-accion-inline {
+  display: inline;
+}
+
+.boton-tabla-activar,
+.boton-tabla-desactivar {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 0.2s ease;
+}
+
+.boton-tabla-activar {
+  background-color: #ffffff;
+  color: #166534;
+  border-color: #166534;
+}
+
+.boton-tabla-activar:hover {
+  background-color: #166534;
+  color: #ffffff;
+}
+
+.boton-tabla-desactivar {
+  background-color: #ffffff;
+  color: #991b1b;
+  border-color: #991b1b;
+}
+
+.boton-tabla-desactivar:hover {
+  background-color: #991b1b;
+  color: #ffffff;
+}
+
+.texto-atenuado {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-style: italic;
+}
+
+/* Filtros de usuarios */
+.filtros-admin {
+  background-color: var(--color-superficie, #ffffff);
+  border: 1px solid var(--color-borde, #e2e8f0);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1.25rem;
+}
+
+.campo-filtro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1 1 200px;
+}
+
+.campo-filtro label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-texto, #1a202c);
+}
+
+.campo-filtro input,
+.campo-filtro select {
+  padding: 0.55rem 0.75rem;
+  font-size: 0.95rem;
+  border: 1px solid var(--color-borde, #e2e8f0);
+  border-radius: 6px;
+  background-color: #ffffff;
+}
+
+.campo-filtro input:focus,
+.campo-filtro select:focus {
+  outline: 3px solid var(--color-foco, #0c66be);
+  border-color: var(--color-primario, #084c8d);
+}
+
+.campo-filtro-boton {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.enlace-limpiar {
+  font-size: 0.875rem;
+  color: var(--color-primario, #084c8d);
+  text-decoration: underline;
+}
+
+/* Tarjetas de temas en contenidos */
+.lista-temas-admin {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.tarjeta-tema-admin {
+  background-color: var(--color-superficie, #ffffff);
+  border: 1px solid var(--color-borde, #e2e8f0);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.tema-admin-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-borde, #e2e8f0);
+}
+
+.tema-admin-titulo-bloque {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tema-admin-titulo-bloque h2 {
+  font-size: 1.25rem;
+  margin: 0;
+  color: var(--color-primario-oscuro, #063868);
+}
+
+.tema-admin-acciones {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tema-admin-descripcion {
+  font-size: 0.95rem;
+  color: var(--color-texto-suave, #4a5568);
+  margin-bottom: 1.25rem;
+}
+
+.bloque-lecciones-admin h3 {
+  font-size: 1.05rem;
+  margin: 0 0 0.75rem 0;
+  color: var(--color-texto, #1a202c);
+}
+
+.enlace-admin {
+  font-weight: 700;
+  color: #0369a1 !important;
+  background-color: #e0f2fe;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}

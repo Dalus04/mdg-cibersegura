@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Usuarios — Panel de Administración{% endblock %}
+
+{% block content %}
+<section class="seccion-admin" aria-labelledby="titulo-usuarios">
+  <div class="encabezado-seccion">
+    <h1 id="titulo-usuarios">Gestión de Usuarios</h1>
+    <p class="descripcion-seccion">
+      Supervisión de cuentas registradas, permisos de rol y estado de acceso a la plataforma.
+    </p>
+  </div>
+
+  {% include "admin/nav_admin.html" %}
+
+  <div class="filtros-admin">
+    <form method="get" action="{{ url_for('admin.usuarios') }}" class="form-filtros">
+      <div class="campo-filtro">
+        <label for="busqueda">Buscar por nombre o correo:</label>
+        <input type="text" id="busqueda" name="busqueda" value="{{ busqueda }}" placeholder="Ej. Juan Pérez o @gmail.com">
+      </div>
+
+      <div class="campo-filtro">
+        <label for="rol">Rol:</label>
+        <select id="rol" name="rol">
+          <option value="">Todos los roles</option>
+          <option value="ciudadano" {% if rol_filtro == 'ciudadano' %}selected{% endif %}>Ciudadano</option>
+          <option value="administrador" {% if rol_filtro == 'administrador' %}selected{% endif %}>Administrador</option>
+        </select>
+      </div>
+
+      <div class="campo-filtro">
+        <label for="estado">Estado:</label>
+        <select id="estado" name="estado">
+          <option value="">Todos los estados</option>
+          <option value="activo" {% if estado_filtro == 'activo' %}selected{% endif %}>Activo</option>
+          <option value="inactivo" {% if estado_filtro == 'inactivo' %}selected{% endif %}>Inactivo</option>
+        </select>
+      </div>
+
+      <div class="campo-filtro-boton">
+        <button type="submit" class="boton-primario">Filtrar</button>
+        {% if busqueda or rol_filtro or estado_filtro %}
+          <a href="{{ url_for('admin.usuarios') }}" class="enlace-limpiar">Limpiar filtros</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  <div class="panel-admin-bloque">
+    <h2>Usuarios Registrados ({{ usuarios | length }})</h2>
+    <div class="tabla-contenedor" tabindex="0" role="region" aria-label="Tabla de usuarios del sistema">
+      <table class="tabla-admin">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nombres y Apellidos</th>
+            <th scope="col">Correo Electrónico</th>
+            <th scope="col">Rol</th>
+            <th scope="col">Lecciones</th>
+            <th scope="col">Evaluaciones</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in usuarios %}
+            <tr>
+              <td>{{ u.id_usuario }}</td>
+              <td><strong>{{ u.nombre_completo }}</strong></td>
+              <td><code>{{ u.correo }}</code></td>
+              <td><span class="insignia-rol">{{ u.rol }}</span></td>
+              <td>{{ u.lecciones_completadas }}</td>
+              <td>{{ u.evaluaciones_aprobadas }}</td>
+              <td><span class="insignia-estado insignia-{{ u.estado }}">{{ u.estado | capitalize }}</span></td>
+              <td>
+                {% if u.id_usuario != current_user.id_usuario %}
+                  <form action="{{ url_for('admin.cambiar_estado_usuario', id_usuario=u.id_usuario) }}" method="post" class="form-accion-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    {% if u.estado == 'activo' %}
+                      <input type="hidden" name="estado" value="inactivo">
+                      <button type="submit" class="boton-tabla-desactivar" aria-label="Desactivar usuario {{ u.nombre_completo }}">Desactivar</button>
+                    {% else %}
+                      <input type="hidden" name="estado" value="activo">
+                      <button type="submit" class="boton-tabla-activar" aria-label="Activar usuario {{ u.nombre_completo }}">Activar</button>
+                    {% endif %}
+                  </form>
+                {% else %}
+                  <span class="texto-atenuado">Sesión actual</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="8">No se encontraron usuarios que coincidan con los criterios de búsqueda.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

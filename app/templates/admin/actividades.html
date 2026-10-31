@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Actividades y Simulaciones — Panel de Administración{% endblock %}
+
+{% block content %}
+<section class="seccion-admin" aria-labelledby="titulo-actividades">
+  <div class="encabezado-seccion">
+    <h1 id="titulo-actividades">Gestión de Actividades y Simulaciones</h1>
+    <p class="descripcion-seccion">
+      Supervisión de talleres prácticos, escenarios controlados de phishing y efectividad de decisiones ciudadanas.
+    </p>
+  </div>
+
+  {% include "admin/nav_admin.html" %}
+
+  <div class="panel-admin-bloque">
+    <h2>Actividades Registradas ({{ actividades | length }})</h2>
+    <div class="tabla-contenedor" tabindex="0" role="region" aria-label="Tabla de actividades del sistema">
+      <table class="tabla-admin">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Título de la Actividad</th>
+            <th scope="col">Tema Asignado</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Total Intentos</th>
+            <th scope="col">Aciertos</th>
+            <th scope="col">Efectividad</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for act in actividades %}
+            <tr>
+              <td>{{ act.id_actividad }}</td>
+              <td><strong>{{ act.titulo }}</strong></td>
+              <td>{{ act.tema_titulo or 'Sin tema' }}</td>
+              <td><span class="insignia-tipo">{{ act.tipo | capitalize }}</span></td>
+              <td>{{ act.total_intentos }}</td>
+              <td>{{ act.intentos_exitosos }}</td>
+              <td><strong>{{ act.tasa_exito }}%</strong></td>
+              <td><span class="insignia-estado insignia-{{ act.estado }}">{{ act.estado | capitalize }}</span></td>
+              <td>
+                <form action="{{ url_for('admin.cambiar_estado_actividad', id_actividad=act.id_actividad) }}" method="post" class="form-accion-inline">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  {% if act.estado == 'publicado' %}
+                    <input type="hidden" name="estado" value="borrador">
+                    <button type="submit" class="boton-tabla-desactivar" aria-label="Pasar actividad {{ act.titulo }} a borrador">Ocultar</button>
+                  {% else %}
+                    <input type="hidden" name="estado" value="publicado">
+                    <button type="submit" class="boton-tabla-activar" aria-label="Publicar actividad {{ act.titulo }}">Publicar</button>
+                  {% endif %}
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="9">No hay actividades registradas en la plataforma.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}
