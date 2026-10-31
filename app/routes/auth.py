@@ -3,13 +3,14 @@ from urllib.parse import urlsplit
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
+from app.core.auth_service import (
+    MENSAJE_CREDENCIALES,
+    MENSAJE_CUENTA_INACTIVA,
+    AuthService,
+)
 from app.forms import LoginForm, RegistroForm
-from app.models import Usuario
 
 auth_bp = Blueprint("auth", __name__)
-
-MENSAJE_CREDENCIALES = "Correo o contraseña incorrectos."
-MENSAJE_CUENTA_INACTIVA = "Tu cuenta no está activa. Contacta a la administración."
 
 
 def _es_url_segura(target: str | None) -> bool:
@@ -26,12 +27,16 @@ def registro():
 
     form = RegistroForm()
     if form.validate_on_submit():
-        Usuario.registrar_ciudadano(
+        exito, usuario, error = AuthService.registrar_ciudadano(
             nombres=form.nombres.data,
             apellidos=form.apellidos.data,
             correo=form.correo.data,
             password=form.contrasena.data,
         )
+        if not exito:
+            flash(error or "Error al crear la cuenta.", "error")
+            return render_template("registro.html", form=form)
+
         flash("Tu cuenta se creó correctamente. Ya puedes iniciar sesión.", "exito")
         return redirect(url_for("auth.login"))
 
@@ -45,11 +50,12 @@ def login():
 
     form = LoginForm()
     if form.validate_on_submit():
-        usuario = Usuario.autenticar(form.correo.data, form.contrasena.data)
-        if usuario is None:
-            flash(MENSAJE_CREDENCIALES, "error")
-        elif not usuario.is_active:
-            flash(MENSAJE_CUENTA_INACTIVA, "error")
+        exito, usuario, error = AuthService.autenticar_usuario(
+            correo=form.correo.data,
+            password=form.contrasena.data,
+        )
+        if not exito:
+            flash(error or MENSAJE_CREDENCIALES, "error")
         elif login_user(usuario):
             flash(f"Bienvenido o bienvenida, {usuario.nombres}.", "exito")
             next_page = request.args.get("next")
