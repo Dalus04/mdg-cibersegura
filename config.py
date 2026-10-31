@@ -16,7 +16,9 @@ class Config:
         f"sqlite:///{(INSTANCE_DIR / 'mdg_cibersegura.db').as_posix()}",
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    TEMPLATES_AUTO_RELOAD = True
     WTF_CSRF_ENABLED = True
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
+    AUTO_CREATE_TABLES = os.environ.get("AUTO_CREATE_TABLES", "true").lower() in ("true", "1", "yes")
+    AUTO_SEED_DATA = os.environ.get("AUTO_SEED_DATA", "true").lower() in ("true", "1", "yes")
+

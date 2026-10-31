@@ -1,7 +1,7 @@
 from flask import Flask
 
 from config import INSTANCE_DIR, Config
-from app.extensions import csrf, db, login_manager
+from app.extensions import csrf, db, login_manager, migrate
 
 
 def create_app(config_class=Config) -> Flask:
@@ -15,6 +15,7 @@ def create_app(config_class=Config) -> Flask:
     app.config.from_object(config_class)
 
     db.init_app(app)
+    migrate.init_app(app, db)
     csrf.init_app(app)
     login_manager.init_app(app)
 
@@ -34,21 +35,40 @@ def create_app(config_class=Config) -> Flask:
     app.register_blueprint(auth_bp)
     app.register_blueprint(aprendizaje_bp)
 
-    with app.app_context():
-        from app import models  # noqa: F401
+    @app.cli.command("seed")
+    def seed_command():
+        """Siembra los datos iniciales de roles, contenidos, usuarios, actividades y evaluaciones."""
         from app.seeds import (
             seed_actividades_iniciales,
             seed_contenidos_iniciales,
             seed_evaluaciones_iniciales,
             seed_usuarios_iniciales,
         )
-
-        db.create_all()
         _seed_roles()
         seed_contenidos_iniciales()
         seed_usuarios_iniciales()
         seed_actividades_iniciales()
         seed_evaluaciones_iniciales()
+        print("¡Datos semilla sembrados con éxito!")
+
+    with app.app_context():
+        from app import models  # noqa: F401
+
+        if app.config.get("AUTO_CREATE_TABLES", True):
+            db.create_all()
+
+        if app.config.get("AUTO_SEED_DATA", True):
+            from app.seeds import (
+                seed_actividades_iniciales,
+                seed_contenidos_iniciales,
+                seed_evaluaciones_iniciales,
+                seed_usuarios_iniciales,
+            )
+            _seed_roles()
+            seed_contenidos_iniciales()
+            seed_usuarios_iniciales()
+            seed_actividades_iniciales()
+            seed_evaluaciones_iniciales()
 
     return app
 
