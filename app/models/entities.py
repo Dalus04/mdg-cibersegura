@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timezone
 
 from flask_login import UserMixin
@@ -137,6 +138,27 @@ class Actividad(db.Model):
     tema: Mapped[Tema] = relationship(back_populates="actividades")
     intentos: Mapped[list["IntentoActividad"]] = relationship(back_populates="actividad")
 
+    @property
+    def configuracion(self) -> dict:
+        """Parsea las instrucciones en formato JSON estructurado o devuelve dict básico."""
+        if not self.instrucciones:
+            return {}
+        try:
+            return json.loads(self.instrucciones)
+        except (ValueError, TypeError):
+            return {"introduccion": self.instrucciones}
+
+    def obtener_ultimo_intento(self, id_usuario: int) -> "IntentoActividad | None":
+        """Retorna el intento más reciente del usuario para esta actividad."""
+        return db.session.scalar(
+            select(IntentoActividad)
+            .where(
+                IntentoActividad.id_actividad == self.id_actividad,
+                IntentoActividad.id_usuario == id_usuario,
+            )
+            .order_by(IntentoActividad.fecha_intento.desc())
+        )
+
 
 class Evaluacion(db.Model):
     __tablename__ = "evaluacion"
@@ -238,14 +260,29 @@ class ProgresoContenido(db.Model):
         temas = db.session.scalars(
             select(Tema)
             .where(Tema.estado == "publicado")
-            .options(selectinload(Tema.contenidos))
+            .options(
+                selectinload(Tema.contenidos),
+                selectinload(Tema.actividades),
+            )
             .order_by(Tema.orden)
         ).all()
 
         completados = cls.obtener_completados_usuario(id_usuario)
 
+        # Actividades realizadas con éxito por el usuario
+        intentos_exitosos = set(
+            db.session.scalars(
+                select(IntentoActividad.id_actividad).where(
+                    IntentoActividad.id_usuario == id_usuario,
+                    IntentoActividad.resultado == "exitoso",
+                )
+            ).all()
+        )
+
         total_lecciones_global = 0
         total_completadas_global = 0
+        total_actividades_global = 0
+        total_actividades_completadas_global = 0
         temas_resumen = []
 
         for tema in temas:
@@ -277,11 +314,20 @@ class ProgresoContenido(db.Model):
                 None,
             )
 
+            # Actividades del tema
+            actividades_publicadas = [a for a in tema.actividades if a.estado == "publicado"]
+            tot_act = len(actividades_publicadas)
+            comp_act = sum(1 for a in actividades_publicadas if a.id_actividad in intentos_exitosos)
+            total_actividades_global += tot_act
+            total_actividades_completadas_global += comp_act
+
             temas_resumen.append(
                 {
                     "tema": tema,
                     "total_lecciones": total_tema,
                     "lecciones_completadas": completadas_tema,
+                    "total_actividades": tot_act,
+                    "actividades_completadas": comp_act,
                     "porcentaje": porcentaje,
                     "estado": estado,
                     "siguiente_leccion": siguiente,
@@ -298,6 +344,8 @@ class ProgresoContenido(db.Model):
         return {
             "total_lecciones": total_lecciones_global,
             "lecciones_completadas": total_completadas_global,
+            "total_actividades": total_actividades_global,
+            "actividades_completadas": total_actividades_completadas_global,
             "porcentaje_global": porcentaje_global,
             "total_temas": len(temas),
             "temas_completados": temas_completados,
@@ -316,6 +364,21 @@ class IntentoActividad(db.Model):
 
     usuario: Mapped[Usuario] = relationship(back_populates="intentos_actividad")
     actividad: Mapped[Actividad] = relationship(back_populates="intentos")
+
+    @classmethod
+    def registrar(
+        cls, id_usuario: int, id_actividad: int, resultado: str
+    ) -> "IntentoActividad":
+        """Registra un nuevo intento de resolución de actividad."""
+        intento = cls(
+            id_usuario=id_usuario,
+            id_actividad=id_actividad,
+            resultado=resultado,
+            fecha_intento=utc_now(),
+        )
+        db.session.add(intento)
+        db.session.commit()
+        return intento
 
 
 class IntentoEvaluacion(db.Model):

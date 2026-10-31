@@ -5,7 +5,7 @@ from flask_login import current_user, login_required
 from sqlalchemy import select
 
 from app.extensions import db
-from app.models import Contenido, ProgresoContenido, Tema
+from app.models import Actividad, Contenido, IntentoActividad, ProgresoContenido, Tema
 
 aprendizaje_bp = Blueprint("aprendizaje", __name__)
 
@@ -77,12 +77,26 @@ def detalle_tema(id_tema: int):
             "completado": completadas == total and total > 0,
         }
 
+    actividades = db.session.scalars(
+        select(Actividad)
+        .where(Actividad.id_tema == tema.id_tema, Actividad.estado == "publicado")
+    ).all()
+
+    intentos_actividades = {}
+    if current_user.is_authenticated:
+        for act in actividades:
+            intentos_actividades[act.id_actividad] = act.obtener_ultimo_intento(
+                current_user.id_usuario
+            )
+
     return render_template(
         "aprendizaje/tema_detalle.html",
         tema=tema,
         contenidos=contenidos,
         completados_ids=completados_ids,
         progreso_tema=progreso_tema,
+        actividades=actividades,
+        intentos_actividades=intentos_actividades,
     )
 
 
@@ -235,3 +249,95 @@ def mi_progreso():
     """Panel de avance formativo del ciudadano."""
     resumen = ProgresoContenido.obtener_resumen_progreso_usuario(current_user.id_usuario)
     return render_template("aprendizaje/mi_progreso.html", resumen=resumen)
+
+
+@aprendizaje_bp.get("/temas/<int:id_tema>/actividades/<int:id_actividad>")
+def ver_actividad(id_tema: int, id_actividad: int):
+    """Presenta una actividad práctica o simulación en entorno seguro."""
+    tema = db.session.scalar(
+        select(Tema).where(Tema.id_tema == id_tema, Tema.estado == "publicado")
+    )
+    if tema is None:
+        abort(404)
+
+    actividad = db.session.scalar(
+        select(Actividad).where(
+            Actividad.id_actividad == id_actividad,
+            Actividad.id_tema == tema.id_tema,
+            Actividad.estado == "publicado",
+        )
+    )
+    if actividad is None:
+        abort(404)
+
+    ultimo_intento = None
+    if current_user.is_authenticated:
+        ultimo_intento = actividad.obtener_ultimo_intento(current_user.id_usuario)
+
+    return render_template(
+        "aprendizaje/actividad.html",
+        tema=tema,
+        actividad=actividad,
+        configuracion=actividad.configuracion,
+        ultimo_intento=ultimo_intento,
+    )
+
+
+@aprendizaje_bp.post("/temas/<int:id_tema>/actividades/<int:id_actividad>/resolver")
+@login_required
+def resolver_actividad(id_tema: int, id_actividad: int):
+    """Evalúa la decisión del ciudadano en la actividad y registra el intento con retroalimentación."""
+    tema = db.session.scalar(
+        select(Tema).where(Tema.id_tema == id_tema, Tema.estado == "publicado")
+    )
+    if tema is None:
+        abort(404)
+
+    actividad = db.session.scalar(
+        select(Actividad).where(
+            Actividad.id_actividad == id_actividad,
+            Actividad.id_tema == tema.id_tema,
+            Actividad.estado == "publicado",
+        )
+    )
+    if actividad is None:
+        abort(404)
+
+    opcion_id = request.form.get("opcion_id")
+    config = actividad.configuracion
+    opciones = config.get("opciones", [])
+
+    opcion_elegida = next((o for o in opciones if o.get("id") == opcion_id), None)
+    if opcion_elegida is None:
+        flash("Por favor, selecciona una alternativa antes de enviar tu respuesta.", "error")
+        return redirect(
+            url_for(
+                "aprendizaje.ver_actividad",
+                id_tema=tema.id_tema,
+                id_actividad=actividad.id_actividad,
+            )
+        )
+
+    es_correcta = bool(opcion_elegida.get("es_correcta"))
+    resultado_clave = "exitoso" if es_correcta else "requiere_repaso"
+
+    intento = IntentoActividad.registrar(
+        id_usuario=current_user.id_usuario,
+        id_actividad=actividad.id_actividad,
+        resultado=resultado_clave,
+    )
+
+    if es_correcta:
+        flash("¡Felicitaciones! Has completado la actividad con una decisión acertada.", "exito")
+    else:
+        flash("Atención: tu respuesta revela un riesgo de seguridad. Revisa la explicación detallada.", "error")
+
+    return render_template(
+        "aprendizaje/actividad_resultado.html",
+        tema=tema,
+        actividad=actividad,
+        configuracion=config,
+        opcion_elegida=opcion_elegida,
+        es_correcta=es_correcta,
+        intento=intento,
+    )

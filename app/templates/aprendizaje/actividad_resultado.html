@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Resultado de la actividad · {{ actividad.titulo }} · MDG Cibersegura{% endblock %}
+
+{% block content %}
+  <nav aria-label="Ruta de navegación">
+    <ol class="migas">
+      <li><a href="{{ url_for('main.index') }}">Inicio</a></li>
+      <li><a href="{{ url_for('aprendizaje.lista_temas') }}">Temas educativos</a></li>
+      <li><a href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">{{ tema.titulo }}</a></li>
+      <li><a href="{{ url_for('aprendizaje.ver_actividad', id_tema=tema.id_tema, id_actividad=actividad.id_actividad) }}">{{ actividad.titulo }}</a></li>
+      <li aria-current="page">Resultado</li>
+    </ol>
+  </nav>
+
+  <article class="resultado-actividad-contenedor">
+    <!-- Banner de Evaluación del Resultado -->
+    <header class="banner-resultado-evaluacion {% if es_correcta %}resultado-exito{% else %}resultado-alerta{% endif %}">
+      <div class="icono-resultado-grande" aria-hidden="true">
+        {% if es_correcta %}🛡️{% else %}⚠️{% endif %}
+      </div>
+      <div>
+        <span class="insignia-resultado-tipo">
+          {% if es_correcta %}Decisión preventiva correcta{% else %}Riesgo de seguridad identificado{% endif %}
+        </span>
+        <h1>
+          {% if es_correcta %}
+            ¡Excelente decisión defensiva!
+          {% else %}
+            Atención: esta acción pone en riesgo tus cuentas
+          {% endif %}
+        </h1>
+        <p class="subtitulo-resultado">
+          Actividad: <strong>{{ actividad.titulo }}</strong> · {{ tema.titulo }}
+        </p>
+      </div>
+    </header>
+
+    <!-- Análisis de la Respuesta Seleccionada -->
+    <section class="seccion-analisis-respuesta" aria-labelledby="titulo-analisis">
+      <h2 id="titulo-analisis">Análisis de tu elección</h2>
+
+      <div class="tarjeta-eleccion-usuario {% if es_correcta %}eleccion-correcta{% else %}eleccion-incorrecta{% endif %}">
+        <div class="rotulo-eleccion">
+          <strong>Tu respuesta elegida:</strong>
+        </div>
+        <p class="texto-eleccion-marcada">«{{ opcion_elegida.texto }}»</p>
+        <div class="caja-explicacion-pedagogica">
+          <strong>Explicación:</strong>
+          <p>{{ opcion_elegida.explicacion }}</p>
+        </div>
+      </div>
+
+      <!-- Indicios sospechosos si aplica a la simulación -->
+      {% if configuracion.indicios_analisis %}
+        <div class="caja-indicios-revelados">
+          <h3>Indicios clave que debías observar en el mensaje:</h3>
+          <ul class="lista-indicios">
+            {% for indicio in configuracion.indicios_analisis %}
+              <li>
+                <strong>{{ indicio.elemento }}:</strong> {{ indicio.descripcion }}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <!-- Consejo de ciberseguridad final -->
+      {% if configuracion.consejo_final %}
+        <div class="caja-consejo-ciberseguridad">
+          <span class="icono-bombilla" aria-hidden="true">💡</span>
+          <div>
+            <strong>Recomendación preventiva institucional:</strong>
+            <p>{{ configuracion.consejo_final }}</p>
+          </div>
+        </div>
+      {% endif %}
+    </section>
+
+    <!-- Botones de Acción y Navegación -->
+    <footer class="pie-acciones-resultado">
+      <a class="enlace-accion" href="{{ url_for('aprendizaje.ver_actividad', id_tema=tema.id_tema, id_actividad=actividad.id_actividad) }}">
+        🔄 Practicar nuevamente
+      </a>
+      <a class="enlace-secundario" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
+        Volver a lecciones del tema
+      </a>
+      <a class="enlace-secundario" href="{{ url_for('aprendizaje.mi_progreso') }}">
+        Ver mi progreso
+      </a>
+    </footer>
+  </article>
+{% endblock %}

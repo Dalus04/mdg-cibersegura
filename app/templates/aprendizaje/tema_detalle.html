@@ -80,6 +80,52 @@
       {% endif %}
     </section>
 
+    {% if actividades %}
+      <section aria-labelledby="titulo-actividades" class="seccion-actividades-tema">
+        <header class="cabecera-seccion-actividades">
+          <span class="insignia-institucional">Práctica y simulación</span>
+          <h2 id="titulo-actividades">Actividades y simulaciones del tema</h2>
+          <p>Aplica tus conocimientos teóricos en situaciones controladas de seguridad digital.</p>
+        </header>
+
+        <div class="grid-actividades-tema">
+          {% for act in actividades %}
+            {% set intento = intentos_actividades.get(act.id_actividad) if intentos_actividades else None %}
+            <article class="tarjeta-actividad-item tipo-{{ act.tipo }}">
+              <div class="cabecera-tarjeta-actividad">
+                <span class="insignia-tipo-actividad tipo-{{ act.tipo }}">
+                  {% if act.tipo == 'simulacion' %}
+                    🛡️ Simulación
+                  {% else %}
+                    ⚙️ Taller práctico
+                  {% endif %}
+                </span>
+                {% if intento %}
+                  {% if intento.resultado == 'exitoso' %}
+                    <span class="badge-progreso badge-completado" role="status">✓ Realizado con éxito</span>
+                  {% else %}
+                    <span class="badge-progreso badge-en-progreso" role="status">⚠️ Requiere práctica</span>
+                  {% endif %}
+                {% endif %}
+              </div>
+
+              <h3>
+                <a href="{{ url_for('aprendizaje.ver_actividad', id_tema=tema.id_tema, id_actividad=act.id_actividad) }}">
+                  {{ act.titulo }}
+                </a>
+              </h3>
+
+              <div class="pie-tarjeta-actividad">
+                <a class="enlace-accion" href="{{ url_for('aprendizaje.ver_actividad', id_tema=tema.id_tema, id_actividad=act.id_actividad) }}">
+                  {% if intento %}Repetir actividad{% else %}Comenzar actividad →{% endif %}
+                </a>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
     <footer class="pie-navegacion-tema">
       <p>
         <a class="enlace-secundario" href="{{ url_for('aprendizaje.lista_temas') }}">

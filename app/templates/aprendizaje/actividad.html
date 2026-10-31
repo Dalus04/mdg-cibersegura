@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}{{ actividad.titulo }} · {{ tema.titulo }} · MDG Cibersegura{% endblock %}
+
+{% block content %}
+  <nav aria-label="Ruta de navegación">
+    <ol class="migas">
+      <li><a href="{{ url_for('main.index') }}">Inicio</a></li>
+      <li><a href="{{ url_for('aprendizaje.lista_temas') }}">Temas educativos</a></li>
+      <li><a href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">{{ tema.titulo }}</a></li>
+      <li aria-current="page">{{ actividad.titulo }}</li>
+    </ol>
+  </nav>
+
+  <article class="actividad-contenedor">
+    <header class="encabezado-actividad">
+      <div class="metadatos-actividad">
+        <span class="insignia-tipo-actividad tipo-{{ actividad.tipo }}">
+          {% if actividad.tipo == 'simulacion' %}
+            🛡️ Simulación en entorno seguro
+          {% else %}
+            ⚙️ Taller práctico interactivo
+          {% endif %}
+        </span>
+        <span class="etiqueta-tema-padre">{{ tema.titulo }}</span>
+      </div>
+
+      <h1>{{ actividad.titulo }}</h1>
+
+      {% if configuracion.introduccion %}
+        <p class="introduccion-actividad">{{ configuracion.introduccion }}</p>
+      {% endif %}
+
+      {% if ultimo_intento %}
+        <div class="aviso-ultimo-intento {% if ultimo_intento.resultado == 'exitoso' %}intento-exitoso{% else %}intento-repaso{% endif %}" role="status">
+          <strong>Tu último intento:</strong> 
+          {% if ultimo_intento.resultado == 'exitoso' %}
+            ✓ Completado con éxito el {{ ultimo_intento.fecha_intento.strftime('%d/%m/%Y') }}. Puedes volver a practicar tantas veces como desees.
+          {% else %}
+            ⚠️ Requiere práctica. Realizado el {{ ultimo_intento.fecha_intento.strftime('%d/%m/%Y') }}. ¡Intenta nuevamente!
+          {% endif %}
+        </div>
+      {% endif %}
+    </header>
+
+    <!-- Escenario de la Simulación o Caso Práctico -->
+    <section class="seccion-escenario-actividad" aria-labelledby="titulo-escenario">
+      <h2 id="titulo-escenario" class="sr-only">Escenario interactivo</h2>
+
+      {% if configuracion.escenario_simulado %}
+        <!-- Visualización realista de Correo Simulado -->
+        {% set correo = configuracion.escenario_simulado %}
+        <div class="cliente-correo-simulado" aria-label="Cliente de correo electrónico seguro simulado">
+          <div class="barra-superior-correo">
+            <span class="punto-rojo"></span>
+            <span class="punto-amarillo"></span>
+            <span class="punto-verde"></span>
+            <span class="titulo-ventana-correo">Bandeja de entrada — Simulador de Ciberseguridad</span>
+          </div>
+
+          <div class="cabecera-correo-simulado">
+            <div class="campo-correo">
+              <strong>De:</strong> <span class="remitente-destacado">{{ correo.remitente_nombre }}</span> &lt;<span class="correo-falso-remitente">{{ correo.remitente_direccion }}</span>&gt;
+            </div>
+            <div class="campo-correo">
+              <strong>Para:</strong> <span>{{ correo.destinatario }}</span>
+            </div>
+            <div class="campo-correo">
+              <strong>Fecha:</strong> <span>{{ correo.fecha }}</span>
+            </div>
+            <div class="campo-correo">
+              <strong>Asunto:</strong> <span class="asunto-urgente">{{ correo.asunto }}</span>
+            </div>
+          </div>
+
+          <div class="cuerpo-correo-simulado">
+            <div class="texto-correo">
+              {% for linea in correo.mensaje.split('\n\n') %}
+                <p>{{ linea }}</p>
+              {% endfor %}
+            </div>
+
+            <div class="inspeccion-enlace-alerta">
+              <span class="icono-lupa" aria-hidden="true">🔍</span>
+              <div>
+                <strong>Inspección visual del enlace:</strong>
+                <code>{{ correo.enlace_falso }}</code>
+                <p class="nota-segura">En un correo real, verifica el dominio antes de hacer clic posando el cursor o manteniendo presionado el enlace.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      {% elif configuracion.caso_contexto %}
+        <!-- Caso Contextual de Taller Práctico -->
+        <div class="tarjeta-caso-contexto">
+          <h3>Situación planteada</h3>
+          <p>{{ configuracion.caso_contexto }}</p>
+        </div>
+      {% endif %}
+    </section>
+
+    <!-- Formulario de toma de decisión -->
+    <section class="seccion-formulario-actividad" aria-labelledby="titulo-decision">
+      <h2 id="titulo-decision">{{ configuracion.pregunta or '¿Cuál es la decisión correcta?' }}</h2>
+
+      {% if current_user.is_authenticated %}
+        <form action="{{ url_for('aprendizaje.resolver_actividad', id_tema=tema.id_tema, id_actividad=actividad.id_actividad) }}" method="post" class="form-decision-actividad">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <fieldset class="grupo-opciones-actividad">
+            <legend class="sr-only">Selecciona tu alternativa</legend>
+
+            <div class="lista-opciones-radios">
+              {% for opcion in configuracion.opciones %}
+                <label class="tarjeta-opcion-decision" for="opcion_{{ opcion.id }}">
+                  <input 
+                    type="radio" 
+                    name="opcion_id" 
+                    id="opcion_{{ opcion.id }}" 
+                    value="{{ opcion.id }}" 
+                    required
+                  >
+                  <span class="indicador-radio-custom" aria-hidden="true"></span>
+                  <span class="texto-opcion-decision">{{ opcion.texto }}</span>
+                </label>
+              {% endfor %}
+            </div>
+          </fieldset>
+
+          <div class="acciones-formulario-actividad">
+            <button type="submit" class="boton-enviar-actividad">
+              Confirmar y evaluar decisión →
+            </button>
+            <a class="enlace-secundario" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
+              Volver al tema
+            </a>
+          </div>
+        </form>
+      {% else %}
+        <div class="caja-login-requerido">
+          <p>
+            <strong>Para participar en esta actividad y registrar tu resultado:</strong>
+          </p>
+          <div class="acciones-hero">
+            <a class="enlace-accion" href="{{ url_for('auth.login', next=request.path) }}">Iniciar sesión</a>
+            <a class="enlace-secundario" href="{{ url_for('auth.registro') }}">Registrarse</a>
+          </div>
+        </div>
+      {% endif %}
+    </section>
+  </article>
+{% endblock %}

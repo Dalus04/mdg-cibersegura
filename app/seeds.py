@@ -1,7 +1,9 @@
+import json
+
 from sqlalchemy import select
 
 from app.extensions import db
-from app.models import Contenido, Tema
+from app.models import Actividad, Contenido, Tema
 
 DATOS_TEMAS_INICIALES = [
     {
@@ -429,5 +431,234 @@ def seed_usuarios_iniciales() -> None:
                 )
                 nuevo_usuario.set_password(data["password"])
                 db.session.add(nuevo_usuario)
+
+    db.session.commit()
+
+
+ACTIVIDADES_INICIALES = [
+    {
+        "tema_orden": 1,
+        "titulo": "Taller interactivo: Creación y validación de Passphrase",
+        "tipo": "practica",
+        "instrucciones": json.dumps(
+            {
+                "introduccion": (
+                    "En esta práctica interactiva aplicarás las recomendaciones aprendidas para crear "
+                    "contraseñas seguras y comprenderás por qué la longitud supera a la complejidad simple."
+                ),
+                "caso_contexto": (
+                    "Una vecina de Guadalupe necesita crear una contraseña para su cuenta de correo "
+                    "y su banca digital. Desea una clave que sea resistente a ataques automatizados "
+                    "de fuerza bruta y diccionario, pero que pueda memorizar sin anotarla en un papel."
+                ),
+                "pregunta": "¿Cuál de las siguientes propuestas de contraseña es la más segura y recomendable?",
+                "opciones": [
+                    {
+                        "id": "opt_1",
+                        "texto": "Guadalupe2026!",
+                        "es_correcta": False,
+                        "explicacion": (
+                            "Incorrecta. Aunque incluye mayúscula, números y un símbolo, está formada "
+                            "por una palabra común predecible (el nombre del distrito) y el año actual. "
+                            "Los programas de ataque prueban estos patrones en cuestión de segundos."
+                        ),
+                    },
+                    {
+                        "id": "opt_2",
+                        "texto": "P4$$w0rd#99",
+                        "es_correcta": False,
+                        "explicacion": (
+                            "Incorrecta. Las sustituciones simples (como '4' por 'a' o '$' por 's') "
+                            "están incorporadas en todos los diccionarios de cracking actuales y no "
+                            "añaden seguridad real si la longitud es corta (11 caracteres)."
+                        ),
+                    },
+                    {
+                        "id": "opt_3",
+                        "texto": "algarrobo-guitarra-rio-playa",
+                        "es_correcta": True,
+                        "explicacion": (
+                            "¡Correcto! Esta frase de contraseña ('passphrase') tiene 28 caracteres "
+                            "formados por cuatro palabras cotidianas no relacionadas. Su gran longitud "
+                            "hace matemáticamente inviable un ataque de fuerza bruta moderno, y a la vez "
+                            "es sumamente fácil de recordar."
+                        ),
+                    },
+                ],
+                "consejo_final": (
+                    "Recuerda: la longitud (16 caracteres o más) y la unicidad de tu clave son tus mejores escudos. "
+                    "Complementa siempre tus cuentas principales activando la autenticación en dos pasos (2FA)."
+                ),
+            },
+            ensure_ascii=False,
+        ),
+    },
+    {
+        "tema_orden": 2,
+        "titulo": "Simulador de Alerta: Detección de Mensaje de Phishing Bancario",
+        "tipo": "simulacion",
+        "instrucciones": json.dumps(
+            {
+                "introduccion": (
+                    "Entorno seguro de simulación de ciberseguridad. Examina con atención el siguiente "
+                    "correo electrónico sospechoso simulado y toma la decisión más prudente."
+                ),
+                "escenario_simulado": {
+                    "tipo_mensaje": "Correo electrónico",
+                    "remitente_nombre": "Banco de la Nación - Notificaciones Oficiales",
+                    "remitente_direccion": "alerta-seguridad@bn-verificacion-urgente.net",
+                    "destinatario": "ciudadano.guadalupe@ejemplo.com",
+                    "asunto": "🚨 URGENTE: Bloqueo preventivo de su tarjeta y banca por internet en 2 horas",
+                    "fecha": "Hoy, 09:30 AM",
+                    "mensaje": (
+                        "Estimado(a) ciudadano(a):\n\n"
+                        "Detectamos múltiples intentos de acceso no autorizados a su cuenta desde una ubicación no habitual.\n\n"
+                        "Por protocolo de seguridad institucional, sus operaciones electrónicas y tarjetas serán SUSPENDIDAS "
+                        "en un plazo máximo de 2 HORAS salvo que valide su identidad de inmediato a través de nuestro enlace oficial:\n\n"
+                        "👉 http://bn-verificacion-urgente.net/actualizar-datos-login\n\n"
+                        "Si no actualiza sus credenciales dentro del plazo, su cuenta quedará bloqueada indefinidamente.\n\n"
+                        "Atentamente,\n"
+                        "División de Prevención de Fraudes"
+                    ),
+                    "enlace_falso": "http://bn-verificacion-urgente.net/actualizar-datos-login",
+                },
+                "indicios_analisis": [
+                    {
+                        "elemento": "Dominio falso del remitente",
+                        "descripcion": "El correo proviene de '@bn-verificacion-urgente.net' en lugar del dominio oficial del Estado (.gob.pe o .com.pe).",
+                    },
+                    {
+                        "elemento": "Sentido falso de extrema urgencia",
+                        "descripcion": "Amenaza con bloqueo en 2 horas para forzar una decisión impulsiva sin verificar.",
+                    },
+                    {
+                        "elemento": "Enlace fraudulento",
+                        "descripcion": "Usa HTTP no seguro y conduce a un sitio web falso diseñado para clonar tus claves.",
+                    },
+                ],
+                "pregunta": "¿Qué acción debes tomar ante este mensaje?",
+                "opciones": [
+                    {
+                        "id": "opt_hacer_clic",
+                        "texto": "Hacer clic en el enlace de inmediato e ingresar mi documento y clave para que no me bloqueen.",
+                        "es_correcta": False,
+                        "explicacion": (
+                            "🚨 ¡PELIGRO! Habrías caído en la trampa del atacante. La página clonada robaría "
+                            "tu número de tarjeta y clave secreta, permitiendo a los delincuentes vaciar tus fondos."
+                        ),
+                    },
+                    {
+                        "id": "opt_responder",
+                        "texto": "Responder al correo adjuntando una foto de mi DNI para demostrar que soy el titular.",
+                        "es_correcta": False,
+                        "explicacion": (
+                            "⚠️ RIESGO GRAVE. Estarías entregando tus datos personales sensibles directamente "
+                            "a ciberdelincuentes, facilitando la suplantación de tu identidad y fraudes crediticios."
+                        ),
+                    },
+                    {
+                        "id": "opt_identificar_phishing",
+                        "texto": "Identificar el correo como Phishing: no abrir el enlace, no responder y verificar directamente por canales oficiales o presenciales.",
+                        "es_correcta": True,
+                        "explicacion": (
+                            "🛡️ ¡DECISIÓN CORRECTA! Reconociste las señales de alarma: remitente falso, "
+                            "urgencia extorsiva y enlace fraudulento. Ninguna institución oficial o banco "
+                            "solicita claves ni actualiza datos por enlaces directos de correo."
+                        ),
+                    },
+                ],
+                "consejo_final": (
+                    "Ante cualquier notificación de 'bloqueo urgente', nunca utilices los enlaces del mensaje. "
+                    "Comunícate siempre por los números telefónicos oficiales que figuran al dorso de tu tarjeta o acude a la agencia."
+                ),
+            },
+            ensure_ascii=False,
+        ),
+    },
+    {
+        "tema_orden": 3,
+        "titulo": "Simulador de Privacidad: Permisos Excesivos en Aplicaciones Móviles",
+        "tipo": "simulacion",
+        "instrucciones": json.dumps(
+            {
+                "introduccion": (
+                    "Aprende a proteger tus datos personales conforme a los principios de proporcionalidad "
+                    "y finalidad establecidos en la Ley N.° 29733 de Protección de Datos Personales."
+                ),
+                "caso_contexto": (
+                    "Instalas una aplicación gratuita llamada 'Linterna Brillante HD' en tu teléfono celular. "
+                    "Al iniciarla por primera vez, te solicita los siguientes permisos en pantalla:\n\n"
+                    "• Cámara y Flash (requerido para encender la luz)\n"
+                    "• Acceso a toda tu libreta de Contactos\n"
+                    "• Ubicación GPS precisa en tiempo real\n"
+                    "• Acceso permanente al Micrófono"
+                ),
+                "pregunta": "¿Cuál es la conducta más adecuada respetando tu privacidad digital?",
+                "opciones": [
+                    {
+                        "id": "opt_aceptar_todo",
+                        "texto": "Aceptar todos los permisos sin leer para que la aplicación funcione más rápido.",
+                        "es_correcta": False,
+                        "explicacion": (
+                            "Riesgo alto: La aplicación recopilará tus contactos personales, ubicación y audios "
+                            "para venderlos a terceros o realizar perfiles publicitarios invasivos sin tu consentimiento informado."
+                        ),
+                    },
+                    {
+                        "id": "opt_limitar_permisos",
+                        "texto": "Conceder únicamente el permiso de Flash/Cámara (estrictamente necesario) y denegar Contactos, Ubicación y Micrófono.",
+                        "es_correcta": True,
+                        "explicacion": (
+                            "¡Excelente! Aplicas el principio de proporcionalidad (Ley 29733): una herramienta "
+                            "solo debe tener acceso a los datos indispensables para su finalidad técnica."
+                        ),
+                    },
+                    {
+                        "id": "opt_desinstalar",
+                        "texto": "Denegar los permisos invasivos y desinstalar la app, buscando una alternativa que no pida datos desmedidos.",
+                        "es_correcta": True,
+                        "explicacion": (
+                            "¡Muy buena decisión preventiva! Si una aplicación sencilla exige permisos desproporcionados, "
+                            "lo más sensato es desinstalarla y preferir las funciones nativas del sistema operativo."
+                        ),
+                    },
+                ],
+                "consejo_final": (
+                    "Revisa periódicamente los permisos en los ajustes de tu teléfono. Si una app no necesita un dato "
+                    "para su función declarada, no tiene por qué tener acceso a él."
+                ),
+            },
+            ensure_ascii=False,
+        ),
+    },
+]
+
+
+def seed_actividades_iniciales() -> None:
+    """Inserta actividades y simulaciones educativas para los temas correspondientes."""
+    from app.models import Actividad, Tema
+
+    temas = {tema.orden: tema for tema in db.session.scalars(select(Tema)).all()}
+
+    for data in ACTIVIDADES_INICIALES:
+        tema = temas.get(data["tema_orden"])
+        if tema is None:
+            continue
+
+        actividad_existente = db.session.scalar(
+            select(Actividad).where(
+                Actividad.id_tema == tema.id_tema,
+                Actividad.titulo == data["titulo"],
+            )
+        )
+        if actividad_existente is None:
+            nueva_actividad = Actividad(
+                id_tema=tema.id_tema,
+                titulo=data["titulo"],
+                tipo=data["tipo"],
+                instrucciones=data["instrucciones"],
+                estado="publicado",
+            )
+            db.session.add(nueva_actividad)
 
     db.session.commit()
