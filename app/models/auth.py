@@ -51,6 +51,14 @@ class Usuario(UserMixin, db.Model):
     def is_active(self) -> bool:
         return self.estado == "activo"
 
+    @property
+    def es_administrador(self) -> bool:
+        return self.rol is not None and self.rol.nombre == "administrador"
+
+    @property
+    def nombre_completo(self) -> str:
+        return f"{self.nombres} {self.apellidos}".strip()
+
     def set_password(self, password: str) -> None:
         self.password_hash = generate_password_hash(password)
 

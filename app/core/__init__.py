@@ -5,15 +5,20 @@ independientemente del mecanismo de entrega (Web SSR, API REST o CLI).
 """
 
 from app.core.actividad_service import ActividadService
+from app.core.admin_service import AdminService
 from app.core.aprendizaje_service import AprendizajeService
 from app.core.auth_service import AuthService
+from app.core.decorators import admin_required, api_login_required
 from app.core.evaluacion_service import EvaluacionService
 from app.core.progreso_service import ProgresoService
 
 __all__ = [
     "ActividadService",
+    "AdminService",
     "AprendizajeService",
     "AuthService",
     "EvaluacionService",
     "ProgresoService",
+    "admin_required",
+    "api_login_required",
 ]

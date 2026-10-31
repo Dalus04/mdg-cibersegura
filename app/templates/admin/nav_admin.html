@@ -1,0 +1,9 @@
+<nav class="nav-admin" aria-label="Navegación del Panel de Administración">
+  <ul class="nav-admin-lista">
+    <li><a href="{{ url_for('admin.dashboard') }}" class="nav-admin-enlace {% if request.endpoint == 'admin.dashboard' %}activo{% endif %}">Panel General</a></li>
+    <li><a href="{{ url_for('admin.usuarios') }}" class="nav-admin-enlace {% if request.endpoint == 'admin.usuarios' %}activo{% endif %}">Usuarios</a></li>
+    <li><a href="{{ url_for('admin.contenidos') }}" class="nav-admin-enlace {% if request.endpoint == 'admin.contenidos' %}activo{% endif %}">Contenidos y Temas</a></li>
+    <li><a href="{{ url_for('admin.actividades') }}" class="nav-admin-enlace {% if request.endpoint == 'admin.actividades' %}activo{% endif %}">Actividades y Simulaciones</a></li>
+    <li><a href="{{ url_for('admin.evaluaciones') }}" class="nav-admin-enlace {% if request.endpoint == 'admin.evaluaciones' %}activo{% endif %}">Evaluaciones</a></li>
+  </ul>
+</nav>

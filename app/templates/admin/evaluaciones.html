@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Evaluaciones — Panel de Administración{% endblock %}
+
+{% block content %}
+<section class="seccion-admin" aria-labelledby="titulo-evaluaciones">
+  <div class="encabezado-seccion">
+    <h1 id="titulo-evaluaciones">Gestión de Evaluaciones Formativas</h1>
+    <p class="descripcion-seccion">
+      Supervisión de cuestionarios institucionales, estadísticas de notas sobre 20 puntos y tasas de aprobación.
+    </p>
+  </div>
+
+  {% include "admin/nav_admin.html" %}
+
+  <div class="panel-admin-bloque">
+    <h2>Evaluaciones Registradas ({{ evaluaciones | length }})</h2>
+    <div class="tabla-contenedor" tabindex="0" role="region" aria-label="Tabla de evaluaciones del sistema">
+      <table class="tabla-admin">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Título de la Evaluación</th>
+            <th scope="col">Tema Asignado</th>
+            <th scope="col">Preguntas</th>
+            <th scope="col">Mínimo / Total</th>
+            <th scope="col">Intentos</th>
+            <th scope="col">Aprobados</th>
+            <th scope="col">Nota Promedio</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ev in evaluaciones %}
+            <tr>
+              <td>{{ ev.id_evaluacion }}</td>
+              <td><strong>{{ ev.titulo }}</strong></td>
+              <td>{{ ev.tema_titulo or 'Sin tema' }}</td>
+              <td>{{ ev.total_preguntas }}</td>
+              <td>{{ ev.puntaje_minimo }} / {{ ev.puntaje_maximo }} pts</td>
+              <td>{{ ev.total_intentos }}</td>
+              <td>{{ ev.aprobados }} ({{ ev.tasa_aprobacion }}%)</td>
+              <td><strong>{{ ev.promedio_nota }}</strong> / 20</td>
+              <td><span class="insignia-estado insignia-{{ ev.estado }}">{{ ev.estado | capitalize }}</span></td>
+              <td>
+                <form action="{{ url_for('admin.cambiar_estado_evaluacion', id_evaluacion=ev.id_evaluacion) }}" method="post" class="form-accion-inline">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  {% if ev.estado == 'publicado' %}
+                    <input type="hidden" name="estado" value="borrador">
+                    <button type="submit" class="boton-tabla-desactivar" aria-label="Pasar evaluación {{ ev.titulo }} a borrador">Ocultar</button>
+                  {% else %}
+                    <input type="hidden" name="estado" value="publicado">
+                    <button type="submit" class="boton-tabla-activar" aria-label="Publicar evaluación {{ ev.titulo }}">Publicar</button>
+                  {% endif %}
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="10">No hay evaluaciones registradas en el sistema.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}
