@@ -30,24 +30,47 @@
     </header>
 
     <section aria-labelledby="titulo-lecciones" class="seccion-lecciones-tema">
-      <h2 id="titulo-lecciones">Lecciones del tema</h2>
+      <div class="cabecera-seccion-lecciones">
+        <h2 id="titulo-lecciones">Lecciones del tema</h2>
+        {% if progreso_tema %}
+          <div class="caja-progreso-tema">
+            <div class="info-progreso-tema">
+              <span class="texto-resumen-avance"><strong>Tu avance:</strong> {{ progreso_tema.completadas }} de {{ progreso_tema.total }} completadas ({{ progreso_tema.porcentaje }}%)</span>
+              {% if progreso_tema.completado %}
+                <span class="insignia-progreso-completo" role="status">✓ Módulo completado</span>
+              {% endif %}
+            </div>
+            <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ progreso_tema.porcentaje }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progreso en {{ tema.titulo }}: {{ progreso_tema.porcentaje }}%">
+              <div class="barra-progreso-relleno" style="width: {{ progreso_tema.porcentaje }}%;"></div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
 
       {% if contenidos %}
         <ol class="lista-lecciones">
           {% for contenido in contenidos %}
-            <li class="item-leccion">
+            {% set es_comp = contenido.id_contenido in completados_ids %}
+            <li class="item-leccion {% if es_comp %}item-leccion-completada{% endif %}">
               <div class="info-leccion">
                 <span class="orden-leccion" aria-hidden="true">{{ loop.index }}</span>
                 <div class="cuerpo-item-leccion">
-                  <h3>
-                    <a href="{{ url_for('aprendizaje.ver_contenido', id_tema=tema.id_tema, id_contenido=contenido.id_contenido) }}">
-                      {{ contenido.titulo }}
-                    </a>
-                  </h3>
+                  <div class="fila-titulo-leccion">
+                    <h3>
+                      <a href="{{ url_for('aprendizaje.ver_contenido', id_tema=tema.id_tema, id_contenido=contenido.id_contenido) }}">
+                        {{ contenido.titulo }}
+                      </a>
+                    </h3>
+                    {% if es_comp %}
+                      <span class="insignia-leccion-completada" role="status">
+                        <span aria-hidden="true">✓</span> Completada
+                      </span>
+                    {% endif %}
+                  </div>
                 </div>
               </div>
-              <a class="enlace-accion" href="{{ url_for('aprendizaje.ver_contenido', id_tema=tema.id_tema, id_contenido=contenido.id_contenido) }}">
-                Leer lección
+              <a class="enlace-accion {% if es_comp %}enlace-repasar{% endif %}" href="{{ url_for('aprendizaje.ver_contenido', id_tema=tema.id_tema, id_contenido=contenido.id_contenido) }}">
+                {% if es_comp %}Repasar lección{% else %}Leer lección{% endif %}
               </a>
             </li>
           {% endfor %}

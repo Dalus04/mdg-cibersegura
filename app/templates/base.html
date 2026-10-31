@@ -19,6 +19,7 @@
             <li><a href="{{ url_for('main.index') }}">Inicio</a></li>
             <li><a href="{{ url_for('aprendizaje.lista_temas') }}">Temas educativos</a></li>
             {% if current_user.is_authenticated %}
+              <li><a href="{{ url_for('aprendizaje.mi_progreso') }}">Mi progreso</a></li>
               <li>
                 <form action="{{ url_for('auth.logout') }}" method="post" class="form-logout">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

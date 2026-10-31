@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 from flask_login import UserMixin
 from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint, select
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, selectinload
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.extensions import db
@@ -91,6 +91,9 @@ class Usuario(UserMixin, db.Model):
         if usuario is None or not usuario.check_password(password):
             return None
         return usuario
+
+    def obtener_resumen_progreso(self) -> dict:
+        return ProgresoContenido.obtener_resumen_progreso_usuario(self.id_usuario)
 
 
 class Tema(db.Model):
@@ -187,7 +190,119 @@ class ProgresoContenido(db.Model):
     fecha_completado: Mapped[datetime | None] = mapped_column(DateTime)
 
     usuario: Mapped[Usuario] = relationship(back_populates="progresos")
-    contenido: Mapped[Contenido] = relationship(back_populates="progresos")
+    contenido: Mapped["Contenido"] = relationship(back_populates="progresos")
+
+    @classmethod
+    def marcar_completado(
+        cls, id_usuario: int, id_contenido: int, completado: bool = True
+    ) -> "ProgresoContenido":
+        """Registra o actualiza el estado de completado de una lección para un usuario."""
+        progreso = db.session.scalar(
+            select(cls).where(
+                cls.id_usuario == id_usuario,
+                cls.id_contenido == id_contenido,
+            )
+        )
+        ahora = utc_now()
+        if progreso is None:
+            progreso = cls(
+                id_usuario=id_usuario,
+                id_contenido=id_contenido,
+                completado=completado,
+                fecha_completado=ahora if completado else None,
+            )
+            db.session.add(progreso)
+        else:
+            progreso.completado = completado
+            progreso.fecha_completado = ahora if completado else None
+
+        db.session.commit()
+        return progreso
+
+    @classmethod
+    def obtener_completados_usuario(
+        cls, id_usuario: int, ids_contenido: list[int] | None = None
+    ) -> set[int]:
+        """Obtiene el conjunto de IDs de contenido completados por el usuario."""
+        query = select(cls.id_contenido).where(
+            cls.id_usuario == id_usuario,
+            cls.completado.is_(True),
+        )
+        if ids_contenido is not None:
+            query = query.where(cls.id_contenido.in_(ids_contenido))
+        return set(db.session.scalars(query).all())
+
+    @classmethod
+    def obtener_resumen_progreso_usuario(cls, id_usuario: int) -> dict:
+        """Calcula las métricas de avance formativo del usuario agrupadas por tema."""
+        temas = db.session.scalars(
+            select(Tema)
+            .where(Tema.estado == "publicado")
+            .options(selectinload(Tema.contenidos))
+            .order_by(Tema.orden)
+        ).all()
+
+        completados = cls.obtener_completados_usuario(id_usuario)
+
+        total_lecciones_global = 0
+        total_completadas_global = 0
+        temas_resumen = []
+
+        for tema in temas:
+            lecciones_publicadas = [
+                c for c in tema.contenidos if c.estado == "publicado"
+            ]
+            lecciones_publicadas.sort(key=lambda c: c.orden)
+
+            total_tema = len(lecciones_publicadas)
+            completadas_tema = sum(
+                1 for c in lecciones_publicadas if c.id_contenido in completados
+            )
+            total_lecciones_global += total_tema
+            total_completadas_global += completadas_tema
+
+            porcentaje = (
+                round((completadas_tema / total_tema) * 100) if total_tema > 0 else 0
+            )
+
+            if completadas_tema == 0:
+                estado = "no_iniciado"
+            elif completadas_tema == total_tema:
+                estado = "completado"
+            else:
+                estado = "en_progreso"
+
+            siguiente = next(
+                (c for c in lecciones_publicadas if c.id_contenido not in completados),
+                None,
+            )
+
+            temas_resumen.append(
+                {
+                    "tema": tema,
+                    "total_lecciones": total_tema,
+                    "lecciones_completadas": completadas_tema,
+                    "porcentaje": porcentaje,
+                    "estado": estado,
+                    "siguiente_leccion": siguiente,
+                }
+            )
+
+        porcentaje_global = (
+            round((total_completadas_global / total_lecciones_global) * 100)
+            if total_lecciones_global > 0
+            else 0
+        )
+        temas_completados = sum(1 for t in temas_resumen if t["estado"] == "completado")
+
+        return {
+            "total_lecciones": total_lecciones_global,
+            "lecciones_completadas": total_completadas_global,
+            "porcentaje_global": porcentaje_global,
+            "total_temas": len(temas),
+            "temas_completados": temas_completados,
+            "temas": temas_resumen,
+        }
 
 
 class IntentoActividad(db.Model):

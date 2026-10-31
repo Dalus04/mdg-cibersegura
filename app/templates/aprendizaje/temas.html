@@ -43,6 +43,22 @@
               </h2>
             </header>
             <p class="descripcion-tema">{{ tema.descripcion }}</p>
+            {% if current_user.is_authenticated and tema.id_tema in progreso_por_tema %}
+              {% set prog = progreso_por_tema[tema.id_tema] %}
+              <div class="indicador-avance-tarjeta">
+                <div class="cabecera-avance-tarjeta">
+                  <span class="texto-avance">Avance: {{ prog.completadas }}/{{ prog.total }} lecciones</span>
+                  {% if prog.completado %}
+                    <span class="insignia-progreso-completo" role="status">✓ Completado</span>
+                  {% else %}
+                    <span class="porcentaje-avance">{{ prog.porcentaje }}%</span>
+                  {% endif %}
+                </div>
+                <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ prog.porcentaje }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progreso en {{ tema.titulo }}: {{ prog.porcentaje }}%">
+                  <div class="barra-progreso-relleno" style="width: {{ prog.porcentaje }}%;"></div>
+                </div>
+              </div>
+            {% endif %}
             <footer class="pie-tarjeta">
               {% set total = tema.contenidos|selectattr("estado", "equalto", "publicado")|list|length %}
               <span class="indicador-lecciones">{{ total }} {{ 'lección' if total == 1 else 'lecciones' }}</span>

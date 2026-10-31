@@ -34,6 +34,44 @@
       {% endfor %}
     </div>
 
+    <section class="seccion-marcar-progreso" aria-label="Registro de avance de la lección">
+      {% if current_user.is_authenticated %}
+        {% if esta_completada %}
+          <div class="caja-estado-progreso completado">
+            <div class="icono-estado-progreso" aria-hidden="true">✓</div>
+            <div class="texto-estado-progreso">
+              <p class="estado-destacado"><strong>Has completado esta lección formativa</strong></p>
+              {% if fecha_completado %}
+                <p class="fecha-progreso">Registrado el {{ fecha_completado.strftime('%d/%m/%Y') }}</p>
+              {% endif %}
+            </div>
+            <form action="{{ url_for('aprendizaje.desmarcar_completado', id_tema=tema.id_tema, id_contenido=contenido.id_contenido) }}" method="post" class="form-estado-progreso">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="boton-desmarcar">Marcar como pendiente</button>
+            </form>
+          </div>
+        {% else %}
+          <div class="caja-estado-progreso pendiente">
+            <div class="texto-estado-progreso">
+              <p class="estado-destacado"><strong>¿Has terminado de leer y comprender este contenido?</strong></p>
+              <p class="subtexto-progreso">Registra tu avance para dar seguimiento a tu formación en ciberseguridad.</p>
+            </div>
+            <form action="{{ url_for('aprendizaje.marcar_completado', id_tema=tema.id_tema, id_contenido=contenido.id_contenido) }}" method="post" class="form-estado-progreso">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="boton-completar">Marcar lección como completada ✓</button>
+            </form>
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="caja-estado-progreso anonimo">
+          <p>
+            <a href="{{ url_for('auth.login', next=request.path) }}">Inicia sesión</a> o 
+            <a href="{{ url_for('auth.registro') }}">regístrate</a> para registrar tu avance en la plataforma.
+          </p>
+        </div>
+      {% endif %}
+    </section>
+
     <nav class="navegacion-lecciones" aria-label="Navegación entre lecciones">
       <div class="control-navegacion anterior">
         {% if anterior %}

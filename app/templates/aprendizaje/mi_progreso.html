@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Mi progreso · MDG Cibersegura{% endblock %}
+
+{% block content %}
+  <nav aria-label="Ruta de navegación">
+    <ol class="migas">
+      <li><a href="{{ url_for('main.index') }}">Inicio</a></li>
+      <li aria-current="page">Mi progreso</li>
+    </ol>
+  </nav>
+
+  <header class="encabezado-seccion">
+    <span class="insignia-institucional">Seguimiento ciudadano</span>
+    <h1>Mi progreso de aprendizaje</h1>
+    <p class="descripcion-seccion">
+      Bienvenido o bienvenida, <strong>{{ current_user.nombres }}</strong>. Aquí puedes monitorear tus avances en cada módulo educativo, 
+      retomar tus lecciones pendientes y consolidar tus competencias en ciberseguridad.
+    </p>
+  </header>
+
+  <!-- Métricas Generales del Ciudadano -->
+  <section class="seccion-metricas-progreso" aria-labelledby="titulo-metricas-generales">
+    <h2 id="titulo-metricas-generales" class="sr-only">Resumen cuantitativo de aprendizaje</h2>
+    <div class="grid-metricas-progreso">
+      
+      <div class="tarjeta-metrica-progreso">
+        <span class="etiqueta-metrica">Avance total</span>
+        <div class="valor-metrica">{{ resumen.porcentaje_global }}%</div>
+        <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ resumen.porcentaje_global }}" aria-valuemin="0" aria-valuemax="100" aria-label="Avance global en la plataforma: {{ resumen.porcentaje_global }}%">
+          <div class="barra-progreso-relleno" style="width: {{ resumen.porcentaje_global }}%;"></div>
+        </div>
+        <p class="subtexto-metrica">Porcentaje global completado</p>
+      </div>
+
+      <div class="tarjeta-metrica-progreso">
+        <span class="etiqueta-metrica">Lecciones leídas</span>
+        <div class="valor-metrica">{{ resumen.lecciones_completadas }} / {{ resumen.total_lecciones }}</div>
+        <p class="subtexto-metrica">Contenidos formativos completados</p>
+      </div>
+
+      <div class="tarjeta-metrica-progreso">
+        <span class="etiqueta-metrica">Módulos completados</span>
+        <div class="valor-metrica">{{ resumen.temas_completados }} / {{ resumen.total_temas }}</div>
+        <p class="subtexto-metrica">Temas con 100% de lecciones leídas</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Desglose por Temas Educativos -->
+  <section class="seccion-desglose-temas" aria-labelledby="titulo-desglose">
+    <header class="encabezado-desglose">
+      <h2 id="titulo-desglose">Progreso detallado por tema</h2>
+      <p>Revisa qué lecciones has completado y cuáles tienes pendientes en cada área temática.</p>
+    </header>
+
+    <div class="lista-progreso-temas">
+      {% for item in resumen.temas %}
+        <article class="tarjeta-progreso-tema estado-{{ item.estado }}">
+          <div class="contenedor-miniatura-progreso">
+            <img 
+              src="{{ url_for('static', filename='img/tema-' ~ item.tema.orden ~ '.jpg') }}" 
+              alt="Ilustración de {{ item.tema.titulo }}" 
+              class="imagen-miniatura-progreso"
+              loading="lazy"
+            >
+          </div>
+
+          <div class="cuerpo-progreso-tema">
+            <header class="cabecera-item-progreso">
+              <div>
+                <span class="etiqueta-orden">Tema {{ item.tema.orden }}</span>
+                <h3>
+                  <a href="{{ url_for('aprendizaje.detalle_tema', id_tema=item.tema.id_tema) }}">
+                    {{ item.tema.titulo }}
+                  </a>
+                </h3>
+              </div>
+              <div class="insignia-estado-contenedor">
+                {% if item.estado == 'completado' %}
+                  <span class="badge-progreso badge-completado" role="status">✓ Completado</span>
+                {% elif item.estado == 'en_progreso' %}
+                  <span class="badge-progreso badge-en-progreso" role="status">En progreso</span>
+                {% else %}
+                  <span class="badge-progreso badge-no-iniciado" role="status">No iniciado</span>
+                {% endif %}
+              </div>
+            </header>
+
+            <div class="detalles-barra-progreso">
+              <div class="fila-texto-barra">
+                <span class="contador-avance">{{ item.lecciones_completadas }} de {{ item.total_lecciones }} lecciones</span>
+                <span class="porcentaje-item">{{ item.porcentaje }}%</span>
+              </div>
+              <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ item.porcentaje }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progreso en {{ item.tema.titulo }}: {{ item.porcentaje }}%">
+                <div class="barra-progreso-relleno" style="width: {{ item.porcentaje }}%;"></div>
+              </div>
+            </div>
+
+            <footer class="pie-item-progreso">
+              {% if item.siguiente_leccion %}
+                <div class="accion-recomendada">
+                  <span class="texto-sugerencia">Siguiente paso:</span>
+                  <a class="enlace-accion" href="{{ url_for('aprendizaje.ver_contenido', id_tema=item.tema.id_tema, id_contenido=item.siguiente_leccion.id_contenido) }}">
+                    Continuar con «{{ item.siguiente_leccion.titulo }}» →
+                  </a>
+                </div>
+              {% else %}
+                <div class="accion-recomendada">
+                  <span class="texto-completado-exito">¡Has completado todas las lecciones de este tema!</span>
+                  <a class="enlace-secundario" href="{{ url_for('aprendizaje.detalle_tema', id_tema=item.tema.id_tema) }}">
+                    Repasar lecciones
+                  </a>
+                </div>
+              {% endif %}
+            </footer>
+          </div>
+        </article>
+      {% else %}
+        <p>No se encontraron temas educativos publicados.</p>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

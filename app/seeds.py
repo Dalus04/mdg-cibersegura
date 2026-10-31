@@ -164,7 +164,6 @@ DATOS_TEMAS_INICIALES = [
             },
         ],
     },
-  sergio
     {
         "titulo": "Seguridad en Compras Online y Billeteras Digitales (Yape/Plin)",
         "descripcion": (
@@ -349,7 +348,6 @@ DATOS_TEMAS_INICIALES = [
             },
         ],
     },
-main
 ]
 
 
