@@ -1,0 +1,262 @@
+/* ==========================================================================
+   04-COMPONENTS / COMPONENTS.CSS
+   Componentes UI reutilizables: Botones, Insignias, Alertas, Formularios
+   y Barras de progreso.
+   ========================================================================== */
+
+/* Insignias y etiquetas */
+.insignia-institucional {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #eef4fb;
+  color: var(--enlace);
+  padding: 0.25rem 0.7rem;
+  border-radius: 20px;
+  margin-bottom: 0.5rem;
+  border: 1px solid #d0e1f9;
+}
+
+.etiqueta-orden {
+  display: inline-block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+/* Mensajes Flash y Alertas */
+.mensajes {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+}
+
+.mensaje {
+  padding: 0.85rem 1.25rem;
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.mensaje-exito {
+  background-color: #ecfdf5;
+  color: var(--exito);
+  border: 1px solid #a7f3d0;
+}
+
+.mensaje-error {
+  background-color: #fef2f2;
+  color: var(--error);
+  border: 1px solid #fecaca;
+}
+
+/* Botones y acciones */
+.enlace-accion,
+.enlace-secundario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.55rem 1.15rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+}
+
+.enlace-accion {
+  background: var(--enlace);
+  color: #ffffff;
+  border: 2px solid var(--enlace);
+  box-shadow: 0 2px 4px rgba(8, 76, 141, 0.15);
+}
+
+.enlace-accion:hover,
+.enlace-accion:focus {
+  background: var(--enlace-hover);
+  border-color: var(--enlace-hover);
+  color: #ffffff;
+}
+
+.enlace-secundario {
+  background: #ffffff;
+  color: var(--enlace);
+  border: 2px solid var(--enlace);
+}
+
+.enlace-secundario:hover,
+.enlace-secundario:focus {
+  background: #eef4fb;
+}
+
+/* Formularios (Login, Registro y campos reutilizables) */
+.contenedor-formulario-auth {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 0 2rem;
+}
+
+.tarjeta-formulario {
+  width: 100%;
+  max-width: var(--ancho-formulario);
+  background: #ffffff;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 2.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.encabezado-formulario {
+  margin-bottom: 1.5rem;
+}
+
+.encabezado-formulario h1 {
+  font-size: 1.85rem;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.encabezado-formulario p {
+  color: var(--texto-secundario);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.campo {
+  margin-bottom: 1.25rem;
+}
+
+.campo label {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.35rem;
+}
+
+.campo input {
+  width: 100%;
+  font: inherit;
+  font-size: 1rem;
+  padding: 0.65rem 0.85rem;
+  border: 1.5px solid var(--borde-fuerte);
+  border-radius: 6px;
+  background: #ffffff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.campo input:focus {
+  outline: none;
+  border-color: var(--enlace);
+  box-shadow: 0 0 0 3px rgba(8, 76, 141, 0.2);
+}
+
+.error-campo {
+  color: var(--error);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0.35rem 0 0;
+}
+
+.fila-submit {
+  margin-top: 1.75rem;
+  margin-bottom: 0;
+}
+
+.fila-submit input[type="submit"],
+button[type="submit"] {
+  width: 100%;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  background: var(--enlace);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.fila-submit input[type="submit"]:hover,
+.fila-submit input[type="submit"]:focus,
+button[type="submit"]:hover,
+button[type="submit"]:focus {
+  background: var(--enlace-hover);
+}
+
+.pie-formulario {
+  border-top: 1px solid var(--borde);
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  text-align: center;
+  font-size: 0.92rem;
+  color: var(--texto-secundario);
+}
+
+.pie-formulario p {
+  margin: 0;
+}
+
+/* Componentes de progreso genéricos */
+.barra-progreso-contenedor {
+  width: 100%;
+  height: 8px;
+  background-color: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0.4rem 0;
+}
+
+.barra-progreso-relleno {
+  height: 100%;
+  background: linear-gradient(90deg, #084c8d, #0284c7);
+  border-radius: 999px;
+  transition: width 0.35s ease-in-out;
+}
+
+.insignia-progreso-completo {
+  display: inline-flex;
+  align-items: center;
+  background-color: #dcfce7;
+  color: #15803d;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid #bbf7d0;
+}
+
+.badge-progreso {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.badge-completado {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.badge-en-progreso {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.badge-no-iniciado {
+  background-color: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+}

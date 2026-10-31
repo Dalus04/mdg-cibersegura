@@ -1,0 +1,124 @@
+/* ==========================================================================
+   05-PAGES / INICIO.CSS
+   Estilos específicos de la página de inicio (Hero y resumen de ejes temáticos).
+   ========================================================================== */
+
+/* -------------------------------------------------------------
+   PÁGINA DE INICIO (HERO & RESUMEN DE EJES)
+------------------------------------------------------------- */
+.seccion-hero {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  align-items: center;
+  gap: 2.5rem;
+  margin-bottom: 3.5rem;
+  background: #ffffff;
+  padding: 2.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--borde);
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+}
+
+.hero-texto h1 {
+  font-size: 2.35rem;
+  letter-spacing: -0.02em;
+  margin: 0.35rem 0 0.85rem;
+  color: #0f172a;
+}
+
+.subtitulo-inicio {
+  font-size: 1.15rem;
+  color: var(--texto-secundario);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.tarjeta-bienvenida {
+  background: var(--fondo-suave);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 1.35rem;
+  margin-top: 1rem;
+}
+
+.tarjeta-bienvenida h2 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.tarjeta-bienvenida p {
+  margin: 0 0 1rem;
+  color: #334155;
+  font-size: 0.95rem;
+}
+
+.acciones-hero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.imagen-hero {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--borde);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.seccion-destacada {
+  margin-top: 2rem;
+}
+
+.encabezado-destacado h2 {
+  font-size: 1.65rem;
+  margin-bottom: 0.35rem;
+}
+
+.encabezado-destacado p {
+  color: var(--texto-secundario);
+  margin: 0 0 1.75rem;
+}
+
+.grid-resumen-temas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1.5rem;
+}
+
+.item-resumen-tema {
+  background: #ffffff;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.item-resumen-tema:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
+}
+
+.miniatura-tema {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 0.85rem;
+  border: 1px solid #f1f5f9;
+}
+
+.item-resumen-tema h3 {
+  font-size: 1.05rem;
+  margin-bottom: 0.35rem;
+}
+
+.item-resumen-tema p {
+  font-size: 0.88rem;
+  color: var(--texto-secundario);
+  margin: 0;
+  line-height: 1.45;
+}

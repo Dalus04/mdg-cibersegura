@@ -1,0 +1,552 @@
+/* ==========================================================================
+   05-PAGES / ACTIVIDADES.CSS
+   Estilos de los entornos interactivos prácticos: Simulador de Phishing Bancario,
+   Taller de contraseñas y Análisis de permisos móviles.
+   ========================================================================== */
+
+/* -------------------------------------------------------------
+   ACTIVIDADES Y SIMULACIONES PRÁCTICAS
+------------------------------------------------------------- */
+.insignia-tipo-actividad {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.insignia-tipo-actividad.tipo-simulacion {
+  background-color: #f3e8ff;
+  color: #6b21a8;
+  border: 1px solid #d8b4fe;
+}
+
+.insignia-tipo-actividad.tipo-practica {
+  background-color: #ccfbf1;
+  color: #0f766e;
+  border: 1px solid #99f6e4;
+}
+
+/* Sección de actividades dentro del detalle del tema */
+.seccion-actividades-tema {
+  margin-top: 3.5rem;
+  border-top: 2px solid #e2e8f0;
+  padding-top: 2.5rem;
+}
+
+.cabecera-seccion-actividades {
+  margin-bottom: 1.5rem;
+}
+
+.cabecera-seccion-actividades h2 {
+  margin: 0.35rem 0 0.25rem;
+}
+
+.cabecera-seccion-actividades p {
+  margin: 0;
+  color: #64748b;
+}
+
+.grid-actividades-tema {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.tarjeta-actividad-item {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tarjeta-actividad-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+}
+
+.tarjeta-actividad-item.tipo-simulacion {
+  border-left: 4px solid #9333ea;
+}
+
+.tarjeta-actividad-item.tipo-practica {
+  border-left: 4px solid #0d9488;
+}
+
+.cabecera-tarjeta-actividad {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tarjeta-actividad-item h3 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.15rem;
+}
+
+.tarjeta-actividad-item h3 a {
+  text-decoration: none;
+  color: #0f172a;
+}
+
+.tarjeta-actividad-item h3 a:hover,
+.tarjeta-actividad-item h3 a:focus {
+  color: #084c8d;
+}
+
+.pie-tarjeta-actividad {
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+/* Pantalla de Actividad / Simulación */
+.actividad-contenedor {
+  max-width: var(--ancho-lectura);
+  margin: 0 auto;
+}
+
+.encabezado-actividad {
+  margin-bottom: 2rem;
+}
+
+.metadatos-actividad {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.etiqueta-tema-padre {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.introduccion-actividad {
+  font-size: 1.05rem;
+  color: #334155;
+  line-height: 1.6;
+}
+
+.aviso-ultimo-intento {
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  margin-top: 1rem;
+}
+
+.aviso-ultimo-intento.intento-exitoso {
+  background-color: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #14532d;
+}
+
+.aviso-ultimo-intento.intento-repaso {
+  background-color: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+
+/* Widget de Cliente de Correo Simulado */
+.cliente-correo-simulado {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  margin: 1.75rem 0;
+}
+
+.barra-superior-correo {
+  background-color: #f1f5f9;
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.punto-rojo, .punto-amarillo, .punto-verde {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.punto-rojo { background-color: #ef4444; }
+.punto-amarillo { background-color: #f59e0b; }
+.punto-verde { background-color: #10b981; }
+
+.titulo-ventana-correo {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-left: 0.5rem;
+}
+
+.cabecera-correo-simulado {
+  background-color: #f8fafc;
+  padding: 1.1rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+}
+
+.campo-correo strong {
+  color: #475569;
+  min-width: 60px;
+  display: inline-block;
+}
+
+.remitente-destacado {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.correo-falso-remitente {
+  color: #b91c1c;
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.asunto-urgente {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.cuerpo-correo-simulado {
+  padding: 1.75rem 1.5rem;
+}
+
+.texto-correo {
+  color: #1e293b;
+  line-height: 1.65;
+}
+
+.inspeccion-enlace-alerta {
+  background-color: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.inspeccion-enlace-alerta code {
+  background-color: #fef3c7;
+  color: #92400e;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 700;
+  word-break: break-all;
+  display: inline-block;
+  margin: 0.25rem 0;
+}
+
+.nota-segura {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  color: #78350f;
+}
+
+/* Tarjeta de caso de contexto para taller práctico */
+.tarjeta-caso-contexto {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  border-left: 4px solid #084c8d;
+}
+
+.tarjeta-caso-contexto h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: #0f172a;
+  font-size: 1.15rem;
+}
+
+.tarjeta-caso-contexto p {
+  margin: 0;
+  color: #334155;
+  white-space: pre-line;
+  line-height: 1.6;
+}
+
+/* Formulario de opciones de decisión */
+.seccion-formulario-actividad {
+  margin-top: 2rem;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.75rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.seccion-formulario-actividad h2 {
+  font-size: 1.25rem;
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+  color: #0f172a;
+}
+
+.grupo-opciones-actividad {
+  border: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+}
+
+.lista-opciones-radios {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.tarjeta-opcion-decision {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  background-color: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tarjeta-opcion-decision:hover {
+  background-color: #ffffff;
+  border-color: #94a3b8;
+}
+
+.tarjeta-opcion-decision:has(input:checked) {
+  background-color: #f0f7ff;
+  border-color: #084c8d;
+  box-shadow: 0 0 0 2px rgba(8, 76, 141, 0.15);
+}
+
+.tarjeta-opcion-decision input[type="radio"] {
+  margin-top: 0.25rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: #084c8d;
+  cursor: pointer;
+}
+
+.texto-opcion-decision {
+  font-size: 0.98rem;
+  color: #1e293b;
+  line-height: 1.5;
+}
+
+.acciones-formulario-actividad {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: 0.5rem;
+}
+
+.boton-enviar-actividad {
+  background-color: #084c8d;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.85rem 1.6rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.boton-enviar-actividad:hover,
+.boton-enviar-actividad:focus {
+  background-color: #063868;
+  transform: translateY(-1px);
+}
+
+.caja-login-requerido {
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+/* Pantalla de Resultados de la Actividad */
+.resultado-actividad-contenedor {
+  max-width: var(--ancho-lectura);
+  margin: 0 auto;
+}
+
+.banner-resultado-evaluacion {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  border-radius: 14px;
+  margin-bottom: 2rem;
+}
+
+.banner-resultado-evaluacion.resultado-exito {
+  background-color: #f0fdf4;
+  border: 2px solid #86efac;
+  color: #14532d;
+}
+
+.banner-resultado-evaluacion.resultado-alerta {
+  background-color: #fef2f2;
+  border: 2px solid #fca5a5;
+  color: #7f1d1d;
+}
+
+.icono-resultado-grande {
+  font-size: 2.75rem;
+  line-height: 1;
+}
+
+.insignia-resultado-tipo {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+}
+
+.banner-resultado-evaluacion h1 {
+  margin: 0 0 0.35rem;
+  font-size: 1.75rem;
+  color: inherit;
+}
+
+.subtitulo-resultado {
+  margin: 0;
+  font-size: 0.92rem;
+  opacity: 0.9;
+}
+
+.seccion-analisis-respuesta {
+  margin-bottom: 2.5rem;
+}
+
+.tarjeta-eleccion-usuario {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.tarjeta-eleccion-usuario.eleccion-correcta {
+  border-left: 5px solid #16a34a;
+}
+
+.tarjeta-eleccion-usuario.eleccion-incorrecta {
+  border-left: 5px solid #dc2626;
+}
+
+.rotulo-eleccion {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.4rem;
+}
+
+.texto-eleccion-marcada {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 1rem;
+}
+
+.caja-explicacion-pedagogica {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 0.95rem;
+  color: #334155;
+}
+
+.caja-explicacion-pedagogica strong {
+  color: #0f172a;
+}
+
+.caja-explicacion-pedagogica p {
+  margin: 0.35rem 0 0;
+  line-height: 1.6;
+}
+
+.caja-indicios-revelados {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.caja-indicios-revelados h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  color: #0f172a;
+}
+
+.lista-indicios {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  color: #334155;
+  font-size: 0.95rem;
+}
+
+.caja-consejo-ciberseguridad {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 1.35rem 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  color: #1e3a8a;
+}
+
+.icono-bombilla {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.caja-consejo-ciberseguridad p {
+  margin: 0.3rem 0 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.pie-acciones-resultado {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}

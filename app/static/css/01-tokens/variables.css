@@ -1,0 +1,31 @@
+/* ==========================================================================
+   01-TOKENS / VARIABLES.CSS
+   Sistema de tokens de diseño, paleta cromática institucional y métricas.
+   Cumple con estándares de contraste WCAG 2.2 Nivel AA (> 4.5:1).
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  line-height: 1.6;
+
+  /* Identidad cromática institucional (MDG Guadalupe) */
+  --enlace: #084c8d;
+  --enlace-hover: #063868;
+  --texto: #1a1a1a;
+  --texto-secundario: #475569;
+  --fondo: #ffffff;
+  --fondo-suave: #f8fafc;
+  --fondo-tarjeta: #ffffff;
+  --borde: #e2e8f0;
+  --borde-fuerte: #94a3b8;
+
+  /* Estados y retroalimentación pedagógica */
+  --error: #8b1a1a;
+  --exito: #0b5d1e;
+
+  /* Dimensionamiento ergonómico */
+  --ancho-maximo: 76rem;
+  --ancho-lectura: 54rem;
+  --ancho-formulario: 30rem;
+}
