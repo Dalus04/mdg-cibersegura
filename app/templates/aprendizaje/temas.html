@@ -27,10 +27,12 @@
         <article class="tarjeta-tema">
           <div class="contenedor-imagen-tema">
             <img 
-              src="{{ url_for('static', filename='img/tema-' ~ tema.orden ~ '.jpg') }}" 
-              alt="Ilustración representativa de {{ tema.titulo }}" 
+              src="{{ url_for('static', filename='img/tema-' ~ ((tema.orden - 1) % 8 + 1) ~ '.jpg') }}" 
+              alt="" 
               class="imagen-tarjeta-tema"
               loading="lazy"
+              aria-hidden="true"
+              onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/hero.jpg') }}'"
             >
           </div>
           <div class="cuerpo-tarjeta-tema">
@@ -49,7 +51,7 @@
                 <div class="cabecera-avance-tarjeta">
                   <span class="texto-avance">Avance: {{ prog.completadas }}/{{ prog.total }} lecciones</span>
                   {% if prog.completado %}
-                    <span class="insignia-progreso-completo" role="status">✓ Completado</span>
+                    <span class="insignia-progreso-completo" role="status">✓ Lecciones completadas</span>
                   {% else %}
                     <span class="porcentaje-avance">{{ prog.porcentaje }}%</span>
                   {% endif %}
@@ -62,7 +64,7 @@
             <footer class="pie-tarjeta">
               {% set total = tema.contenidos|selectattr("estado", "equalto", "publicado")|list|length %}
               <span class="indicador-lecciones">{{ total }} {{ 'lección' if total == 1 else 'lecciones' }}</span>
-              <a class="enlace-accion" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
+              <a class="enlace-accion" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}" aria-label="Explorar lecciones del tema {{ tema.orden }}: {{ tema.titulo }}">
                 Explorar lecciones
               </a>
             </footer>

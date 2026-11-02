@@ -98,6 +98,12 @@ body:has(.contenedor-formulario-auth) .mensajes {
   color: #ffffff;
 }
 
+.enlace-accion:focus-visible,
+.enlace-secundario:focus-visible {
+  outline: 3px solid var(--foco-anillo, #0284c7);
+  outline-offset: 2px;
+}
+
 .enlace-secundario {
   background: #ffffff;
   color: var(--enlace);

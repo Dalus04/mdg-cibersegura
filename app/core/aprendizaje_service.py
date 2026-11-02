@@ -1,5 +1,6 @@
 """Servicio de gestión del catálogo de temas, lecciones y lectura formativa en MDG Cibersegura."""
 
+import re
 from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -18,6 +19,63 @@ from app.models.entities import (
 
 class AprendizajeService:
     """Orquesta la navegación temática, la lectura formativa y el seguimiento lección por lección."""
+
+    @classmethod
+    def parsear_bloques_contenido(cls, texto_contenido: str) -> list[dict[str, Any]]:
+        """Convierte el texto en bloques semánticos (párrafos, subtítulos, listas ordenadas y desordenadas)."""
+        parrafos_crudos = [p.strip() for p in texto_contenido.split("\n\n") if p.strip()]
+        bloques: list[dict[str, Any]] = []
+
+        for parrafo in parrafos_crudos:
+            lineas = [line.strip() for line in parrafo.split("\n") if line.strip()]
+            if not lineas:
+                continue
+
+            es_lista_bullets = all(l.startswith(("•", "-", "*")) for l in lineas)
+            es_lista_numeros = all(
+                l and l[0].isdigit() and ("." in l[:4] or ")" in l[:4]) for l in lineas
+            )
+
+            if es_lista_bullets:
+                items = [re.sub(r"^[•\-*]\s*", "", l) for l in lineas]
+                bloques.append({"tipo": "lista_desordenada", "elementos": items})
+                continue
+
+            if es_lista_numeros:
+                items = [re.sub(r"^\d+[\.\)]\s*", "", l) for l in lineas]
+                bloques.append({"tipo": "lista_ordenada", "elementos": items})
+                continue
+
+            if len(lineas) > 1:
+                primera_linea = lineas[0]
+                lineas_restantes = lineas[1:]
+                resto_es_bullets = all(
+                    l.startswith(("•", "-", "*")) for l in lineas_restantes
+                )
+                resto_es_numeros = all(
+                    l and l[0].isdigit() and ("." in l[:4] or ")" in l[:4])
+                    for l in lineas_restantes
+                )
+
+                if resto_es_bullets or resto_es_numeros:
+                    if primera_linea.endswith(":"):
+                        bloques.append(
+                            {"tipo": "subtitulo", "texto": primera_linea.rstrip(":")}
+                        )
+                    else:
+                        bloques.append({"tipo": "parrafo", "texto": primera_linea})
+
+                    if resto_es_bullets:
+                        items = [re.sub(r"^[•\-*]\s*", "", l) for l in lineas_restantes]
+                        bloques.append({"tipo": "lista_desordenada", "elementos": items})
+                    else:
+                        items = [re.sub(r"^\d+[\.\)]\s*", "", l) for l in lineas_restantes]
+                        bloques.append({"tipo": "lista_ordenada", "elementos": items})
+                    continue
+
+            bloques.append({"tipo": "parrafo", "texto": parrafo})
+
+        return bloques
 
     @classmethod
     def obtener_catalogo_temas(
@@ -140,6 +198,10 @@ class AprendizajeService:
             return None
 
         parrafos = [p.strip() for p in contenido.contenido.split("\n\n") if p.strip()]
+        bloques = cls.parsear_bloques_contenido(contenido.contenido)
+
+        total_palabras = len(contenido.contenido.split())
+        minutos_lectura = max(1, round(total_palabras / 180))
 
         lecciones = db.session.scalars(
             select(Contenido)
@@ -177,6 +239,8 @@ class AprendizajeService:
             "tema": tema,
             "contenido": contenido,
             "parrafos": parrafos,
+            "bloques": bloques,
+            "minutos_lectura": minutos_lectura,
             "indice": indice_actual + 1,
             "total_lecciones": len(lecciones),
             "anterior": anterior,

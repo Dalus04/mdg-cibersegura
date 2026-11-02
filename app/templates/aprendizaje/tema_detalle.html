@@ -22,9 +22,11 @@
       </div>
       <div class="grafico-encabezado-tema">
         <img 
-          src="{{ url_for('static', filename='img/tema-' ~ tema.orden ~ '.jpg') }}" 
-          alt="Ilustración temática sobre {{ tema.titulo }}" 
+          src="{{ url_for('static', filename='img/tema-' ~ ((tema.orden - 1) % 8 + 1) ~ '.jpg') }}" 
+          alt="" 
           class="imagen-banner-tema"
+          aria-hidden="true"
+          onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/hero.jpg') }}'"
         >
       </div>
     </header>
@@ -37,7 +39,7 @@
             <div class="info-progreso-tema">
               <span class="texto-resumen-avance"><strong>Tu avance:</strong> {{ progreso_tema.completadas }} de {{ progreso_tema.total }} completadas ({{ progreso_tema.porcentaje }}%)</span>
               {% if progreso_tema.completado %}
-                <span class="insignia-progreso-completo" role="status">✓ Módulo completado</span>
+                <span class="insignia-progreso-completo" role="status">✓ Lecciones completadas</span>
               {% endif %}
             </div>
             <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ progreso_tema.porcentaje }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progreso en {{ tema.titulo }}: {{ progreso_tema.porcentaje }}%">
@@ -69,7 +71,7 @@
                   </div>
                 </div>
               </div>
-              <a class="enlace-accion {% if es_comp %}enlace-repasar{% endif %}" href="{{ url_for('aprendizaje.ver_contenido', id_tema=tema.id_tema, id_contenido=contenido.id_contenido) }}">
+              <a class="enlace-accion {% if es_comp %}enlace-repasar{% endif %}" href="{{ url_for('aprendizaje.ver_contenido', id_tema=tema.id_tema, id_contenido=contenido.id_contenido) }}" aria-label="{{ 'Repasar' if es_comp else 'Leer' }} lección {{ loop.index }}: {{ contenido.titulo }}">
                 {% if es_comp %}Repasar lección{% else %}Leer lección{% endif %}
               </a>
             </li>

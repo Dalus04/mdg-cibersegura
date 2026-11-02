@@ -79,6 +79,7 @@ def marcar_completado(id_tema: int, id_contenido: int):
             "aprendizaje.ver_contenido",
             id_tema=id_tema,
             id_contenido=id_contenido,
+            _anchor="seccion-marcar-progreso",
         )
     )
 
@@ -102,6 +103,7 @@ def desmarcar_completado(id_tema: int, id_contenido: int):
             "aprendizaje.ver_contenido",
             id_tema=id_tema,
             id_contenido=id_contenido,
+            _anchor="seccion-marcar-progreso",
         )
     )
 

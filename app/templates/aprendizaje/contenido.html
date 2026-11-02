@@ -17,24 +17,53 @@
       <div class="metadatos-leccion">
         <span class="etiqueta-tema">{{ tema.titulo }}</span>
         <span class="contador-leccion">Lección {{ indice }} de {{ total_lecciones }}</span>
+        {% if minutos_lectura %}
+          <span class="tiempo-lectura" aria-label="Tiempo estimado de lectura: {{ minutos_lectura }} {{ 'minuto' if minutos_lectura == 1 else 'minutos' }}">
+            ⏱️ {{ minutos_lectura }} min de lectura
+          </span>
+        {% endif %}
       </div>
       <h1>{{ contenido.titulo }}</h1>
       <div class="contenedor-banner-leccion">
         <img 
-          src="{{ url_for('static', filename='img/tema-' ~ tema.orden ~ '.jpg') }}" 
-          alt="Ilustración formativa de {{ tema.titulo }}" 
+          src="{{ url_for('static', filename='img/tema-' ~ ((tema.orden - 1) % 8 + 1) ~ '.jpg') }}" 
+          alt="" 
           class="imagen-banner-leccion"
+          aria-hidden="true"
+          onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/hero.jpg') }}'"
         >
       </div>
     </header>
 
     <div class="cuerpo-leccion">
-      {% for parrafo in parrafos %}
-        <p class="parrafo-leccion">{{ parrafo }}</p>
-      {% endfor %}
+      {% if bloques %}
+        {% for bloque in bloques %}
+          {% if bloque.tipo == 'subtitulo' %}
+            <h2 class="subtitulo-leccion">{{ bloque.texto }}</h2>
+          {% elif bloque.tipo == 'lista_desordenada' %}
+            <ul class="lista-leccion">
+              {% for item in bloque.elementos %}
+                <li>{{ item }}</li>
+              {% endfor %}
+            </ul>
+          {% elif bloque.tipo == 'lista_ordenada' %}
+            <ol class="lista-leccion ordenada">
+              {% for item in bloque.elementos %}
+                <li>{{ item }}</li>
+              {% endfor %}
+            </ol>
+          {% else %}
+            <p class="parrafo-leccion">{{ bloque.texto }}</p>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        {% for parrafo in parrafos %}
+          <p class="parrafo-leccion">{{ parrafo }}</p>
+        {% endfor %}
+      {% endif %}
     </div>
 
-    <section class="seccion-marcar-progreso" aria-label="Registro de avance de la lección">
+    <section class="seccion-marcar-progreso" id="seccion-marcar-progreso" aria-label="Registro de avance de la lección">
       {% if current_user.is_authenticated %}
         {% if esta_completada %}
           <div class="caja-estado-progreso completado">
@@ -58,7 +87,12 @@
             </div>
             <form action="{{ url_for('aprendizaje.marcar_completado', id_tema=tema.id_tema, id_contenido=contenido.id_contenido) }}" method="post" class="form-estado-progreso">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <button type="submit" class="boton-completar">Marcar lección como completada ✓</button>
+              {% if siguiente %}
+                <input type="hidden" name="siguiente_url" value="{{ url_for('aprendizaje.ver_contenido', id_tema=tema.id_tema, id_contenido=siguiente.id_contenido) }}">
+                <button type="submit" class="boton-completar">Marcar lección como completada y continuar →</button>
+              {% else %}
+                <button type="submit" class="boton-completar">Marcar lección como completada ✓</button>
+              {% endif %}
             </form>
           </div>
         {% endif %}
@@ -83,7 +117,7 @@
       </div>
 
       <div class="control-navegacion indice">
-        <a class="enlace-indice" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
+        <a class="enlace-indice" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}" aria-label="Volver al índice del tema: {{ tema.titulo }}">
           Índice del tema
         </a>
       </div>
@@ -96,8 +130,16 @@
           </a>
         {% else %}
           <div class="caja-fin-tema">
-            <p><strong>¡Has completado todas las lecciones de este tema!</strong></p>
-            <a class="enlace-accion" href="{{ url_for('aprendizaje.lista_temas') }}">Explorar más temas</a>
+            <p class="titulo-fin-tema"><strong>¡Has completado todas las lecciones de este tema!</strong></p>
+            <p class="subtexto-fin-tema">Aplica lo aprendido en las actividades prácticas o rinde la evaluación formativa.</p>
+            <div class="acciones-fin-tema">
+              <a class="enlace-accion" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}#titulo-actividades">
+                Continuar a actividades y evaluación →
+              </a>
+              <a class="enlace-secundario" href="{{ url_for('aprendizaje.lista_temas') }}">
+                Explorar más temas
+              </a>
+            </div>
           </div>
         {% endif %}
       </div>

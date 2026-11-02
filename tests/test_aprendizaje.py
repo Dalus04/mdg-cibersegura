@@ -129,3 +129,46 @@ def test_navegacion_global_incluye_temas(client):
     assert "/temas" in html
     assert "Temas educativos" in html
     assert "Explorar temas educativos" in html
+
+
+def test_ver_contenido_renderiza_bloques_semanticos_y_tiempo_lectura(client, app):
+    with app.app_context():
+        tema = db.session.scalar(db.select(Tema).where(Tema.orden == 1))
+        leccion1 = db.session.scalar(
+            db.select(Contenido).where(Contenido.id_tema == tema.id_tema, Contenido.orden == 1)
+        )
+        id_tema = tema.id_tema
+        id_leccion1 = leccion1.id_contenido
+
+    response = client.get(f"/temas/{id_tema}/contenidos/{id_leccion1}")
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+
+    # Verifica tiempo de lectura y listas semánticas
+    assert "min de lectura" in html
+    assert "subtitulo-leccion" in html
+    assert "lista-leccion" in html
+
+
+def test_completar_leccion_con_siguiente_url_redirige_correctamente(client, app):
+    from tests.test_progreso import login_ciudadano
+
+    login_ciudadano(client)
+    with app.app_context():
+        tema = db.session.scalar(db.select(Tema).where(Tema.orden == 1))
+        leccion1 = db.session.scalar(
+            db.select(Contenido).where(Contenido.id_tema == tema.id_tema, Contenido.orden == 1)
+        )
+        leccion2 = db.session.scalar(
+            db.select(Contenido).where(Contenido.id_tema == tema.id_tema, Contenido.orden == 2)
+        )
+        siguiente_url = f"/temas/{tema.id_tema}/contenidos/{leccion2.id_contenido}"
+
+    response = client.post(
+        f"/temas/{tema.id_tema}/contenidos/{leccion1.id_contenido}/completar",
+        data={"siguiente_url": siguiente_url},
+        follow_redirects=False,
+    )
+    assert response.status_code == 302
+    assert response.headers["Location"] == siguiente_url
+
