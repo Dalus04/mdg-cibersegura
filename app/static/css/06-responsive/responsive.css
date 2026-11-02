@@ -32,18 +32,80 @@
   }
 
   .contenedor-cabecera {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
   }
 
-  .tarjeta-formulario {
-    padding: 1.5rem 1.25rem;
-    border-radius: 10px;
+  .boton-toggle-menu {
+    display: inline-flex;
+  }
+
+  /* Menú móvil colapsable con Progressive Enhancement */
+  .nav-principal.nav-colapsable {
+    display: none;
+    width: 100%;
+    margin-top: 0.5rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--borde);
+  }
+
+  .nav-principal.nav-colapsable.menu-abierto {
+    display: block;
+    animation: slideDownMenu 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes slideDownMenu {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-principal.nav-colapsable.menu-abierto {
+      animation: none;
+    }
   }
 
   .nav-principal ul {
-    gap: 0.35rem 0.75rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .nav-principal a {
+    display: flex;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.98rem;
+    border-radius: 6px;
+  }
+
+  .item-usuario-nav {
+    padding: 0.4rem 0.5rem;
+    border-top: 1px dashed var(--borde);
+    margin-top: 0.25rem;
+    padding-top: 0.6rem;
+  }
+
+  .form-logout {
+    display: block;
+    width: 100%;
+  }
+
+  .boton-logout {
+    display: flex;
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.95rem;
+    text-align: left;
   }
 
   .hero-texto h1 {

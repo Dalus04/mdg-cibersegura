@@ -12,16 +12,41 @@
       </p>
 
       {% if current_user.is_authenticated %}
-        <div class="tarjeta-bienvenida">
-          <h2>¡Hola, {{ current_user.nombres }}!</h2>
-          <p>Sesión iniciada como {{ current_user.nombres }} {{ current_user.apellidos }} ({{ current_user.correo }}). Puedes acceder a todas las lecciones y recursos formativos.</p>
+        <div class="tarjeta-bienvenida tarjeta-bienvenida-ciudadano">
+          <div class="cabecera-bienvenida">
+            <div>
+              <h2>¡Hola, {{ current_user.nombres }}!</h2>
+              <p class="datos-sesion">Sesión iniciada como <strong>{{ current_user.nombres }} {{ current_user.apellidos }}</strong> ({{ current_user.correo }}). Tienes acceso a todos los recursos formativos.</p>
+            </div>
+            {% if resumen and resumen.total_lecciones > 0 %}
+              <div class="indicador-avance-global">
+                <span class="etiqueta-avance-global">Tu avance general</span>
+                <span class="valor-avance-global">{{ resumen.porcentaje_global }}%</span>
+                <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ resumen.porcentaje_global }}" aria-valuemin="0" aria-valuemax="100" aria-label="Avance global en la plataforma: {{ resumen.porcentaje_global }}%">
+                  <div class="barra-progreso-relleno" style="width: {{ resumen.porcentaje_global }}%;"></div>
+                </div>
+                <span class="resumen-lecciones-avance">{{ resumen.lecciones_completadas }} de {{ resumen.total_lecciones }} lecciones</span>
+              </div>
+            {% endif %}
+          </div>
           <div class="acciones-hero">
-            <a class="enlace-accion" href="{{ url_for('aprendizaje.lista_temas') }}">
-              Explorar temas educativos →
-            </a>
+            {% if siguiente_leccion and tema_siguiente %}
+              <a class="enlace-accion" href="{{ url_for('aprendizaje.ver_contenido', id_tema=tema_siguiente.id_tema, id_contenido=siguiente_leccion.id_contenido) }}">
+                Continuar con «{{ siguiente_leccion.titulo }}» →
+              </a>
+            {% else %}
+              <a class="enlace-accion" href="{{ url_for('aprendizaje.lista_temas') }}">
+                Explorar temas educativos →
+              </a>
+            {% endif %}
             <a class="enlace-secundario" href="{{ url_for('aprendizaje.mi_progreso') }}">
               Ver mi progreso
             </a>
+            {% if current_user.es_administrador %}
+              <a class="enlace-admin-hero" href="{{ url_for('admin.dashboard') }}">
+                Consola de administración
+              </a>
+            {% endif %}
           </div>
         </div>
       {% else %}
@@ -59,29 +84,42 @@
     </header>
 
     <div class="grid-resumen-temas">
-      <div class="item-resumen-tema">
-        <img src="{{ url_for('static', filename='img/tema-1.jpg') }}" alt="Gestión de contraseñas seguras" class="miniatura-tema" loading="lazy">
-        <h3>1. Contraseñas seguras y 2FA</h3>
-        <p>Técnicas para crear claves robustas y activar la doble verificación en cuentas.</p>
-      </div>
-
-      <div class="item-resumen-tema">
-        <img src="{{ url_for('static', filename='img/tema-2.jpg') }}" alt="Detección de enlaces fraudulentos" class="miniatura-tema" loading="lazy">
-        <h3>2. Detección de Phishing</h3>
-        <p>Cómo reconocer mensajes engañosos y verificar enlaces antes de hacer clic.</p>
-      </div>
-
-      <div class="item-resumen-tema">
-        <img src="{{ url_for('static', filename='img/tema-3.jpg') }}" alt="Protección de datos personales" class="miniatura-tema" loading="lazy">
-        <h3>3. Privacidad y Datos (Ley 29733)</h3>
-        <p>Cuidado de tu información confidencial y derechos frente a plataformas digitales.</p>
-      </div>
-
-      <div class="item-resumen-tema">
-        <img src="{{ url_for('static', filename='img/tema-4.jpg') }}" alt="Navegación segura y redes Wi-Fi" class="miniatura-tema" loading="lazy">
-        <h3>4. Redes Wi-Fi y Navegación</h3>
-        <p>Peligros de redes públicas y buenas prácticas de conexión en la vida diaria.</p>
-      </div>
+      {% for tema in temas %}
+        <article class="tarjeta-resumen-tema">
+          <a href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}" class="enlace-tarjeta-tema">
+            <div class="contenedor-miniatura-inicio">
+              <img 
+                src="{{ url_for('static', filename='img/tema-' ~ tema.orden ~ '.jpg') }}" 
+                alt="Ilustración representativa de {{ tema.titulo }}" 
+                class="miniatura-tema" 
+                loading="lazy"
+              >
+            </div>
+            <div class="cuerpo-resumen-tema">
+              <span class="etiqueta-orden">Tema {{ tema.orden }}</span>
+              <h3>{{ tema.titulo }}</h3>
+              <p>{{ tema.descripcion }}</p>
+              {% if current_user.is_authenticated and tema.id_tema in progreso_por_tema %}
+                {% set prog = progreso_por_tema[tema.id_tema] %}
+                <div class="indicador-progreso-mini">
+                  <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ prog.porcentaje }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progreso en {{ tema.titulo }}: {{ prog.porcentaje }}%">
+                    <div class="barra-progreso-relleno" style="width: {{ prog.porcentaje }}%;"></div>
+                  </div>
+                  <span class="texto-avance-mini">
+                    {% if prog.completado %}
+                      <span class="texto-completado-badge">✓ Completado</span>
+                    {% else %}
+                      {{ prog.porcentaje }}% completado ({{ prog.completadas }}/{{ prog.total }})
+                    {% endif %}
+                  </span>
+                </div>
+              {% endif %}
+            </div>
+          </a>
+        </article>
+      {% else %}
+        <p>No se encontraron temas educativos disponibles en este momento.</p>
+      {% endfor %}
     </div>
   </section>
 {% endblock %}

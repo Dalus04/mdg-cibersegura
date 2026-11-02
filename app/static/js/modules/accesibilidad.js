@@ -191,6 +191,60 @@ function initFormSubmitProtection() {
 }
 
 /**
+ * Inicializa el menú de navegación móvil adaptable y accesible.
+ */
+function initMenuMovil() {
+  const toggleBtn = document.querySelector('.boton-toggle-menu');
+  const navMenu = document.getElementById('menu-principal');
+  if (!toggleBtn || !navMenu) return;
+
+  // Activa el modo colapsable bajo Progressive Enhancement
+  navMenu.classList.add('nav-colapsable');
+
+  const cerrarMenu = () => {
+    toggleBtn.setAttribute('aria-expanded', 'false');
+    toggleBtn.setAttribute('aria-label', 'Abrir menú de navegación');
+    navMenu.classList.remove('menu-abierto');
+    anunciar('Menú de navegación cerrado', 'polite');
+  };
+
+  const abrirMenu = () => {
+    toggleBtn.setAttribute('aria-expanded', 'true');
+    toggleBtn.setAttribute('aria-label', 'Cerrar menú de navegación');
+    navMenu.classList.add('menu-abierto');
+    anunciar('Menú de navegación desplegado', 'polite');
+  };
+
+  toggleBtn.addEventListener('click', () => {
+    const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+    if (isExpanded) {
+      cerrarMenu();
+    } else {
+      abrirMenu();
+    }
+  });
+
+  // Cerrar con tecla Escape y retornar el foco al botón toggle
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && toggleBtn.getAttribute('aria-expanded') === 'true') {
+      cerrarMenu();
+      toggleBtn.focus();
+    }
+  });
+
+  // Cerrar al hacer clic fuera de la cabecera en móvil
+  document.addEventListener('click', (e) => {
+    if (
+      toggleBtn.getAttribute('aria-expanded') === 'true' &&
+      !navMenu.contains(e.target) &&
+      !toggleBtn.contains(e.target)
+    ) {
+      cerrarMenu();
+    }
+  });
+}
+
+/**
  * Inicializa el módulo de accesibilidad.
  */
 export function initAccesibilidad() {
@@ -199,4 +253,5 @@ export function initAccesibilidad() {
   initPasswordToggles();
   initErrorFocusManagement();
   initFormSubmitProtection();
+  initMenuMovil();
 }
