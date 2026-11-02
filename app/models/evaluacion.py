@@ -106,6 +106,16 @@ class IntentoEvaluacion(db.Model):
         """Indica si el puntaje obtenido alcanza el mínimo aprobatorio."""
         return self.puntaje_obtenido >= self.evaluacion.puntaje_minimo
 
+    @property
+    def fecha_intento_local(self) -> datetime:
+        """Retorna la fecha y hora del intento en la zona horaria de Perú (UTC-5)."""
+        from datetime import timedelta, timezone
+        if self.fecha_intento.tzinfo is None:
+            dt_utc = self.fecha_intento.replace(tzinfo=timezone.utc)
+        else:
+            dt_utc = self.fecha_intento.astimezone(timezone.utc)
+        return dt_utc.astimezone(timezone(timedelta(hours=-5)))
+
     @classmethod
     def registrar_intento(
         cls, id_usuario: int, evaluacion: Evaluacion, respuestas_dict: dict[int, int]

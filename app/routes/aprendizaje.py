@@ -211,7 +211,15 @@ def enviar_evaluacion(id_tema: int):
         if error_msg and "no existe" in error_msg.lower():
             abort(404)
         flash(error_msg or "Error al procesar la evaluación.", "error")
-        return redirect(url_for("aprendizaje.ver_evaluacion", id_tema=id_tema))
+        eval_data = EvaluacionService.obtener_evaluacion_tema(id_tema, current_user.id_usuario)
+        if eval_data is None:
+            abort(404)
+        return render_template(
+            "aprendizaje/evaluacion.html",
+            **eval_data,
+            respuestas_previas=request.form,
+            error_formulario=error_msg,
+        )
 
     if intento.aprobado:
         flash(
@@ -220,7 +228,7 @@ def enviar_evaluacion(id_tema: int):
         )
     else:
         flash(
-            f"Obtuviste {intento.puntaje_obtenido:.1f} puntos (mínimo aprobatorio: 14.0). Puedes repasar las lecciones y volver a intentarlo.",
+            f"Obtuviste {intento.puntaje_obtenido:.1f} puntos (mínimo aprobatorio: {intento.evaluacion.puntaje_minimo:.1f} puntos). Puedes repasar las lecciones y volver a intentarlo.",
             "error",
         )
 

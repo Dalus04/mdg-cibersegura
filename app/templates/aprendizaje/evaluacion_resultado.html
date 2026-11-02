@@ -16,11 +16,11 @@
   <article class="resultado-evaluacion-contenedor">
     <!-- Banner Principal de Calificación -->
     <header class="banner-resultado-calificacion {% if intento.aprobado %}calificacion-aprobada{% else %}calificacion-desaprobada{% endif %}">
-      <div class="icono-resultado-evaluacion" aria-hidden="true">
+      <div class="icono-resultado-gran icono-resultado-evaluacion" aria-hidden="true">
         {% if intento.aprobado %}🎓{% else %}📋{% endif %}
       </div>
 
-      <div class="info-resultado-banner">
+      <div class="cuerpo-resultado-banner info-resultado-banner">
         <span class="insignia-estado-nota">
           {% if intento.aprobado %}Evaluación Aprobada{% else %}Evaluación No Superada{% endif %}
         </span>
@@ -35,49 +35,49 @@
 
         <div class="fila-puntajes-banner">
           <div class="caja-puntaje-obtenido">
-            <span class="etiqueta-puntaje">Puntaje obtenido</span>
-            <span class="valor-puntaje">{{ intento.puntaje_obtenido|round(1) }} <small>/ {{ evaluacion.puntaje_maximo|round(0)|int }}</small></span>
+            <span class="etiqueta-bloque etiqueta-puntaje">Puntaje obtenido</span>
+            <span class="valor-bloque valor-puntaje">{{ intento.puntaje_obtenido|round(1) }} <small>/ {{ evaluacion.puntaje_maximo|round(0)|int }}</small></span>
           </div>
           <div class="caja-puntaje-minimo">
-            <span class="etiqueta-puntaje">Mínimo para aprobar</span>
-            <span class="valor-minimo">{{ evaluacion.puntaje_minimo|round(0)|int }} pts</span>
+            <span class="etiqueta-bloque etiqueta-puntaje">Mínimo para aprobar</span>
+            <span class="valor-bloque valor-minimo">{{ evaluacion.puntaje_minimo|round(0)|int }} pts</span>
           </div>
         </div>
 
         <p class="fecha-evaluacion-realizada">
-          Intento rendido el {{ intento.fecha_intento.strftime('%d/%m/%Y a las %H:%M UTC') }}
+          Intento rendido el {{ intento.fecha_intento_local.strftime('%d/%m/%Y a las %I:%M %p') }} (Hora de Perú)
         </p>
       </div>
     </header>
 
     <!-- Desglose Pregunta por Pregunta -->
-    <section class="seccion-desglose-preguntas" aria-labelledby="titulo-desglose-eval">
+    <section class="seccion-desglose-preguntas desglose-respuestas-evaluacion" aria-labelledby="titulo-desglose-eval">
       <h2 id="titulo-desglose-eval">Revisión detallada de respuestas</h2>
       <p>Comprueba qué respuestas marcaste y cuál era la alternativa correcta para consolidar tu aprendizaje.</p>
 
-      <div class="lista-preguntas-resultado">
+      <div class="lista-preguntas-resultado lista-respuestas-repaso">
         {% for pregunta in evaluacion.preguntas %}
           {% set alt_elegida = respuestas_por_pregunta.get(pregunta.id_pregunta) %}
           {% set es_acierto = alt_elegida and alt_elegida.es_correcta %}
           
-          <div class="tarjeta-pregunta-resultado {% if es_acierto %}pregunta-acertada{% else %}pregunta-fallada{% endif %}">
+          <article class="tarjeta-pregunta-resultado {% if es_acierto %}pregunta-acertada{% else %}pregunta-fallada{% endif %}">
             <header class="cabecera-pregunta-resultado">
               <div class="indicador-acierto">
                 {% if es_acierto %}
-                  <span class="badge-acierto acierto-si">✓ Correcta (+{{ pregunta.puntaje|round(0)|int }} pts)</span>
+                  <span class="badge-acierto acierto acierto-si">✓ Correcta (+{{ pregunta.puntaje|round(0)|int }} pts)</span>
                 {% else %}
-                  <span class="badge-acierto acierto-no">✗ Incorrecta (0 pts)</span>
+                  <span class="badge-acierto fallo acierto-no">✗ Incorrecta (0 pts)</span>
                 {% endif %}
               </div>
               <span class="orden-pregunta-res">Pregunta {{ loop.index }}</span>
             </header>
 
-            <p class="enunciado-pregunta-res">{{ pregunta.enunciado }}</p>
+            <h3 class="enunciado-pregunta-resultado enunciado-pregunta-res">{{ pregunta.enunciado }}</h3>
 
-            <div class="lista-alternativas-resultado">
+            <ul class="lista-alternativas-resultado">
               {% for alt in pregunta.alternativas %}
                 {% set fue_marcada = alt_elegida and alt_elegida.id_alternativa == alt.id_alternativa %}
-                <div class="item-alternativa-res {% if alt.es_correcta %}alt-es-correcta{% elif fue_marcada %}alt-marcada-incorrecta{% endif %}">
+                <li class="item-alternativa-res {% if alt.es_correcta %}alt-es-correcta{% elif fue_marcada %}alt-marcada-incorrecta{% endif %}">
                   <span class="icono-estado-alt" aria-hidden="true">
                     {% if alt.es_correcta %}
                       ✓
@@ -97,25 +97,46 @@
                       <span class="etiqueta-respuesta-correcta">(Respuesta correcta esperada)</span>
                     {% endif %}
                   </div>
-                </div>
+                </li>
               {% endfor %}
-            </div>
-          </div>
+            </ul>
+          </article>
         {% endfor %}
       </div>
     </section>
 
-    <!-- Botones de Acción Posterior -->
+    <!-- Botones de Acción Posterior (CTA Adaptativo) -->
     <footer class="pie-acciones-evaluacion">
-      <a class="enlace-accion" href="{{ url_for('aprendizaje.ver_evaluacion', id_tema=tema.id_tema) }}">
-        🔄 Rendir evaluación nuevamente
-      </a>
-      <a class="enlace-secundario" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
-        Volver a lecciones del tema
-      </a>
-      <a class="enlace-secundario" href="{{ url_for('aprendizaje.mi_progreso') }}">
-        Consultar mi progreso global
-      </a>
+      {% if intento.aprobado %}
+        {% if siguiente_tema %}
+          <a class="enlace-accion" href="{{ url_for('aprendizaje.detalle_tema', id_tema=siguiente_tema.id_tema) }}">
+            Continuar al siguiente tema: {{ siguiente_tema.titulo }} →
+          </a>
+        {% else %}
+          <a class="enlace-accion" href="{{ url_for('aprendizaje.lista_temas') }}">
+            Explorar más temas educativos →
+          </a>
+        {% endif %}
+        <a class="enlace-secundario" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
+          Volver a lecciones del tema
+        </a>
+        <a class="enlace-secundario" href="{{ url_for('aprendizaje.ver_evaluacion', id_tema=tema.id_tema) }}">
+          🔄 Rendir evaluación nuevamente
+        </a>
+        <a class="enlace-secundario" href="{{ url_for('aprendizaje.mi_progreso') }}">
+          Consultar mi progreso global
+        </a>
+      {% else %}
+        <a class="enlace-accion" href="{{ url_for('aprendizaje.ver_evaluacion', id_tema=tema.id_tema) }}">
+          🔄 Rendir evaluación nuevamente
+        </a>
+        <a class="enlace-secundario" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
+          Repasar lecciones del tema
+        </a>
+        <a class="enlace-secundario" href="{{ url_for('aprendizaje.mi_progreso') }}">
+          Consultar mi progreso global
+        </a>
+      {% endif %}
     </footer>
   </article>
 {% endblock %}

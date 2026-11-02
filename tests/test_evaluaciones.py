@@ -265,3 +265,64 @@ def test_evaluacion_tema_inexistente_retorna_404(client):
     login_ciudadano(client)
     resp_post = client.post("/temas/999/evaluacion/enviar", data={})
     assert resp_post.status_code == 404
+
+
+def test_enviar_evaluacion_incompleta_retiene_respuestas(client, app):
+    """Verifica que si faltan preguntas, las respuestas previamente marcadas se retengan y se señalen las faltantes."""
+    login_ciudadano(client)
+
+    with app.app_context():
+        evaluacion = db.session.scalar(db.select(Evaluacion).where(Evaluacion.id_tema == 1))
+        primera_pregunta = evaluacion.preguntas[0]
+        primera_alt = primera_pregunta.alternativas[0]
+        data_parcial = {f"pregunta_{primera_pregunta.id_pregunta}": str(primera_alt.id_alternativa)}
+
+    response = client.post(
+        "/temas/1/evaluacion/enviar",
+        data=data_parcial,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+
+    # 1. Alerta de formulario incompleto
+    assert "Cuestionario incompleto" in html
+    assert "Falta responder esta pregunta obligatoria" in html
+    # 2. La alternativa que el usuario marcó sigue estando 'checked'
+    assert f'value="{primera_alt.id_alternativa}"' in html
+    assert "checked" in html
+
+
+def test_evaluacion_semantica_legend_incluye_enunciado(client):
+    """Verifica que el legend de cada fieldset contenga el enunciado para accesibilidad WCAG 2.2."""
+    login_ciudadano(client)
+    response = client.get("/temas/1/evaluacion")
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+
+    assert "cabecera-pregunta-evaluacion" in html
+    assert "enunciado-pregunta" in html
+    assert "meta-pregunta-legend" in html
+
+
+def test_resultado_evaluacion_cta_adaptativo_y_fecha_local(client, app):
+    """Verifica que la vista de resultados aprobada muestre el CTA adaptativo y la fecha en hora de Perú."""
+    login_ciudadano(client)
+
+    with app.app_context():
+        evaluacion = db.session.scalar(db.select(Evaluacion).where(Evaluacion.id_tema == 1))
+        respuestas = {}
+        for p in evaluacion.preguntas:
+            alt_correcta = next(a for a in p.alternativas if a.es_correcta)
+            respuestas[f"pregunta_{p.id_pregunta}"] = str(alt_correcta.id_alternativa)
+
+    response = client.post("/temas/1/evaluacion/enviar", data=respuestas, follow_redirects=True)
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+
+    # CTA al siguiente tema (Tema 2 existe)
+    assert "Continuar al siguiente tema:" in html
+    # Fecha formateada en hora de Perú
+    assert "(Hora de Perú)" in html
+    assert "UTC" not in html
+

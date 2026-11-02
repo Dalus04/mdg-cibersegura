@@ -62,28 +62,56 @@
     </header>
 
     {% if current_user.is_authenticated %}
-      <form action="{{ url_for('aprendizaje.enviar_evaluacion', id_tema=tema.id_tema) }}" method="post" class="form-evaluacion-cuestionario">
+      <form action="{{ url_for('aprendizaje.enviar_evaluacion', id_tema=tema.id_tema) }}" method="post" class="form-evaluacion-cuestionario" id="form-cuestionario-evaluacion">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        {% if error_formulario %}
+          <div class="alerta alerta-error alerta-eval-incompleta" role="alert" tabindex="-1" id="alerta-formulario-eval">
+            <strong>⚠️ Cuestionario incompleto:</strong>
+            <p>{{ error_formulario }} Por favor, responde las preguntas señaladas antes de enviar.</p>
+          </div>
+        {% endif %}
+
+        <div class="barra-estado-evaluacion" role="status" aria-live="polite">
+          <div class="info-progreso-preguntas">
+            <span class="icono-progreso-preguntas" aria-hidden="true">📊</span>
+            <span>Avance del cuestionario: <strong id="contador-respondidas">0</strong> de <strong>{{ evaluacion.preguntas|length }}</strong> preguntas respondidas</span>
+          </div>
+          <div class="barra-avance-eval" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="{{ evaluacion.preguntas|length }}" aria-label="Progreso de respuestas">
+            <div class="relleno-avance-eval" id="barra-progreso-relleno" style="width: 0%;"></div>
+          </div>
+        </div>
 
         <div class="lista-preguntas-evaluacion">
           {% for pregunta in evaluacion.preguntas %}
-            <fieldset class="tarjeta-pregunta-evaluacion">
+            {% set valor_previo = respuestas_previas.get('pregunta_' ~ pregunta.id_pregunta) if respuestas_previas else None %}
+            {% set falta_esta_pregunta = respuestas_previas and not valor_previo %}
+            <fieldset class="tarjeta-pregunta-evaluacion {% if falta_esta_pregunta %}pregunta-incompleta{% endif %}">
               <legend class="cabecera-pregunta-evaluacion">
-                <span class="numero-pregunta">Pregunta {{ loop.index }} de {{ evaluacion.preguntas|length }}</span>
-                <span class="valor-pregunta">{{ pregunta.puntaje|round(0)|int }} pts</span>
+                <div class="meta-pregunta-legend">
+                  <span class="numero-pregunta">Pregunta {{ loop.index }} de {{ evaluacion.preguntas|length }}</span>
+                  <span class="valor-pregunta">{{ pregunta.puntaje|round(0)|int }} pts</span>
+                </div>
+                <span class="enunciado-pregunta">{{ pregunta.enunciado }}</span>
               </legend>
 
-              <p class="enunciado-pregunta">{{ pregunta.enunciado }}</p>
+              {% if falta_esta_pregunta %}
+                <div class="aviso-pregunta-requerida" role="alert">
+                  <span>⚠️ Falta responder esta pregunta obligatoria</span>
+                </div>
+              {% endif %}
 
               <div class="lista-alternativas-pregunta">
                 {% for alt in pregunta.alternativas %}
-                  <label class="tarjeta-alternativa-item" for="alt_{{ alt.id_alternativa }}">
+                  {% set fue_marcada = valor_previo and (valor_previo|string == alt.id_alternativa|string) %}
+                  <label class="tarjeta-alternativa-item {% if fue_marcada %}opcion-activa{% endif %}" for="alt_{{ alt.id_alternativa }}">
                     <input 
                       type="radio" 
                       name="pregunta_{{ pregunta.id_pregunta }}" 
                       id="alt_{{ alt.id_alternativa }}" 
                       value="{{ alt.id_alternativa }}" 
                       required
+                      {% if fue_marcada %}checked{% endif %}
                     >
                     <span class="radio-alternativa-custom" aria-hidden="true"></span>
                     <span class="texto-alternativa">{{ alt.texto }}</span>
@@ -95,7 +123,7 @@
         </div>
 
         <div class="pie-formulario-evaluacion">
-          <button type="submit" class="boton-enviar-evaluacion">
+          <button type="submit" class="boton-enviar-evaluacion" id="btn-enviar-evaluacion">
             Enviar respuestas y calificar evaluación →
           </button>
           <a class="enlace-secundario" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">

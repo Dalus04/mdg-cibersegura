@@ -121,9 +121,16 @@ class EvaluacionService:
 
         respuestas_por_pregunta = {r.id_pregunta: r.alternativa for r in intento.respuestas}
 
+        siguiente_tema = db.session.scalar(
+            select(Tema)
+            .where(Tema.orden > tema.orden, Tema.estado == "publicado")
+            .order_by(Tema.orden.asc())
+        )
+
         return {
             "tema": tema,
             "evaluacion": intento.evaluacion,
             "intento": intento,
             "respuestas_por_pregunta": respuestas_por_pregunta,
+            "siguiente_tema": siguiente_tema,
         }

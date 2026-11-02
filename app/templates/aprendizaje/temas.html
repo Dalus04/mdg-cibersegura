@@ -64,10 +64,14 @@
             <footer class="pie-tarjeta">
               {% set total = tema.contenidos|selectattr("estado", "equalto", "publicado")|list|length %}
               {% set tot_act = (tema.actividades|selectattr("estado", "equalto", "publicado")|list|length) if tema.actividades is defined else 0 %}
+              {% set tot_eval = (tema.evaluaciones|selectattr("estado", "equalto", "publicado")|list|length) if tema.evaluaciones is defined else 0 %}
               <div class="indicadores-tema-pie">
                 <span class="indicador-lecciones">{{ total }} {{ 'lección' if total == 1 else 'lecciones' }}</span>
                 {% if tot_act > 0 %}
                   <span class="indicador-actividad-badge" title="Este tema incluye talleres o simulaciones interactivas">🛡️ Práctica</span>
+                {% endif %}
+                {% if tot_eval > 0 %}
+                  <span class="indicador-evaluacion-badge" title="Este tema incluye evaluación formal de conocimientos">📝 Evaluación</span>
                 {% endif %}
               </div>
               <a class="enlace-accion" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}" aria-label="Explorar lecciones del tema {{ tema.orden }}: {{ tema.titulo }}">

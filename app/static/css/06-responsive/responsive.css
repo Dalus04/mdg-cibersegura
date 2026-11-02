@@ -214,7 +214,8 @@
     gap: 1.25rem;
   }
 
-  .icono-resultado-gran {
+  .icono-resultado-gran,
+  .icono-resultado-evaluacion {
     margin: 0 auto;
   }
 
@@ -236,11 +237,20 @@
     padding: 1.25rem 1rem;
   }
 
+  .pie-formulario-evaluacion,
   .pie-acciones-evaluacion {
     flex-direction: column;
     align-items: stretch;
   }
 
+  .boton-enviar-evaluacion {
+    width: 100%;
+    padding: 0.85rem 1.25rem;
+    font-size: 0.98rem;
+    text-align: center;
+  }
+
+  .pie-formulario-evaluacion a,
   .pie-acciones-evaluacion a {
     text-align: center;
   }

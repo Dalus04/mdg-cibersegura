@@ -74,6 +74,66 @@ function mostrarAvisoSeguridad(mensaje) {
 }
 
 /**
+ * Actualiza el contador dinámico y barra de avance de preguntas respondidas.
+ * @param {HTMLFormElement} form
+ */
+function actualizarProgresoEvaluacion(form) {
+  if (!form) return;
+  const inputs = form.querySelectorAll('input[type="radio"][name^="pregunta_"]');
+  if (!inputs.length) return;
+
+  const grupos = new Set();
+  const gruposRespondidos = new Set();
+
+  inputs.forEach((i) => {
+    grupos.add(i.name);
+    if (i.checked) {
+      gruposRespondidos.add(i.name);
+    }
+  });
+
+  const total = grupos.size;
+  const respondidas = gruposRespondidos.size;
+
+  const contadorEl = document.getElementById('contador-respondidas');
+  if (contadorEl) {
+    contadorEl.textContent = respondidas;
+  }
+
+  const rellenoEl = document.getElementById('barra-progreso-relleno');
+  if (rellenoEl) {
+    const porcentaje = total > 0 ? Math.round((respondidas / total) * 100) : 0;
+    rellenoEl.style.width = `${porcentaje}%`;
+  }
+
+  const barraAvance = form.querySelector('.barra-avance-eval');
+  if (barraAvance) {
+    barraAvance.setAttribute('aria-valuenow', respondidas);
+  }
+}
+
+/**
+ * Inicializa el comportamiento del cuestionario formal de evaluación.
+ */
+function initFormularioEvaluacion() {
+  const form = document.getElementById('form-cuestionario-evaluacion');
+  if (!form) return;
+
+  actualizarProgresoEvaluacion(form);
+
+  form.addEventListener('submit', () => {
+    const btn = document.getElementById('btn-enviar-evaluacion');
+    if (btn && !btn.disabled) {
+      setTimeout(() => {
+        btn.disabled = true;
+        btn.setAttribute('aria-busy', 'true');
+        btn.textContent = 'Calificando evaluación... ⏳';
+      }, 10);
+    }
+  });
+}
+
+/**
  * Inicializa la confirmación visual de alternativas seleccionadas.
  */
 function initSeleccionOpciones() {
@@ -102,14 +162,26 @@ function initSeleccionOpciones() {
         const labelText = (textElement ? textElement.innerText : parentCard.innerText).trim();
         anunciar(`Opción seleccionada: ${labelText.slice(0, 80)}`, 'polite');
       }
+
+      // Si pertenece a una pregunta marcada como incompleta, remover el estado de error
+      const fieldset = input.closest('.tarjeta-pregunta-evaluacion');
+      if (fieldset) {
+        fieldset.classList.remove('pregunta-incompleta');
+        const aviso = fieldset.querySelector('.aviso-pregunta-requerida');
+        if (aviso) aviso.remove();
+      }
+
+      // Actualizar contador del formulario si es evaluación
+      actualizarProgresoEvaluacion(form);
     });
   });
 }
 
 /**
- * Inicializa las mejoras interactivas de las actividades.
+ * Inicializa las mejoras interactivas de las actividades y evaluaciones.
  */
 export function initSimulador() {
   initInspeccionEnlaces();
   initSeleccionOpciones();
+  initFormularioEvaluacion();
 }
