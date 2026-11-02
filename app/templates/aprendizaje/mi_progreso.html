@@ -124,6 +124,20 @@
               <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ item.porcentaje }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progreso en {{ item.tema.titulo }}: {{ item.porcentaje }}%">
                 <div class="barra-progreso-relleno" style="width: {{ item.porcentaje }}%;"></div>
               </div>
+              {% if item.total_actividades > 0 %}
+                <div class="fila-submetrica-actividades">
+                  <span class="etiqueta-submetrica">Taller / Simulación:</span>
+                  <span class="valor-submetrica">
+                    {% if item.actividades_completadas >= item.total_actividades %}
+                      <strong class="texto-exito-progreso">✓ Superado ({{ item.actividades_completadas }}/{{ item.total_actividades }})</strong>
+                    {% elif item.actividades_completadas > 0 %}
+                      <span>{{ item.actividades_completadas }} de {{ item.total_actividades }} completadas</span>
+                    {% else %}
+                      <span class="texto-pendiente-progreso">Pendiente de realizar</span>
+                    {% endif %}
+                  </span>
+                </div>
+              {% endif %}
             </div>
 
             <footer class="pie-item-progreso">
@@ -137,7 +151,11 @@
               {% else %}
                 <div class="accion-recomendada">
                   <span class="texto-completado-exito">¡Has completado todas las lecciones de este tema!</span>
-                  {% if item.evaluacion_info and not item.evaluacion_info.aprobado %}
+                  {% if item.total_actividades > 0 and item.actividades_completadas < item.total_actividades %}
+                    <a class="enlace-accion" href="{{ url_for('aprendizaje.detalle_tema', id_tema=item.tema.id_tema) }}#titulo-actividades">
+                      Desarrollar actividad práctica →
+                    </a>
+                  {% elif item.evaluacion_info and not item.evaluacion_info.aprobado %}
                     <a class="enlace-accion enlace-evaluacion-destacado" href="{{ url_for('aprendizaje.ver_evaluacion', id_tema=item.tema.id_tema) }}">
                       Rendir evaluación formal →
                     </a>

@@ -160,6 +160,29 @@ def resolver_actividad(id_tema: int, id_actividad: int):
     else:
         flash("Atención: tu respuesta revela un riesgo de seguridad. Revisa la explicación detallada.", "error")
 
+    return redirect(
+        url_for(
+            "aprendizaje.resultado_actividad",
+            id_tema=id_tema,
+            id_actividad=id_actividad,
+            id_intento=resultado_data["intento"].id_intento_actividad,
+        )
+    )
+
+
+@aprendizaje_bp.get("/temas/<int:id_tema>/actividades/<int:id_actividad>/resultado/<int:id_intento>")
+@login_required
+def resultado_actividad(id_tema: int, id_actividad: int, id_intento: int):
+    """Muestra la retroalimentación y análisis de un intento de resolución de actividad."""
+    resultado_data = ActividadService.obtener_resultado_intento(
+        id_tema=id_tema,
+        id_actividad=id_actividad,
+        id_intento=id_intento,
+        id_usuario=current_user.id_usuario,
+    )
+    if resultado_data is None:
+        abort(404)
+
     return render_template("aprendizaje/actividad_resultado.html", **resultado_data)
 
 

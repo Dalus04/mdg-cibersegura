@@ -163,6 +163,26 @@
   color: #084c8d;
 }
 
+.fila-submetrica-actividades {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: #475569;
+  margin-top: 0.4rem;
+  padding-top: 0.35rem;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.texto-exito-progreso {
+  color: #15803d;
+}
+
+.texto-pendiente-progreso {
+  color: #64748b;
+  font-style: italic;
+}
+
 .pie-item-progreso {
   display: flex;
   align-items: center;

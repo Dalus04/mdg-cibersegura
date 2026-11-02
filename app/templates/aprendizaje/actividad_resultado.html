@@ -51,6 +51,19 @@
         </div>
       </div>
 
+      {% if not es_correcta and opcion_correcta %}
+        <div class="tarjeta-eleccion-usuario eleccion-correcta">
+          <div class="rotulo-eleccion">
+            <strong>Decisión preventiva recomendada:</strong>
+          </div>
+          <p class="texto-eleccion-marcada">«{{ opcion_correcta.texto }}»</p>
+          <div class="caja-explicacion-pedagogica">
+            <strong>Por qué es la opción adecuada:</strong>
+            <p>{{ opcion_correcta.explicacion }}</p>
+          </div>
+        </div>
+      {% endif %}
+
       <!-- Indicios sospechosos si aplica a la simulación -->
       {% if configuracion.indicios_analisis %}
         <div class="caja-indicios-revelados">

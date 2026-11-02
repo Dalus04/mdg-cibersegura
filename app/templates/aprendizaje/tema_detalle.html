@@ -106,7 +106,7 @@
                   {% if intento.resultado == 'exitoso' %}
                     <span class="badge-progreso badge-completado" role="status">✓ Realizado con éxito</span>
                   {% else %}
-                    <span class="badge-progreso badge-en-progreso" role="status">⚠️ Requiere práctica</span>
+                    <span class="badge-progreso badge-alerta" role="status">⚠️ Requiere práctica</span>
                   {% endif %}
                 {% endif %}
               </div>
@@ -118,7 +118,7 @@
               </h3>
 
               <div class="pie-tarjeta-actividad">
-                <a class="enlace-accion" href="{{ url_for('aprendizaje.ver_actividad', id_tema=tema.id_tema, id_actividad=act.id_actividad) }}">
+                <a class="enlace-accion" href="{{ url_for('aprendizaje.ver_actividad', id_tema=tema.id_tema, id_actividad=act.id_actividad) }}" aria-label="{{ 'Repetir' if intento else 'Comenzar' }} actividad: {{ act.titulo }}">
                   {% if intento %}Repetir actividad{% else %}Comenzar actividad →{% endif %}
                 </a>
               </div>

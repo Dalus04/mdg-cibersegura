@@ -138,7 +138,8 @@ function initErrorFocusManagement() {
  * Previene el doble envío de formularios y proporciona estado de carga accesible.
  */
 function initFormSubmitProtection() {
-  const forms = document.querySelectorAll('.tarjeta-formulario form');
+  const selectorFormularios = '.tarjeta-formulario form, .form-decision-actividad, .form-evaluacion-cuestionario';
+  const forms = document.querySelectorAll(selectorFormularios);
   forms.forEach((form) => {
     form.addEventListener('submit', (e) => {
       const submitBtn = form.querySelector('input[type="submit"], button[type="submit"]');
@@ -173,7 +174,7 @@ function initFormSubmitProtection() {
 
   // Restaurar estado si el usuario regresa con el botón Atrás (bfcache)
   window.addEventListener('pageshow', () => {
-    document.querySelectorAll('.tarjeta-formulario form').forEach((form) => {
+    document.querySelectorAll(selectorFormularios).forEach((form) => {
       delete form.dataset.submitting;
       const submitBtn = form.querySelector('input[type="submit"], button[type="submit"]');
       if (submitBtn) {

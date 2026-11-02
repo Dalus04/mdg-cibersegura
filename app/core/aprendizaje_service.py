@@ -86,7 +86,10 @@ class AprendizajeService:
             select(Tema)
             .where(Tema.estado == "publicado")
             .order_by(Tema.orden)
-            .options(selectinload(Tema.contenidos))
+            .options(
+                selectinload(Tema.contenidos),
+                selectinload(Tema.actividades),
+            )
         ).all()
 
         progreso_por_tema: dict[int, dict[str, Any]] = {}

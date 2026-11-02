@@ -77,21 +77,30 @@ function mostrarAvisoSeguridad(mensaje) {
  * Inicializa la confirmación visual de alternativas seleccionadas.
  */
 function initSeleccionOpciones() {
-  const radioInputs = document.querySelectorAll('input[type="radio"][name="alternativa_id"]');
+  const radioInputs = document.querySelectorAll(
+    'input[type="radio"][name="opcion_id"], input[type="radio"][name="alternativa_id"], input[type="radio"][name^="pregunta_"]'
+  );
   if (!radioInputs.length) return;
 
   radioInputs.forEach((input) => {
     input.addEventListener('change', () => {
-      // Remover clase seleccionada de todas
-      const tarjetas = document.querySelectorAll('.tarjeta-opcion-decision, .tarjeta-alternativa-item');
-      tarjetas.forEach((t) => t.classList.remove('opcion-activa'));
+      const form = input.closest('form') || document;
+      const name = input.getAttribute('name');
+      if (name) {
+        const inputsMismoGrupo = form.querySelectorAll(`input[type="radio"][name="${name}"]`);
+        inputsMismoGrupo.forEach((i) => {
+          const c = i.closest('.tarjeta-opcion-decision, .tarjeta-alternativa-item');
+          if (c) c.classList.remove('opcion-activa');
+        });
+      }
 
       // Agregar a la tarjeta seleccionada
       const parentCard = input.closest('.tarjeta-opcion-decision, .tarjeta-alternativa-item');
       if (parentCard) {
         parentCard.classList.add('opcion-activa');
-        const labelText = parentCard.innerText.trim().slice(0, 60);
-        anunciar(`Opción seleccionada: ${labelText}`);
+        const textElement = parentCard.querySelector('.texto-opcion-decision, .texto-alternativa');
+        const labelText = (textElement ? textElement.innerText : parentCard.innerText).trim();
+        anunciar(`Opción seleccionada: ${labelText.slice(0, 80)}`, 'polite');
       }
     });
   });

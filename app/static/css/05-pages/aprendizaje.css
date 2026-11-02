@@ -128,6 +128,25 @@
   color: var(--texto-secundario);
 }
 
+.indicadores-tema-pie {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.indicador-actividad-badge {
+  background-color: #f3e8ff;
+  color: #6b21a8;
+  border: 1px solid #d8b4fe;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
 /* Indicador de avance en tarjeta de catálogo */
 .indicador-avance-tarjeta {
   position: relative;

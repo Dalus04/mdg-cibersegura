@@ -52,9 +52,9 @@
         {% set correo = configuracion.escenario_simulado %}
         <div class="cliente-correo-simulado" aria-label="Cliente de correo electrónico seguro simulado">
           <div class="barra-superior-correo">
-            <span class="punto-rojo"></span>
-            <span class="punto-amarillo"></span>
-            <span class="punto-verde"></span>
+            <span class="punto-rojo" aria-hidden="true"></span>
+            <span class="punto-amarillo" aria-hidden="true"></span>
+            <span class="punto-verde" aria-hidden="true"></span>
             <span class="titulo-ventana-correo">Bandeja de entrada — Simulador de Ciberseguridad</span>
           </div>
 
@@ -76,7 +76,11 @@
           <div class="cuerpo-correo-simulado">
             <div class="texto-correo">
               {% for linea in correo.mensaje.split('\n\n') %}
-                <p>{{ linea }}</p>
+                {% if correo.enlace_falso and correo.enlace_falso in linea %}
+                  <p>{{ linea.replace(correo.enlace_falso, '') }}<a href="#" class="enlace-simulado-phishing" data-enlace="{{ correo.enlace_falso }}" title="Simulación: Inspección de destino seguro">{{ correo.enlace_falso }}</a></p>
+                {% else %}
+                  <p>{{ linea }}</p>
+                {% endif %}
               {% endfor %}
             </div>
 
@@ -108,8 +112,8 @@
         <form action="{{ url_for('aprendizaje.resolver_actividad', id_tema=tema.id_tema, id_actividad=actividad.id_actividad) }}" method="post" class="form-decision-actividad">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-          <fieldset class="grupo-opciones-actividad">
-            <legend class="sr-only">Selecciona tu alternativa</legend>
+          <fieldset class="grupo-opciones-actividad" aria-labelledby="titulo-decision">
+            <legend class="sr-only">{{ configuracion.pregunta or 'Selecciona tu alternativa' }}</legend>
 
             <div class="lista-opciones-radios">
               {% for opcion in configuracion.opciones %}
@@ -129,7 +133,7 @@
           </fieldset>
 
           <div class="acciones-formulario-actividad">
-            <button type="submit" class="boton-enviar-actividad">
+            <button type="submit" class="boton-enviar-actividad enlace-accion">
               Confirmar y evaluar decisión →
             </button>
             <a class="enlace-secundario" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
@@ -139,12 +143,22 @@
         </form>
       {% else %}
         <div class="caja-login-requerido">
-          <p>
-            <strong>Para participar en esta actividad y registrar tu resultado:</strong>
-          </p>
-          <div class="acciones-hero">
-            <a class="enlace-accion" href="{{ url_for('auth.login', next=request.path) }}">Iniciar sesión</a>
-            <a class="enlace-secundario" href="{{ url_for('auth.registro') }}">Registrarse</a>
+          <div class="lista-opciones-radios modo-exploratorio" aria-label="Alternativas en modo lectura previa">
+            {% for opcion in configuracion.opciones %}
+              <div class="tarjeta-opcion-decision opcion-deshabilitada">
+                <input type="radio" id="opcion_anonima_{{ opcion.id }}" disabled aria-disabled="true">
+                <span class="texto-opcion-decision">{{ opcion.texto }}</span>
+              </div>
+            {% endfor %}
+          </div>
+          <div class="aviso-registro-actividad">
+            <p>
+              <strong>Para participar en esta actividad y registrar tu resultado:</strong>
+            </p>
+            <div class="acciones-hero">
+              <a class="enlace-accion" href="{{ url_for('auth.login', next=request.path) }}">Iniciar sesión</a>
+              <a class="enlace-secundario" href="{{ url_for('auth.registro') }}">Registrarse</a>
+            </div>
           </div>
         </div>
       {% endif %}

@@ -133,8 +133,17 @@
             <p class="titulo-fin-tema"><strong>¡Has completado todas las lecciones de este tema!</strong></p>
             <p class="subtexto-fin-tema">Aplica lo aprendido en las actividades prácticas o rinde la evaluación formativa.</p>
             <div class="acciones-fin-tema">
-              <a class="enlace-accion" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}#titulo-actividades">
-                Continuar a actividades y evaluación →
+              {% set tiene_actividades = (tema.actividades|selectattr('estado', 'equalto', 'publicado')|list|length > 0) if tema.actividades is defined else false %}
+              {% set tiene_evaluaciones = (tema.evaluaciones|selectattr('estado', 'equalto', 'publicado')|list|length > 0) if tema.evaluaciones is defined else false %}
+              {% set destino_anchor = '#titulo-actividades' if tiene_actividades else ('#titulo-evaluacion-tema' if tiene_evaluaciones else '') %}
+              <a class="enlace-accion" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}{{ destino_anchor }}">
+                {% if tiene_actividades %}
+                  Continuar a actividades y evaluación →
+                {% elif tiene_evaluaciones %}
+                  Continuar a la evaluación formal →
+                {% else %}
+                  Volver al índice del tema →
+                {% endif %}
               </a>
               <a class="enlace-secundario" href="{{ url_for('aprendizaje.lista_temas') }}">
                 Explorar más temas

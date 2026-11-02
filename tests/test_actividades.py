@@ -77,11 +77,16 @@ def test_resolver_actividad_sin_seleccion_muestra_error(client):
 def test_resolver_actividad_decision_correcta_registra_intento_exitoso(client, app):
     login_ciudadano(client)
 
-    # En la actividad 1, la opción opt_3 (passphrase) es la correcta
-    response = client.post(
+    # 1. Verificar redirección PRG
+    resp_redirect = client.post(
         "/temas/1/actividades/1/resolver",
         data={"opcion_id": "opt_3"},
     )
+    assert resp_redirect.status_code == 302
+    assert "/temas/1/actividades/1/resultado/" in resp_redirect.headers["Location"]
+
+    # 2. Seguir la redirección y verificar el contenido
+    response = client.get(resp_redirect.headers["Location"])
     assert response.status_code == 200
     html = response.get_data(as_text=True)
 
@@ -100,15 +105,17 @@ def test_resolver_actividad_decision_correcta_registra_intento_exitoso(client, a
         )
         assert intento is not None
         assert intento.resultado == "exitoso"
+        assert intento.opcion_id == "opt_3"
 
 
 def test_resolver_simulacion_decision_incorrecta_muestra_alerta_riesgo(client, app):
     login_ciudadano(client)
 
-    # En la simulación 2, la opción opt_hacer_clic es peligrosa
+    # En la simulación 2, la opción opt_hacer_clic es peligrosa (con follow_redirects)
     response = client.post(
         "/temas/2/actividades/2/resolver",
         data={"opcion_id": "opt_hacer_clic"},
+        follow_redirects=True,
     )
     assert response.status_code == 200
     html = response.get_data(as_text=True)
@@ -126,12 +133,31 @@ def test_resolver_simulacion_decision_incorrecta_muestra_alerta_riesgo(client, a
         )
         assert intento is not None
         assert intento.resultado == "requiere_repaso"
+        assert intento.opcion_id == "opt_hacer_clic"
+
+
+def test_resultado_actividad_acceso_seguro_e_idempotente(client, app):
+    login_ciudadano(client)
+    resp = client.post(
+        "/temas/1/actividades/1/resolver",
+        data={"opcion_id": "opt_3"},
+    )
+    url_resultado = resp.headers["Location"]
+
+    # Recarga GET idempotente sin recrear intentos
+    res_get = client.get(url_resultado)
+    assert res_get.status_code == 200
+    assert "¡Excelente decisión defensiva!" in res_get.get_data(as_text=True)
+
+    # Intento de acceso a resultado inexistente
+    res_inexistente = client.get("/temas/1/actividades/1/resultado/99999")
+    assert res_inexistente.status_code == 404
 
 
 def test_tema_detalle_muestra_badge_de_actividad_realizada(client):
     login_ciudadano(client)
     # Resolver exitosamente
-    client.post("/temas/1/actividades/1/resolver", data={"opcion_id": "opt_3"})
+    client.post("/temas/1/actividades/1/resolver", data={"opcion_id": "opt_3"}, follow_redirects=True)
 
     response = client.get("/temas/1")
     assert response.status_code == 200
@@ -143,7 +169,7 @@ def test_tema_detalle_muestra_badge_de_actividad_realizada(client):
 
 def test_mi_progreso_muestra_metricas_de_actividades(client):
     login_ciudadano(client)
-    client.post("/temas/1/actividades/1/resolver", data={"opcion_id": "opt_3"})
+    client.post("/temas/1/actividades/1/resolver", data={"opcion_id": "opt_3"}, follow_redirects=True)
 
     response = client.get("/mi-progreso")
     assert response.status_code == 200
