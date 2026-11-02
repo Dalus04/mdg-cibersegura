@@ -28,6 +28,12 @@ a:focus {
   color: var(--enlace-hover);
 }
 
+a:focus-visible {
+  outline: 2px solid var(--foco-anillo, #0284c7);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 h1, h2, h3, h4 {
   color: #0f172a;
   line-height: 1.25;

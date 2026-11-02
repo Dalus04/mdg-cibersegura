@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import EmailField, PasswordField, StringField, SubmitField
+from wtforms import BooleanField, EmailField, PasswordField, StringField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
 from app.models import Usuario
@@ -75,4 +75,36 @@ class LoginForm(FlaskForm):
             DataRequired(message="Ingresa tu contraseña."),
         ],
     )
+    recordarme = BooleanField("Mantener sesión iniciada")
     enviar = SubmitField("Iniciar sesión")
+
+
+class SolicitudRecuperacionForm(FlaskForm):
+    correo = EmailField(
+        "Correo electrónico",
+        filters=[_limpiar_correo],
+        validators=[
+            DataRequired(message="Ingresa tu correo electrónico."),
+            Email(message="Ingresa un correo electrónico válido."),
+        ],
+    )
+    enviar = SubmitField("Enviar instrucciones")
+
+
+class RestablecerPasswordForm(FlaskForm):
+    contrasena = PasswordField(
+        "Nueva contraseña",
+        validators=[
+            DataRequired(message="Ingresa una nueva contraseña."),
+            Length(min=8, max=128, message="La contraseña debe tener al menos 8 caracteres."),
+        ],
+    )
+    confirmar_contrasena = PasswordField(
+        "Confirmar nueva contraseña",
+        validators=[
+            DataRequired(message="Confirma tu nueva contraseña."),
+            EqualTo("contrasena", message="Las contraseñas no coinciden."),
+        ],
+    )
+    enviar = SubmitField("Restablecer contraseña")
+

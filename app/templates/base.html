@@ -30,8 +30,8 @@
                 </form>
               </li>
             {% else %}
-              <li><a href="{{ url_for('auth.login') }}">Iniciar sesión</a></li>
-              <li><a href="{{ url_for('auth.registro') }}" class="boton-nav-registro">Registrarse</a></li>
+              <li><a href="{{ url_for('auth.login') }}"{% if request.endpoint == 'auth.login' %} aria-current="page"{% endif %}>Iniciar sesión</a></li>
+              <li><a href="{{ url_for('auth.registro') }}" class="boton-nav-registro"{% if request.endpoint == 'auth.registro' %} aria-current="page"{% endif %}>Registrarse</a></li>
             {% endif %}
           </ul>
         </nav>

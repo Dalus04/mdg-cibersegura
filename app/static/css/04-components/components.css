@@ -56,6 +56,19 @@
   border: 1px solid #fecaca;
 }
 
+.mensaje-info {
+  background-color: #eff6ff;
+  color: var(--enlace);
+  border: 1px solid #bfdbfe;
+}
+
+/* Confinamiento de mensajes flash al ancho de la tarjeta en autenticación */
+body:has(.contenedor-formulario-auth) .mensajes {
+  max-width: var(--ancho-formulario);
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* Botones y acciones */
 .enlace-accion,
 .enlace-secundario {
@@ -110,7 +123,50 @@
   border: 1px solid var(--borde);
   border-radius: 12px;
   padding: 2.25rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.06), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+}
+
+.campo-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.campo-checkbox input[type="checkbox"] {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--enlace);
+  cursor: pointer;
+}
+
+.campo-checkbox label {
+  display: inline;
+  margin-bottom: 0;
+  font-weight: 500;
+  color: #475569;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.fila-recordarme-recuperar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.fila-recordarme-recuperar .campo-checkbox {
+  margin: 0;
+}
+
+.enlace-olvido {
+  margin: 0;
+  font-size: 0.88rem;
 }
 
 .encabezado-formulario {
@@ -157,6 +213,77 @@
   box-shadow: 0 0 0 3px rgba(8, 76, 141, 0.2);
 }
 
+.campo input:focus-visible {
+  outline: 3px solid var(--foco-anillo, #0284c7);
+  outline-offset: 1px;
+  border-color: var(--enlace);
+}
+
+/* Estado de campo inválido (WCAG 2.2 SC 3.3.1) */
+.campo input[aria-invalid="true"] {
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px rgba(139, 26, 26, 0.15);
+}
+
+.campo input[aria-invalid="true"]:focus-visible {
+  outline: 3px solid var(--error);
+  outline-offset: 1px;
+}
+
+.campo-password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.campo-password-wrap input {
+  padding-right: 2.75rem;
+}
+
+.boton-toggle-password {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #64748b;
+  padding: 0.35rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+
+.boton-toggle-password:hover {
+  color: var(--enlace);
+}
+
+.boton-toggle-password:focus-visible {
+  outline: 2px solid var(--foco-anillo, #0284c7);
+  outline-offset: 1px;
+}
+
+.boton-toggle-password .icono-ojo-tachado {
+  display: none;
+}
+
+.boton-toggle-password[aria-pressed="true"] .icono-ojo {
+  display: none;
+}
+
+.boton-toggle-password[aria-pressed="true"] .icono-ojo-tachado {
+  display: block;
+}
+
+.ayuda-campo {
+  font-size: 0.82rem;
+  color: var(--texto-secundario);
+  margin: 0.35rem 0 0;
+}
+
 .error-campo {
   color: var(--error);
   font-size: 0.85rem;
@@ -189,6 +316,12 @@ button[type="submit"] {
 button[type="submit"]:hover,
 button[type="submit"]:focus {
   background: var(--enlace-hover);
+}
+
+.fila-submit input[type="submit"]:focus-visible,
+button[type="submit"]:focus-visible {
+  outline: 3px solid var(--foco-anillo, #0284c7);
+  outline-offset: 2px;
 }
 
 .pie-formulario {

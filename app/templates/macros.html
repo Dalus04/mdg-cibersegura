@@ -1,13 +1,44 @@
-{% macro campo(field, autocomplete="") %}
+{% macro campo(field, autocomplete="", ayuda="") %}
   <div class="campo">
     {{ field.label }}
+    {% set error_id = field.id ~ "-error" %}
+    {% set ayuda_id = field.id ~ "-ayuda" if ayuda else "" %}
+    {% set describedby = (error_id ~ " " ~ ayuda_id if (field.errors and ayuda) else (error_id if field.errors else ayuda_id)).strip() %}
+    
+    {% if field.type == 'PasswordField' %}
+      <div class="campo-password-wrap">
+        {% if field.errors %}
+          {{ field(autocomplete=autocomplete, aria_invalid="true", aria_describedby=describedby if describedby else none) }}
+        {% else %}
+          {{ field(autocomplete=autocomplete, aria_invalid="false", aria_describedby=describedby if describedby else none) }}
+        {% endif %}
+        <button type="button" class="boton-toggle-password" aria-label="Mostrar contraseña" aria-pressed="false" title="Mostrar contraseña">
+          <svg class="icono-ojo" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          <svg class="icono-ojo-tachado" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+          </svg>
+        </button>
+      </div>
+    {% else %}
+      {% if field.errors %}
+        {{ field(autocomplete=autocomplete, aria_invalid="true", aria_describedby=describedby if describedby else none) }}
+      {% else %}
+        {{ field(autocomplete=autocomplete, aria_invalid="false", aria_describedby=describedby if describedby else none) }}
+      {% endif %}
+    {% endif %}
+
+    {% if ayuda %}
+      <p class="ayuda-campo" id="{{ field.id }}-ayuda">{{ ayuda }}</p>
+    {% endif %}
+
     {% if field.errors %}
-      {{ field(autocomplete=autocomplete, aria_invalid="true", aria_describedby=field.id ~ "-error") }}
       <p class="error-campo" id="{{ field.id }}-error" role="alert">
         {{ field.errors[0] }}
       </p>
-    {% else %}
-      {{ field(autocomplete=autocomplete, aria_invalid="false") }}
     {% endif %}
   </div>
 {% endmacro %}

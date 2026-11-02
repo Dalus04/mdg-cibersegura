@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% from "macros.html" import campo %}
+
+{% block title %}Recuperar contraseña · MDG Cibersegura{% endblock %}
+
+{% block content %}
+  <div class="contenedor-formulario-auth">
+    <div class="tarjeta-formulario">
+      <header class="encabezado-formulario">
+        <span class="insignia-institucional">Seguridad de cuenta</span>
+        <h1>Recuperar contraseña</h1>
+        <p>Ingresa el correo electrónico de tu cuenta ciudadana para recibir las instrucciones de restablecimiento.</p>
+      </header>
+      <form method="post">
+        {{ form.hidden_tag() }}
+        {{ campo(form.correo, "email") }}
+        <p class="fila-submit">{{ form.enviar }}</p>
+      </form>
+      <footer class="pie-formulario">
+        <p>¿Recordaste tu clave? <a href="{{ url_for('auth.login') }}">Inicia sesión</a>.</p>
+      </footer>
+    </div>
+  </div>
+{% endblock %}
