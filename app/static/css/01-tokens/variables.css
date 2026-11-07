@@ -1,32 +1,86 @@
 /* ==========================================================================
    01-TOKENS / VARIABLES.CSS
-   Sistema de tokens de diseño, paleta cromática institucional y métricas.
-   Cumple con estándares de contraste WCAG 2.2 Nivel AA (> 4.5:1).
+   Sistema de tokens de diseño: identidad «Civismo Digital Editorial».
+   Azul institucional profundo, neutros piedra cálidos, acento bronce y verde.
+   Todos los pares texto/fondo de uso común superan WCAG 2.2 AA (>= 4.5:1) y
+   los bordes/indicadores de componentes superan 3:1 (SC 1.4.11).
+   Los nombres históricos (--enlace, --texto, --fondo...) se conservan como
+   alias para no afectar a los módulos que aún no se han rediseñado.
    ========================================================================== */
 
 :root {
   color-scheme: light;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+
+  /* Tipografía. Las fuentes web (p. ej. Inter) pueden alojarse localmente más
+     adelante; mientras tanto se usa la mejor fuente del sistema. */
+  --fuente-base: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --fuente-tecnica: ui-monospace, "Cascadia Code", "JetBrains Mono", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-family: var(--fuente-base);
   line-height: 1.6;
 
-  /* Identidad cromática institucional (MDG Guadalupe) */
-  --enlace: #084c8d;
-  --enlace-hover: #063868;
-  --texto: #1a1a1a;
-  --texto-secundario: #475569;
-  --fondo: #ffffff;
-  --fondo-suave: #f8fafc;
-  --fondo-tarjeta: #ffffff;
-  --borde: #e2e8f0;
-  --borde-fuerte: #64748b;
-  --foco-anillo: #0284c7;
+  /* Superficies */
+  --superficie-base: #f6f6f4;
+  --superficie-bloque: #ffffff;
+  --superficie-tonal: #eceee9;
+  --superficie-inversa: #0b1f33;
 
-  /* Estados y retroalimentación pedagógica */
-  --error: #8b1a1a;
-  --exito: #0b5d1e;
+  /* Texto */
+  --texto-primario: #111827;
+  --texto-secundario: #3f4a5a;
+  --texto-meta: #526071;
+  --texto-sobre-inversa: #ffffff;
+  --texto-sobre-inversa-suave: #c5d1de;
 
-  /* Dimensionamiento ergonómico */
-  --ancho-maximo: 76rem;
+  /* Marca y acentos */
+  --color-primario: #0a3d62;
+  --color-primario-hover: #072b47;
+  --acento-cobre: #8c4a0e;
+  --acento-azul-claro: #8fc1e8; /* solo sobre superficie inversa */
+
+  /* Estados: siempre se combinan con icono y texto, nunca solo color */
+  --estado-exito-texto: #0d522c;
+  --estado-exito-fondo: #e8f5ee;
+  --estado-alerta-texto: #7c3a0a;
+  --estado-alerta-fondo: #fdf3e7;
+  --estado-error-texto: #8a1c1c;
+  --estado-error-fondo: #fcecec;
+  --estado-curso-texto: #0a3d62;
+  --estado-curso-fondo: #e6eef5;
+
+  /* Líneas y foco */
+  --borde-sutil: #dce0d9;
+  --borde-fuerte: #7a8694;
+  --foco-anillo: #005fcc;
+
+  /* Acentos por eje temático (pictograma + trama) y su superficie */
+  --tema-1-acento: #0a3d62;
+  --tema-1-fondo: #eef2f6;
+  --tema-2-acento: #8c4a0e;
+  --tema-2-fondo: #f7f3ee;
+  --tema-3-acento: #0d522c;
+  --tema-3-fondo: #edf4f0;
+  --tema-4-acento: #0e4d64;
+  --tema-4-fondo: #edf3f5;
+
+  /* Alias históricos (compatibilidad con módulos no rediseñados) */
+  --enlace: var(--color-primario);
+  --enlace-hover: var(--color-primario-hover);
+  --texto: var(--texto-primario);
+  --fondo: var(--superficie-bloque);
+  --fondo-suave: var(--superficie-base);
+  --fondo-tarjeta: var(--superficie-bloque);
+  --borde: var(--borde-sutil);
+  --error: var(--estado-error-texto);
+  --exito: var(--estado-exito-texto);
+
+  /* Forma y movimiento */
+  --radio-control: 6px;
+  --radio-panel: 10px;
+  --transicion-rapida: 150ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Dimensionamiento */
+  --ancho-maximo: 78rem;
   --ancho-lectura: 54rem;
   --ancho-formulario: 30rem;
+  --margen-lateral: clamp(1rem, 4vw, 2rem);
 }

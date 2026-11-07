@@ -42,7 +42,10 @@
               <li>
                 <form action="{{ url_for('auth.logout') }}" method="post" class="form-logout">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                  <button type="submit" class="boton-logout" title="Cerrar sesión de {{ current_user.nombres }}">Cerrar sesión</button>
+                  <button type="submit" class="boton-logout" title="Cerrar sesión de {{ current_user.nombres }}">
+                    <svg class="icono-salida" aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+                    Cerrar sesión
+                  </button>
                 </form>
               </li>
             {% else %}

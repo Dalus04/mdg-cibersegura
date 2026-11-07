@@ -13,14 +13,16 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: var(--fondo-suave);
-  color: var(--texto);
+  background-color: var(--superficie-base);
+  color: var(--texto-primario);
   font-size: 1rem;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 a {
   color: var(--enlace);
-  transition: color 0.15s ease-in-out;
+  transition: color var(--transicion-rapida);
 }
 
 a:hover,
@@ -28,16 +30,37 @@ a:focus {
   color: var(--enlace-hover);
 }
 
-a:focus-visible {
-  outline: 2px solid var(--foco-anillo, #0284c7);
+/* Foco visible universal (WCAG 2.2 SC 2.4.7 / 2.4.11). Los componentes pueden
+   refinarlo, pero ningún control interactivo debe quedar sin indicador. */
+:focus-visible {
+  outline: 3px solid var(--foco-anillo);
   outline-offset: 2px;
+}
+
+a:focus-visible {
   border-radius: 2px;
 }
 
 h1, h2, h3, h4 {
-  color: #0f172a;
+  color: var(--texto-primario);
   line-height: 1.25;
   margin-top: 0;
+  letter-spacing: -0.015em;
+}
+
+/* Etiqueta editorial reutilizable (sobretítulos y metadatos) */
+.kicker {
+  margin: 0 0 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-meta);
+}
+
+/* Números alineados en columnas (porcentajes, conteos) */
+.numeros-tabulares {
+  font-variant-numeric: tabular-nums;
 }
 
 img {
@@ -63,12 +86,14 @@ img {
   top: 1rem;
   width: auto;
   height: auto;
-  background: #084c8d;
+  background: var(--color-primario);
   color: #ffffff;
   padding: 0.6rem 1.2rem;
   font-weight: 700;
   border-radius: 4px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  outline: 3px solid #ffffff;
+  outline-offset: 0;
+  box-shadow: 0 0 0 6px var(--color-primario);
 }
 
 /* Utilidad para lectores de pantalla */

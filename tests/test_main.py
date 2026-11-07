@@ -134,3 +134,135 @@ def test_boton_toggle_menu_movil_presente(client):
     assert 'aria-controls="menu-principal"' in html
     assert 'aria-label="Abrir menú de navegación"' in html
     assert 'id="menu-principal"' in html
+
+
+# ---------------------------------------------------------------------------
+# Rediseño de la portada: datos dinámicos, estados y accesibilidad estructural
+# ---------------------------------------------------------------------------
+import re  # noqa: E402
+
+from app.models.entities import IntentoActividad, ProgresoContenido  # noqa: E402
+from app.models.evaluacion import IntentoEvaluacion  # noqa: E402
+
+
+def _usuario_ciudadano():
+    return db.session.scalar(db.select(Usuario).where(Usuario.correo == "ciudadano@ejemplo.com"))
+
+
+def _tema(orden):
+    return db.session.scalar(db.select(Tema).where(Tema.orden == orden))
+
+
+def test_portada_no_usa_imagenes_rasterizadas_ni_emojis(client):
+    """La identidad gráfica es CSS/SVG propia: sin <img>, sin hero.jpg y sin emojis."""
+    html_anonimo = client.get("/").get_data(as_text=True)
+    login_ciudadano(client)
+    html_ciudadano = client.get("/").get_data(as_text=True)
+
+    for html in (html_anonimo, html_ciudadano):
+        assert "<img" not in html
+        assert "hero.jpg" not in html
+        assert not re.search(r"tema-\d+\.jpg", html)
+        assert not re.search("[\U0001F300-\U0001FAFF\u2600-\u27BF]", html)
+        assert html.count("<h1") == 1
+        assert 'class="modulos-grid"' in html
+        assert 'aria-hidden="true"' in html
+
+
+def test_visitante_ve_cifras_reales_del_catalogo(client):
+    """Las cifras de la lámina salen de los datos publicados, no son valores fijos."""
+    html = client.get("/").get_data(as_text=True)
+    n_temas = db.session.scalar(
+        db.select(db.func.count()).select_from(Tema).where(Tema.estado == "publicado")
+    )
+    n_lecciones = db.session.scalar(
+        db.select(db.func.count()).select_from(Contenido).where(Contenido.estado == "publicado")
+    )
+
+    assert "Programa formativo" in html
+    assert re.search(r"Módulos</dt>\s*<dd[^>]*>%d</dd>" % n_temas, html)
+    assert re.search(r"Lecciones</dt>\s*<dd[^>]*>%d</dd>" % n_lecciones, html)
+    assert html.count('<article class="modulo ') == n_temas
+    # El visitante no ve progreso personal ni la barra de avance
+    assert 'role="progressbar"' not in html
+    assert "Tu avance general" not in html
+    assert "Crear una cuenta" in html
+
+
+def test_ciudadano_sin_avance_muestra_estado_inicial(client):
+    login_ciudadano(client)
+    html = client.get("/").get_data(as_text=True)
+
+    assert 'role="progressbar"' in html
+    assert "Sin iniciar" in html
+    assert "Tu siguiente paso" in html
+    assert "Lecciones</dt>" in html
+    assert re.search(r"0 de \d+ módulos completados", html)
+    # Ningún módulo se presenta como completado ni «en curso» sin avance real
+    assert "Módulo completado" not in html
+    assert "En curso" not in html
+
+
+def test_ciudadano_con_avance_refleja_datos_reales(client):
+    login_ciudadano(client)
+    usuario = _usuario_ciudadano()
+    tema1 = _tema(1)
+    for contenido in tema1.contenidos:
+        ProgresoContenido.marcar_completado(usuario.id_usuario, contenido.id_contenido, True)
+    n = len(tema1.contenidos)
+
+    html = client.get("/").get_data(as_text=True)
+    assert "%d de %d lecciones" % (n, n) in html
+    assert "100%" in html
+    # Con lecciones completas y práctica pendiente, el siguiente paso es el taller
+    assert "Realizar taller práctico" in html
+    assert "Práctica pendiente" in html
+
+
+def test_estados_completado_y_evaluacion_por_repasar(client):
+    login_ciudadano(client)
+    usuario = _usuario_ciudadano()
+    for orden, puntaje in ((1, 20), (2, 1)):
+        tema = _tema(orden)
+        for contenido in tema.contenidos:
+            ProgresoContenido.marcar_completado(usuario.id_usuario, contenido.id_contenido, True)
+        for actividad in tema.actividades:
+            IntentoActividad.registrar(usuario.id_usuario, actividad.id_actividad, "exitoso")
+        for evaluacion in tema.evaluaciones:
+            db.session.add(
+                IntentoEvaluacion(
+                    id_usuario=usuario.id_usuario,
+                    id_evaluacion=evaluacion.id_evaluacion,
+                    puntaje_obtenido=puntaje,
+                )
+            )
+    db.session.commit()
+
+    html = client.get("/").get_data(as_text=True)
+    assert "Módulo completado" in html
+    assert "Evaluación por repasar" in html
+    assert "1 de " in html and "módulos completados" in html
+    assert "modulo-completado" in html
+    # El siguiente paso pasa a ser rendir de nuevo la evaluación del tema 2
+    assert "Rendir evaluación" in html
+
+
+def test_barras_de_progreso_tienen_semantica_accesible(client):
+    login_ciudadano(client)
+    html = client.get("/").get_data(as_text=True)
+    barras = re.findall(r'<div class="barra-progreso-contenedor"([^>]*)>', html)
+    assert barras
+    for atributos in barras:
+        assert 'role="progressbar"' in atributos
+        for attr in ("aria-valuenow", "aria-valuemin", "aria-valuemax", "aria-label"):
+            assert attr in atributos
+
+
+def test_cada_modulo_tiene_un_unico_enlace_con_nombre_visible(client):
+    html = client.get("/").get_data(as_text=True)
+    articulos = re.findall(r'<article class="modulo .*?</article>', html, re.S)
+    assert articulos
+    for art in articulos:
+        enlaces = re.findall(r"<a [^>]*>(.*?)</a>", art, re.S)
+        assert len(enlaces) == 1
+        assert enlaces[0].strip()

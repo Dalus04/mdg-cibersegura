@@ -10,24 +10,23 @@
   max-width: var(--ancho-maximo);
   margin-left: auto;
   margin-right: auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding-left: var(--margen-lateral);
+  padding-right: var(--margen-lateral);
 }
 
 .contenido-principal {
   flex: 1;
   padding-top: 2rem;
-  padding-bottom: 3.5rem;
+  padding-bottom: 4rem;
 }
 
 /* Cabecera Institucional */
 .cabecera-principal {
-  background: #ffffff;
-  border-bottom: 2px solid var(--borde);
+  background: var(--superficie-bloque);
+  border-bottom: 1px solid var(--borde-sutil);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
 .contenedor-cabecera {
@@ -35,57 +34,63 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1rem;
-  padding-top: 0.85rem;
-  padding-bottom: 0.85rem;
+  gap: 0.5rem 1.5rem;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  min-height: 4rem;
+}
+
+/* Marca + leyenda municipal en una sola línea, separadas por un filete */
+.identidad-marca {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.9rem;
 }
 
 .identidad-marca .marca {
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 800;
   margin: 0;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .identidad-marca .marca a {
-  color: var(--enlace);
+  color: var(--color-primario);
   text-decoration: none;
 }
 
 .subtitulo-institucional {
   display: block;
-  font-size: 0.78rem;
-  color: #475569;
+  font-size: 0.75rem;
+  color: var(--texto-meta);
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-top: 2px;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  padding-left: 0.9rem;
+  border-left: 1px solid var(--borde-fuerte);
 }
 
 /* Botón toggle de menú móvil (accesible) */
 .boton-toggle-menu {
   display: none;
   background: transparent;
-  border: 1.5px solid var(--borde);
-  border-radius: 6px;
+  border: 1.5px solid var(--borde-fuerte);
+  border-radius: var(--radio-control);
   padding: 0.45rem;
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
-  color: #1e293b;
-  transition: background-color 0.15s, border-color 0.15s;
+  width: 44px;
+  height: 44px;
+  color: var(--texto-primario);
+  transition: background-color var(--transicion-rapida);
 }
 
 .boton-toggle-menu:hover {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
-}
-
-.boton-toggle-menu:focus-visible {
-  outline: 3px solid var(--foco-anillo, #0284c7);
-  outline-offset: 2px;
+  background: var(--superficie-tonal);
 }
 
 .icono-hamburguesa {
@@ -100,7 +105,7 @@
   display: block;
   width: 100%;
   height: 2px;
-  background-color: #334155;
+  background-color: var(--texto-primario);
   border-radius: 2px;
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
@@ -121,51 +126,67 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem 1.25rem;
+  gap: 0.25rem 1.5rem;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
+/* Enlaces de navegación: sin píldoras; el estado activo se marca con un filete */
 .nav-principal a {
   font-weight: 600;
   text-decoration: none;
-  color: #334155;
-  padding: 0.45rem 0.75rem;
-  border-radius: 6px;
+  color: var(--texto-secundario);
+  padding: 0.5rem 0.15rem;
+  border-bottom: 2px solid transparent;
   font-size: 0.95rem;
-  transition: all 0.15s ease-in-out;
+  transition: color var(--transicion-rapida), border-color var(--transicion-rapida);
   display: inline-flex;
   align-items: center;
+  min-height: 2.5rem;
 }
 
 .nav-principal a:hover,
 .nav-principal a:focus {
-  color: var(--enlace);
-  background: #eef4fb;
+  color: var(--color-primario);
+  border-bottom-color: var(--borde-fuerte);
 }
 
-.nav-principal a:active {
-  transform: translateY(1px);
-}
-
-/* Indicador visual de página activa */
+/* Indicador visual de página activa (no depende solo del color: filete + peso) */
 .nav-principal a[aria-current="page"] {
-  color: var(--enlace);
-  background: #eef4fb;
+  color: var(--color-primario);
   font-weight: 700;
-  box-shadow: inset 0 -2px 0 var(--enlace);
+  border-bottom-color: var(--color-primario);
 }
 
-.boton-nav-registro {
-  background: var(--enlace) !important;
+/* Enlace de administración: se distingue por el acento bronce, sin fondo propio.
+   Se declara aquí con !important porque admin.css define .enlace-admin con !important. */
+.nav-principal a.enlace-admin {
+  color: var(--acento-cobre) !important;
+  background: transparent;
+  padding: 0.5rem 0.15rem;
+  border-radius: 0;
+}
+
+.nav-principal a.enlace-admin:hover,
+.nav-principal a.enlace-admin:focus,
+.nav-principal a.enlace-admin[aria-current="page"] {
+  color: var(--estado-alerta-texto) !important;
+}
+
+/* Acción de alta en cabecera para visitantes */
+.nav-principal a.boton-nav-registro {
+  background: var(--color-primario);
   color: #ffffff !important;
-  border: 1px solid var(--enlace);
+  border: 1px solid var(--color-primario);
+  border-radius: var(--radio-control);
+  padding: 0.5rem 1rem;
 }
 
-.boton-nav-registro:hover,
-.boton-nav-registro:focus {
-  background: var(--enlace-hover) !important;
+.nav-principal a.boton-nav-registro:hover,
+.nav-principal a.boton-nav-registro:focus {
+  background: var(--color-primario-hover);
+  border-color: var(--color-primario-hover);
   color: #ffffff !important;
 }
 
@@ -178,21 +199,20 @@
 .badge-usuario-nav {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.2rem 0.65rem 0.2rem 0.35rem;
-  background: #f8fafc;
-  border: 1px solid var(--borde);
+  gap: 0.5rem;
+  padding: 0.2rem 0.65rem 0.2rem 0.3rem;
+  background: var(--superficie-tonal);
   border-radius: 999px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #334155;
+  color: var(--texto-primario);
 }
 
 .avatar-iniciales {
-  width: 1.55rem;
-  height: 1.55rem;
+  width: 1.6rem;
+  height: 1.6rem;
   border-radius: 50%;
-  background: var(--enlace);
+  background: var(--color-primario);
   color: #ffffff;
   display: inline-flex;
   align-items: center;
@@ -210,15 +230,15 @@
 }
 
 .insignia-rol-nav {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
-  background: #fef3c7;
-  color: #92400e;
+  background: var(--estado-alerta-fondo);
+  color: var(--estado-alerta-texto);
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
-  border: 1px solid #fde68a;
-  letter-spacing: 0.03em;
+  border: 1px solid var(--estado-alerta-texto);
+  letter-spacing: 0.04em;
 }
 
 .form-logout {
@@ -226,30 +246,35 @@
   align-items: center;
 }
 
-.boton-logout {
+/* «Cerrar sesión» es una salida, no una acción primaria: se muestra discreta.
+   El selector compuesto supera la regla global de button[type="submit"]. */
+.form-logout .boton-logout {
+  width: auto;
   font: inherit;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--texto-secundario);
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 6px;
-  padding: 0.45rem 0.75rem;
+  border-radius: var(--radio-control);
+  padding: 0.45rem 0.65rem;
+  min-height: 2.5rem;
   cursor: pointer;
-  transition: all 0.15s ease-in-out;
+  transition: color var(--transicion-rapida), background-color var(--transicion-rapida), border-color var(--transicion-rapida);
   display: inline-flex;
   align-items: center;
+  gap: 0.4rem;
 }
 
-.boton-logout:hover,
-.boton-logout:focus {
-  background: #fee2e2;
-  color: #991b1b;
-  border-color: #fecaca;
+.form-logout .boton-logout .icono-salida {
+  flex-shrink: 0;
 }
 
-.boton-logout:active {
-  transform: translateY(1px);
+.form-logout .boton-logout:hover,
+.form-logout .boton-logout:focus {
+  background: var(--estado-error-fondo);
+  color: var(--estado-error-texto);
+  border-color: var(--estado-error-texto);
 }
 
 /* Migas de pan accesibles */
@@ -268,23 +293,26 @@
 .migas li:not(:last-child)::after {
   content: "›";
   margin-left: 0.5rem;
-  color: #94a3b8;
+  color: var(--texto-meta);
   font-weight: bold;
 }
 
 .migas [aria-current="page"] {
   font-weight: 600;
-  color: #0f172a;
+  color: var(--texto-primario);
 }
 
-/* Pie de página institucional */
+/* Pie de página institucional (superficie inversa de alto contraste) */
 .pie-principal {
-  background: #ffffff;
-  border-top: 1px solid var(--borde);
+  background: var(--superficie-inversa);
   margin-top: auto;
   padding: 2.5rem 0 1.75rem;
-  color: #64748b;
+  color: var(--texto-sobre-inversa-suave);
   font-size: 0.9rem;
+}
+
+.pie-principal :focus-visible {
+  outline-color: #ffffff;
 }
 
 .contenedor-pie {
@@ -300,16 +328,17 @@
 }
 
 .pie-institucion {
-  color: #0f172a;
-  font-size: 0.98rem;
+  color: var(--texto-sobre-inversa);
+  font-size: 1rem;
 }
 
 .pie-descripcion {
-  font-size: 0.85rem;
-  color: #64748b;
+  font-size: 0.88rem;
+  color: var(--texto-sobre-inversa-suave);
   max-width: 32rem;
 }
 
 .pie-creditos {
   font-size: 0.85rem;
+  color: var(--texto-sobre-inversa-suave);
 }

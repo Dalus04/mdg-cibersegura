@@ -8,12 +8,16 @@
    DISEÑO RESPONSIVE Y MEDIA QUERIES
 ------------------------------------------------------------- */
 @media (max-width: 960px) {
-  .seccion-hero {
+  /* Portada: bloques apilados; el contenido secundario se reorganiza, no solo se reduce */
+  .portada {
     grid-template-columns: 1fr;
-    gap: 2rem;
-    padding: 2rem;
+    gap: 1.5rem;
   }
-  
+
+  .panel-avance-datos {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
   .encabezado-tema-hero {
     grid-template-columns: 1fr;
     gap: 1.5rem;
@@ -22,6 +26,89 @@
 
   .tarjeta-progreso-tema {
     grid-template-columns: 200px 1fr;
+  }
+}
+
+/* Tablet: la lámina del visitante pasa a composición horizontal (arte + cifras) */
+@media (min-width: 681px) and (max-width: 960px) {
+  .lamina {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "etiqueta etiqueta"
+      "arte datos";
+    align-items: center;
+    gap: 1rem 2rem;
+  }
+
+  .lamina-etiqueta { grid-area: etiqueta; }
+  .lamina-arte { grid-area: arte; padding: 0.5rem 1.5rem; }
+  .lamina-datos { grid-area: datos; padding-top: 0; border-top: 0; }
+}
+
+/* Módulos: de 2x2 a una columna de tarjetas horizontales */
+@media (max-width: 760px) {
+  .modulos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modulo {
+    flex-direction: row;
+  }
+
+  .modulo-arte,
+  .modulo-t2 .modulo-arte,
+  .modulo-t4 .modulo-arte {
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    flex: 0 0 9.5rem;
+    min-height: 0;
+    padding: 1rem;
+    border-bottom: 0;
+    border-right: 1px solid var(--borde-sutil);
+  }
+
+  .modulo-numeral {
+    align-self: center;
+    font-size: 2.75rem;
+  }
+
+  .modulo-pictograma {
+    width: 4rem;
+  }
+}
+
+/* Móvil: tarjeta vertical con franja gráfica compacta */
+@media (max-width: 540px) {
+  .modulo {
+    flex-direction: column;
+  }
+
+  .modulo-arte,
+  .modulo-t2 .modulo-arte,
+  .modulo-t4 .modulo-arte {
+    flex: none;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 5.5rem;
+    padding: 0.75rem 1.25rem;
+    border-right: 0;
+    border-bottom: 1px solid var(--borde-sutil);
+  }
+
+  .modulo-t2 .modulo-arte,
+  .modulo-t4 .modulo-arte {
+    flex-direction: row-reverse;
+  }
+
+  .modulo-pictograma {
+    width: 3.5rem;
+  }
+
+  .modulo-numeral {
+    font-size: 2.5rem;
   }
 }
 
@@ -85,7 +172,29 @@
     display: flex;
     padding: 0.65rem 0.85rem;
     font-size: 0.98rem;
-    border-radius: 6px;
+    border-radius: 0;
+    border-bottom: 0;
+    border-left: 3px solid transparent;
+  }
+
+  .nav-principal a:hover,
+  .nav-principal a:focus {
+    border-left-color: var(--borde-fuerte);
+  }
+
+  .nav-principal a[aria-current="page"] {
+    border-left-color: var(--color-primario);
+  }
+
+  .nav-principal a.boton-nav-registro {
+    justify-content: center;
+    border-radius: var(--radio-control);
+  }
+
+  .subtitulo-institucional {
+    flex-basis: 100%;
+    padding-left: 0;
+    border-left: 0;
   }
 
   .item-usuario-nav {
@@ -100,7 +209,7 @@
     width: 100%;
   }
 
-  .boton-logout {
+  .form-logout .boton-logout {
     display: flex;
     width: 100%;
     padding: 0.65rem 0.85rem;
@@ -108,8 +217,27 @@
     text-align: left;
   }
 
-  .hero-texto h1 {
-    font-size: 1.85rem;
+  /* Portada: el siguiente paso y el saludo quedan en el primer pantallazo */
+  .portada-titulo {
+    font-size: 2.25rem;
+  }
+
+  .panel-avance-datos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .portada .acciones-hero .enlace-accion,
+  .portada .acciones-hero .enlace-secundario {
+    flex: 1 1 100%;
+  }
+
+  .metodo {
+    grid-template-columns: 1fr;
+  }
+
+  .metodo li + li {
+    border-left: 0;
+    border-top: 1px solid var(--borde-fuerte);
   }
 
   .grid-temas {
