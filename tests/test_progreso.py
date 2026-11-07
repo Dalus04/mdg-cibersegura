@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.models import Contenido, ProgresoContenido, Tema, Usuario
+from app.models import Contenido, Evaluacion, IntentoActividad, IntentoEvaluacion, ProgresoContenido, Tema, Usuario
 
 
 def login_ciudadano(client):
@@ -159,3 +159,64 @@ def test_resumen_progreso_usuario_calcula_metricas(app):
         assert tema1_resumen["porcentaje"] == 100
         assert tema1_resumen["estado"] == "completado"
         assert tema1_resumen["siguiente_leccion"] is None
+
+
+def test_progreso_diferencia_actividad_intentada_vs_pendiente(client, app):
+    login_ciudadano(client)
+
+    with app.app_context():
+        usuario = Usuario.buscar_por_correo("ciudadano@ejemplo.com")
+        # Registrar intento que requiere repaso en la actividad 1
+        IntentoActividad.registrar(
+            id_usuario=usuario.id_usuario,
+            id_actividad=1,
+            resultado="requiere_repaso",
+            opcion_id="opc_insegura",
+        )
+
+    response = client.get("/mi-progreso")
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+
+    # Debe reflejar que hubo intento y requiere práctica, no "Pendiente de realizar"
+    assert "Intento realizado: requiere práctica" in html
+
+
+def test_progreso_estado_modulo_evaluacion_pendiente_y_aprobada(app):
+    with app.app_context():
+        usuario = Usuario.buscar_por_correo("ciudadano@ejemplo.com")
+        tema1 = db.session.scalar(db.select(Tema).where(Tema.id_tema == 1))
+        lecciones_tema1 = [c for c in tema1.contenidos if c.estado == "publicado"]
+
+        for leccion in lecciones_tema1:
+            ProgresoContenido.marcar_completado(usuario.id_usuario, leccion.id_contenido, True)
+
+        resumen = ProgresoContenido.obtener_resumen_progreso_usuario(usuario.id_usuario)
+        tema1_resumen = next(t for t in resumen["temas"] if t["tema"].id_tema == 1)
+
+        # Sin evaluación aprobada, estado_modulo es evaluacion_pendiente
+        assert tema1_resumen["estado_modulo"] == "evaluacion_pendiente"
+
+        # Registrar intento aprobado en la evaluación
+        evaluacion = db.session.scalar(db.select(Evaluacion).where(Evaluacion.id_tema == 1))
+        respuestas_correctas = {
+            p.id_pregunta: next(a.id_alternativa for a in p.alternativas if a.es_correcta)
+            for p in evaluacion.preguntas
+        }
+        IntentoEvaluacion.registrar_intento(
+            id_usuario=usuario.id_usuario,
+            evaluacion=evaluacion,
+            respuestas_dict=respuestas_correctas,
+        )
+        # Completar también actividad
+        IntentoActividad.registrar(
+            id_usuario=usuario.id_usuario,
+            id_actividad=1,
+            resultado="exitoso",
+        )
+
+        resumen_post = ProgresoContenido.obtener_resumen_progreso_usuario(usuario.id_usuario)
+        tema1_post = next(t for t in resumen_post["temas"] if t["tema"].id_tema == 1)
+
+        assert tema1_post["estado_modulo"] == "completado"
+

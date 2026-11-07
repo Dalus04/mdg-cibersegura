@@ -6,6 +6,7 @@
  */
 
 import { initAccesibilidad } from './modules/accesibilidad.js';
+import { initEvaluaciones } from './modules/evaluaciones.js';
 import { initSimulador } from './modules/simulador.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -14,4 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Inicialización de simulaciones y actividades interactivas
   initSimulador();
+
+  // Inicialización de cuestionarios formales de evaluación
+  initEvaluaciones();
 });

@@ -13,18 +13,24 @@
 
 .grid-metricas-progreso {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.5rem;
 }
 
 .tarjeta-metrica-progreso {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
+  background-color: var(--fondo-tarjeta, #ffffff);
+  border: 1px solid var(--borde, #e2e8f0);
   border-radius: 14px;
   padding: 1.6rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
   display: flex;
   flex-direction: column;
+}
+
+.tarjeta-metrica-principal {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, var(--fondo-tarjeta, #ffffff) 0%, #f0f7ff 100%);
+  border-color: #bfdbfe;
 }
 
 .etiqueta-metrica {
@@ -39,7 +45,7 @@
 .valor-metrica {
   font-size: 2.25rem;
   font-weight: 800;
-  color: #084c8d;
+  color: var(--enlace, #084c8d);
   line-height: 1.1;
   margin: 0.25rem 0 0.5rem;
 }
@@ -47,7 +53,7 @@
 .subtexto-metrica {
   margin: 0;
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--borde-fuerte, #64748b);
 }
 
 .seccion-desglose-temas {
@@ -63,7 +69,7 @@
 }
 
 .encabezado-desglose p {
-  color: #64748b;
+  color: var(--borde-fuerte, #64748b);
   margin: 0;
 }
 
@@ -76,8 +82,8 @@
 .tarjeta-progreso-tema {
   display: grid;
   grid-template-columns: 260px 1fr;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
+  background-color: var(--fondo-tarjeta, #ffffff);
+  border: 1px solid var(--borde, #e2e8f0);
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
@@ -96,8 +102,16 @@
   border-left: 5px solid #0284c7;
 }
 
+.tarjeta-progreso-tema.estado-evaluacion_pendiente {
+  border-left: 5px solid #0284c7;
+}
+
+.tarjeta-progreso-tema.estado-evaluacion_desaprobada {
+  border-left: 5px solid #d97706;
+}
+
 .tarjeta-progreso-tema.estado-no_iniciado {
-  border-left: 5px solid #cbd5e1;
+  border-left: 5px solid #94a3b8;
 }
 
 .contenedor-miniatura-progreso {
@@ -141,6 +155,12 @@
   color: #084c8d;
 }
 
+.cabecera-item-progreso h3 a:focus-visible {
+  outline: 3px solid var(--foco-anillo, #0284c7);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
 .detalles-barra-progreso {
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
@@ -152,6 +172,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
   font-size: 0.85rem;
   color: #475569;
   font-weight: 600;
@@ -161,6 +183,33 @@
 .porcentaje-item {
   font-weight: 700;
   color: #084c8d;
+}
+
+.fila-submetrica-actividades {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: #475569;
+  margin-top: 0.4rem;
+  padding-top: 0.35rem;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.texto-exito-progreso {
+  color: #15803d;
+}
+
+.texto-pendiente-progreso {
+  color: #334155;
+  font-style: italic;
+}
+
+.texto-repaso-progreso {
+  color: #b45309;
+  font-weight: 600;
 }
 
 .pie-item-progreso {
@@ -209,6 +258,32 @@
   background-color: #f1f5f9;
   color: #475569;
   border: 1px solid #cbd5e1;
+}
+
+.badge-evaluacion-enlace {
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+}
+
+.badge-evaluacion-enlace:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.badge-evaluacion-enlace:focus-visible {
+  outline: 3px solid var(--foco-anillo, #0284c7);
+  outline-offset: 2px;
+}
+
+.badge-evaluacion-enlace:active {
+  transform: translateY(0);
+}
+
+.texto-completado-lecciones {
+  font-size: 0.88rem;
+  color: var(--enlace, #084c8d);
+  font-weight: 600;
 }
 
 .enlace-evaluacion-destacado {

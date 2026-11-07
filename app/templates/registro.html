@@ -11,12 +11,12 @@
         <h1>Crear cuenta</h1>
         <p>Regístrate para acceder a los contenidos educativos de ciberseguridad.</p>
       </header>
-      <form method="post" novalidate>
+      <form method="post">
         {{ form.hidden_tag() }}
         {{ campo(form.nombres, "given-name") }}
         {{ campo(form.apellidos, "family-name") }}
         {{ campo(form.correo, "email") }}
-        {{ campo(form.contrasena, "new-password") }}
+        {{ campo(form.contrasena, "new-password", ayuda="Mínimo 8 caracteres.") }}
         {{ campo(form.confirmar_contrasena, "new-password") }}
         <p class="fila-submit">{{ form.enviar }}</p>
       </form>

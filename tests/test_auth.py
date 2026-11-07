@@ -268,3 +268,134 @@ def test_login_usuario_semilla_ciudadano(client):
     html = response.get_data(as_text=True)
     assert "Bienvenido o bienvenida, Ciudadano." in html
     assert "ciudadano@ejemplo.com" in html
+
+
+def test_login_con_opcion_recordarme(client):
+    client.post(
+        "/registro",
+        data={
+            "nombres": "Mateo",
+            "apellidos": "Salas",
+            "correo": "mateo@example.com",
+            "contrasena": "ClaveSegura123",
+            "confirmar_contrasena": "ClaveSegura123",
+        },
+    )
+    response = client.post(
+        "/login",
+        data={
+            "correo": "mateo@example.com",
+            "contrasena": "ClaveSegura123",
+            "recordarme": "y",
+        },
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert "Bienvenido o bienvenida, Mateo." in response.get_data(as_text=True)
+
+
+def test_solicitud_recuperacion_password_existente(client):
+    client.post(
+        "/registro",
+        data={
+            "nombres": "Patricia",
+            "apellidos": "López",
+            "correo": "patricia@example.com",
+            "contrasena": "ClaveSegura123",
+            "confirmar_contrasena": "ClaveSegura123",
+        },
+    )
+
+    response = client.post(
+        "/recuperar-password",
+        data={"correo": "patricia@example.com"},
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "recibirás las instrucciones para restablecer tu contraseña" in html
+
+
+def test_solicitud_recuperacion_password_no_existente_no_revela_usuario(client):
+    response = client.post(
+        "/recuperar-password",
+        data={"correo": "no_existe_este_correo_12345@example.com"},
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "recibirás las instrucciones para restablecer tu contraseña" in html
+
+
+def test_restablecer_password_token_valido(client, app):
+    client.post(
+        "/registro",
+        data={
+            "nombres": "Gabriel",
+            "apellidos": "Quispe",
+            "correo": "gabriel@example.com",
+            "contrasena": "ClaveAntigua123",
+            "confirmar_contrasena": "ClaveAntigua123",
+        },
+    )
+
+    with app.app_context():
+        from app.core.auth_service import AuthService
+
+        exito, token, _ = AuthService.generar_token_recuperacion("gabriel@example.com")
+        assert exito is True
+        assert token is not None
+
+    res_get = client.get(f"/restablecer-password/{token}")
+    assert res_get.status_code == 200
+    assert "Crear nueva contraseña" in res_get.get_data(as_text=True)
+
+    res_post = client.post(
+        f"/restablecer-password/{token}",
+        data={
+            "contrasena": "ClaveNueva456!",
+            "confirmar_contrasena": "ClaveNueva456!",
+        },
+        follow_redirects=True,
+    )
+    assert res_post.status_code == 200
+    assert "Tu contraseña ha sido actualizada exitosamente" in res_post.get_data(as_text=True)
+
+    res_login = client.post(
+        "/login",
+        data={
+            "correo": "gabriel@example.com",
+            "contrasena": "ClaveNueva456!",
+        },
+        follow_redirects=True,
+    )
+    assert res_login.status_code == 200
+    assert "Bienvenido o bienvenida, Gabriel." in res_login.get_data(as_text=True)
+
+
+def test_restablecer_password_token_expirado(client, app):
+    client.post(
+        "/registro",
+        data={
+            "nombres": "Rosa",
+            "apellidos": "Diaz",
+            "correo": "rosa@example.com",
+            "contrasena": "ClaveSegura123",
+            "confirmar_contrasena": "ClaveSegura123",
+        },
+    )
+
+    with app.app_context():
+        from app.core.auth_service import AuthService
+
+        _, token, _ = AuthService.generar_token_recuperacion("rosa@example.com")
+        valido, usuario, error = AuthService.validar_token_recuperacion(token, max_age=-1)
+        assert valido is False
+        assert "expirado" in error.lower()
+
+
+def test_restablecer_password_token_invalido(client):
+    response = client.get("/restablecer-password/token-completamente-falso", follow_redirects=True)
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "no es válido" in html.lower() or "expirado" in html.lower()

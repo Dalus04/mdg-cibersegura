@@ -77,13 +77,75 @@ class ActividadService:
             id_usuario=id_usuario,
             id_actividad=actividad.id_actividad,
             resultado=resultado_clave,
+            opcion_id=opcion_id,
         )
+
+        opciones_correctas = [o for o in opciones if o.get("es_correcta")]
+        opcion_correcta = next((o for o in opciones if o.get("es_correcta")), None)
 
         return True, {
             "tema": tema,
             "actividad": actividad,
             "configuracion": config,
             "opcion_elegida": opcion_elegida,
+            "opcion_correcta": opcion_correcta,
+            "opciones_correctas": opciones_correctas,
             "es_correcta": es_correcta,
             "intento": intento,
         }, None
+
+    @classmethod
+    def obtener_resultado_intento(
+        cls, id_tema: int, id_actividad: int, id_intento: int, id_usuario: int
+    ) -> dict[str, Any] | None:
+        """Obtiene el resultado detallado de un intento de actividad para visualización segura e idempotente."""
+        tema = db.session.scalar(
+            select(Tema).where(Tema.id_tema == id_tema, Tema.estado == "publicado")
+        )
+        if tema is None:
+            return None
+
+        actividad = db.session.scalar(
+            select(Actividad).where(
+                Actividad.id_actividad == id_actividad,
+                Actividad.id_tema == tema.id_tema,
+                Actividad.estado == "publicado",
+            )
+        )
+        if actividad is None:
+            return None
+
+        intento = db.session.scalar(
+            select(IntentoActividad).where(
+                IntentoActividad.id_intento_actividad == id_intento,
+                IntentoActividad.id_actividad == actividad.id_actividad,
+                IntentoActividad.id_usuario == id_usuario,
+            )
+        )
+        if intento is None:
+            return None
+
+        config = actividad.configuracion
+        opciones = config.get("opciones", [])
+        opcion_elegida = next((o for o in opciones if o.get("id") == intento.opcion_id), None)
+        if opcion_elegida is None:
+            opcion_elegida = {
+                "id": intento.opcion_id or "registrada",
+                "texto": "Respuesta registrada",
+                "explicacion": "Tu respuesta ha sido registrada en el sistema.",
+            }
+
+        es_correcta = (intento.resultado == "exitoso")
+        opciones_correctas = [o for o in opciones if o.get("es_correcta")]
+        opcion_correcta = next((o for o in opciones if o.get("es_correcta")), None)
+
+        return {
+            "tema": tema,
+            "actividad": actividad,
+            "configuracion": config,
+            "opcion_elegida": opcion_elegida,
+            "opcion_correcta": opcion_correcta,
+            "opciones_correctas": opciones_correctas,
+            "es_correcta": es_correcta,
+            "intento": intento,
+        }

@@ -16,5 +16,5 @@ csrf = CSRFProtect()
 
 login_manager.login_view = "auth.login"
 login_manager.login_message = "Inicia sesión para continuar."
-login_manager.login_message_category = "error"
+login_manager.login_message_category = "info"
 

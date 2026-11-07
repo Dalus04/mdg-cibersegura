@@ -11,10 +11,17 @@
         <h1>Iniciar sesión</h1>
         <p>Ingresa con el correo y la contraseña de tu cuenta de ciudadano.</p>
       </header>
-      <form method="post" novalidate>
+      <form method="post">
         {{ form.hidden_tag() }}
         {{ campo(form.correo, "username") }}
         {{ campo(form.contrasena, "current-password") }}
+        <div class="fila-recordarme-recuperar">
+          <div class="campo-checkbox">
+            {{ form.recordarme() }}
+            {{ form.recordarme.label }}
+          </div>
+          <p class="enlace-olvido"><a href="{{ url_for('auth.recuperar_password') }}">¿Olvidaste tu contraseña?</a></p>
+        </div>
         <p class="fila-submit">{{ form.enviar }}</p>
       </form>
       <footer class="pie-formulario">

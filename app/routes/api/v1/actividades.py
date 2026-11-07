@@ -59,7 +59,8 @@ def api_ver_actividad(id_tema: int, id_actividad: int):
                     "tipo": actividad_data["actividad"].tipo,
                     "introduccion": config.get("introduccion"),
                     "caso_contexto": config.get("caso_contexto"),
-                    "correo_simulado": config.get("correo_simulado"),
+                    "escenario_simulado": config.get("escenario_simulado") or config.get("correo_simulado"),
+                    "correo_simulado": config.get("escenario_simulado") or config.get("correo_simulado"),
                     "opciones": opciones_sanitizadas,
                     "ultimo_intento": {
                         "resultado": ultimo.resultado,
@@ -142,7 +143,8 @@ def api_resolver_actividad(id_tema: int, id_actividad: int):
                 "exito": True,
                 "es_correcta": resultado_data["es_correcta"],
                 "resultado_clave": intento.resultado,
-                "retroalimentacion": opcion.get("retroalimentacion"),
+                "opcion_id": opcion.get("id"),
+                "retroalimentacion": opcion.get("retroalimentacion") or opcion.get("explicacion"),
                 "explicacion": opcion.get("explicacion"),
                 "intento": {
                     "id_intento_actividad": intento.id_intento_actividad,

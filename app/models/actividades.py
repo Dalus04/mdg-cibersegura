@@ -49,6 +49,18 @@ class Actividad(db.Model):
             .order_by(IntentoActividad.fecha_intento.desc())
         )
 
+    def ha_sido_superada(self, id_usuario: int) -> bool:
+        """Determina si el usuario ha completado exitosamente esta actividad al menos una vez."""
+        return db.session.scalar(
+            select(IntentoActividad.id_intento_actividad)
+            .where(
+                IntentoActividad.id_actividad == self.id_actividad,
+                IntentoActividad.id_usuario == id_usuario,
+                IntentoActividad.resultado == "exitoso",
+            )
+            .limit(1)
+        ) is not None
+
 
 class IntentoActividad(db.Model):
     __tablename__ = "intento_actividad"
@@ -57,6 +69,7 @@ class IntentoActividad(db.Model):
     id_usuario: Mapped[int] = mapped_column(ForeignKey("usuario.id_usuario"), nullable=False)
     id_actividad: Mapped[int] = mapped_column(ForeignKey("actividad.id_actividad"), nullable=False)
     resultado: Mapped[str | None] = mapped_column(String(100))
+    opcion_id: Mapped[str | None] = mapped_column(String(50))
     fecha_intento: Mapped[datetime] = mapped_column(DateTime, default=utc_now, nullable=False)
 
     usuario: Mapped["Usuario"] = relationship(back_populates="intentos_actividad")
@@ -64,13 +77,14 @@ class IntentoActividad(db.Model):
 
     @classmethod
     def registrar(
-        cls, id_usuario: int, id_actividad: int, resultado: str
+        cls, id_usuario: int, id_actividad: int, resultado: str, opcion_id: str | None = None
     ) -> "IntentoActividad":
         """Registra un nuevo intento de resolución de actividad."""
         intento = cls(
             id_usuario=id_usuario,
             id_actividad=id_actividad,
             resultado=resultado,
+            opcion_id=opcion_id,
             fecha_intento=utc_now(),
         )
         db.session.add(intento)

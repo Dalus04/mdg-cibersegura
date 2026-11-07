@@ -18,7 +18,8 @@
   --fondo-suave: #f8fafc;
   --fondo-tarjeta: #ffffff;
   --borde: #e2e8f0;
-  --borde-fuerte: #94a3b8;
+  --borde-fuerte: #64748b;
+  --foco-anillo: #0284c7;
 
   /* Estados y retroalimentación pedagógica */
   --error: #8b1a1a;

@@ -79,6 +79,7 @@ def marcar_completado(id_tema: int, id_contenido: int):
             "aprendizaje.ver_contenido",
             id_tema=id_tema,
             id_contenido=id_contenido,
+            _anchor="seccion-marcar-progreso",
         )
     )
 
@@ -102,6 +103,7 @@ def desmarcar_completado(id_tema: int, id_contenido: int):
             "aprendizaje.ver_contenido",
             id_tema=id_tema,
             id_contenido=id_contenido,
+            _anchor="seccion-marcar-progreso",
         )
     )
 
@@ -158,6 +160,29 @@ def resolver_actividad(id_tema: int, id_actividad: int):
     else:
         flash("Atención: tu respuesta revela un riesgo de seguridad. Revisa la explicación detallada.", "error")
 
+    return redirect(
+        url_for(
+            "aprendizaje.resultado_actividad",
+            id_tema=id_tema,
+            id_actividad=id_actividad,
+            id_intento=resultado_data["intento"].id_intento_actividad,
+        )
+    )
+
+
+@aprendizaje_bp.get("/temas/<int:id_tema>/actividades/<int:id_actividad>/resultado/<int:id_intento>")
+@login_required
+def resultado_actividad(id_tema: int, id_actividad: int, id_intento: int):
+    """Muestra la retroalimentación y análisis de un intento de resolución de actividad."""
+    resultado_data = ActividadService.obtener_resultado_intento(
+        id_tema=id_tema,
+        id_actividad=id_actividad,
+        id_intento=id_intento,
+        id_usuario=current_user.id_usuario,
+    )
+    if resultado_data is None:
+        abort(404)
+
     return render_template("aprendizaje/actividad_resultado.html", **resultado_data)
 
 
@@ -186,7 +211,15 @@ def enviar_evaluacion(id_tema: int):
         if error_msg and "no existe" in error_msg.lower():
             abort(404)
         flash(error_msg or "Error al procesar la evaluación.", "error")
-        return redirect(url_for("aprendizaje.ver_evaluacion", id_tema=id_tema))
+        eval_data = EvaluacionService.obtener_evaluacion_tema(id_tema, current_user.id_usuario)
+        if eval_data is None:
+            abort(404)
+        return render_template(
+            "aprendizaje/evaluacion.html",
+            **eval_data,
+            respuestas_previas=request.form,
+            error_formulario=error_msg,
+        )
 
     if intento.aprobado:
         flash(
@@ -195,7 +228,7 @@ def enviar_evaluacion(id_tema: int):
         )
     else:
         flash(
-            f"Obtuviste {intento.puntaje_obtenido:.1f} puntos (mínimo aprobatorio: 14.0). Puedes repasar las lecciones y volver a intentarlo.",
+            f"Obtuviste {intento.puntaje_obtenido:.1f} puntos (mínimo aprobatorio: {intento.evaluacion.puntaje_minimo:.1f} puntos). Puedes repasar las lecciones y volver a intentarlo.",
             "error",
         )
 

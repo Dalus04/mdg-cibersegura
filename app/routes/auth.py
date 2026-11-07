@@ -1,6 +1,6 @@
 from urllib.parse import urlsplit
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
 from app.core.auth_service import (
@@ -8,7 +8,12 @@ from app.core.auth_service import (
     MENSAJE_CUENTA_INACTIVA,
     AuthService,
 )
-from app.forms import LoginForm, RegistroForm
+from app.forms import (
+    LoginForm,
+    RegistroForm,
+    RestablecerPasswordForm,
+    SolicitudRecuperacionForm,
+)
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -56,7 +61,7 @@ def login():
         )
         if not exito:
             flash(error or MENSAJE_CREDENCIALES, "error")
-        elif login_user(usuario):
+        elif login_user(usuario, remember=form.recordarme.data):
             flash(f"Bienvenido o bienvenida, {usuario.nombres}.", "exito")
             next_page = request.args.get("next")
             if _es_url_segura(next_page):
@@ -74,3 +79,45 @@ def logout():
     logout_user()
     flash("Cerraste sesión correctamente.", "exito")
     return redirect(url_for("auth.login"))
+
+
+@auth_bp.route("/recuperar-password", methods=["GET", "POST"])
+def recuperar_password():
+    if current_user.is_authenticated:
+        return redirect(url_for("main.index"))
+
+    form = SolicitudRecuperacionForm()
+    if form.validate_on_submit():
+        exito, token, _ = AuthService.generar_token_recuperacion(form.correo.data)
+        if exito and token:
+            enlace = url_for("auth.restablecer_password", token=token, _external=True)
+            current_app.logger.info(
+                f"[RECUPERACIÓN DE CONTRASEÑA] Correo: {form.correo.data} | Enlace: {enlace}"
+            )
+
+        flash(
+            "Si la dirección de correo ingresada está registrada, recibirás las instrucciones para restablecer tu contraseña.",
+            "info",
+        )
+        return redirect(url_for("auth.login"))
+
+    return render_template("solicitar_recuperacion.html", form=form)
+
+
+@auth_bp.route("/restablecer-password/<token>", methods=["GET", "POST"])
+def restablecer_password(token: str):
+    if current_user.is_authenticated:
+        return redirect(url_for("main.index"))
+
+    valido, usuario, error_msg = AuthService.validar_token_recuperacion(token)
+    if not valido or usuario is None:
+        flash(error_msg or "El enlace de recuperación no es válido o ha expirado.", "error")
+        return redirect(url_for("auth.recuperar_password"))
+
+    form = RestablecerPasswordForm()
+    if form.validate_on_submit():
+        AuthService.restablecer_password(usuario, form.contrasena.data)
+        flash("Tu contraseña ha sido actualizada exitosamente. Ya puedes iniciar sesión.", "exito")
+        return redirect(url_for("auth.login"))
+
+    return render_template("restablecer_password.html", form=form, token=token)

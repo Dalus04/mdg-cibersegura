@@ -252,7 +252,7 @@ class AdminService:
         resultado = []
         for u in usuarios:
             lecciones_comp = sum(1 for p in u.progresos if p.completado)
-            evals_aprob = sum(1 for i in u.intentos_evaluacion if i.aprobado)
+            evals_aprob = len({i.id_evaluacion for i in u.intentos_evaluacion if i.aprobado})
             resultado.append(
                 {
                     "id_usuario": u.id_usuario,

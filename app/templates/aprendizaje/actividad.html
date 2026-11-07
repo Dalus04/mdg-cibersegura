@@ -50,12 +50,13 @@
       {% if configuracion.escenario_simulado %}
         <!-- Visualización realista de Correo Simulado -->
         {% set correo = configuracion.escenario_simulado %}
-        <div class="cliente-correo-simulado" aria-label="Cliente de correo electrónico seguro simulado">
+        <section class="cliente-correo-simulado" aria-labelledby="titulo-visor-simulado">
           <div class="barra-superior-correo">
-            <span class="punto-rojo"></span>
-            <span class="punto-amarillo"></span>
-            <span class="punto-verde"></span>
-            <span class="titulo-ventana-correo">Bandeja de entrada — Simulador de Ciberseguridad</span>
+            <div class="icono-y-titulo-correo">
+              <span class="icono-correo-municipal" aria-hidden="true">✉️</span>
+              <h3 id="titulo-visor-simulado" class="titulo-ventana-correo">Bandeja de entrada — Simulador de Ciberseguridad</h3>
+            </div>
+            <span class="insignia-entorno-seguro" aria-hidden="true">🛡️ Entorno seguro</span>
           </div>
 
           <div class="cabecera-correo-simulado">
@@ -76,26 +77,47 @@
           <div class="cuerpo-correo-simulado">
             <div class="texto-correo">
               {% for linea in correo.mensaje.split('\n\n') %}
-                <p>{{ linea }}</p>
+                {% if correo.enlace_falso and correo.enlace_falso in linea %}
+                  {% set partes = linea.split(correo.enlace_falso, 1) %}
+                  <p>{{ partes[0] }}<a href="#" class="enlace-simulado-phishing" data-enlace="{{ correo.enlace_falso }}" title="Simulación: Inspección de destino seguro">{{ correo.enlace_falso }}</a>{{ partes[1] }}</p>
+                {% else %}
+                  <p>{{ linea }}</p>
+                {% endif %}
               {% endfor %}
             </div>
 
-            <div class="inspeccion-enlace-alerta">
-              <span class="icono-lupa" aria-hidden="true">🔍</span>
-              <div>
-                <strong>Inspección visual del enlace:</strong>
+            <details class="inspeccion-enlace-alerta">
+              <summary class="resumen-inspeccion">
+                <span class="icono-lupa" aria-hidden="true">🔍</span>
+                <span>Inspección visual del enlace (Pista opcional de seguridad)</span>
+              </summary>
+              <div class="contenido-inspeccion">
+                <strong>Destino detectado en el mensaje:</strong>
                 <code>{{ correo.enlace_falso }}</code>
                 <p class="nota-segura">En un correo real, verifica el dominio antes de hacer clic posando el cursor o manteniendo presionado el enlace.</p>
               </div>
-            </div>
+            </details>
           </div>
-        </div>
+        </section>
 
       {% elif configuracion.caso_contexto %}
-        <!-- Caso Contextual de Taller Práctico -->
-        <div class="tarjeta-caso-contexto">
-          <h3>Situación planteada</h3>
-          <p>{{ configuracion.caso_contexto }}</p>
+        <!-- Caso Contextual de Taller Práctico o Simulación Móvil -->
+        <div class="tarjeta-caso-contexto {% if actividad.tipo == 'simulacion' %}marco-simulacion-movil{% endif %}">
+          {% if actividad.tipo == 'simulacion' %}
+            <div class="cabecera-simulacion-movil">
+              <span class="icono-dispositivo-movil" aria-hidden="true">📱</span>
+              <div>
+                <span class="subtitulo-entorno-movil">Simulación de Dispositivo Móvil</span>
+                <h3 class="titulo-alerta-movil">Alerta de Seguridad: Solicitud de Permisos</h3>
+              </div>
+            </div>
+            <div class="cuerpo-simulacion-movil">
+              <p>{{ configuracion.caso_contexto }}</p>
+            </div>
+          {% else %}
+            <h3>Situación planteada</h3>
+            <p>{{ configuracion.caso_contexto }}</p>
+          {% endif %}
         </div>
       {% endif %}
     </section>
@@ -108,8 +130,8 @@
         <form action="{{ url_for('aprendizaje.resolver_actividad', id_tema=tema.id_tema, id_actividad=actividad.id_actividad) }}" method="post" class="form-decision-actividad">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-          <fieldset class="grupo-opciones-actividad">
-            <legend class="sr-only">Selecciona tu alternativa</legend>
+          <fieldset class="grupo-opciones-actividad" aria-labelledby="titulo-decision">
+            <legend class="sr-only">{{ configuracion.pregunta or 'Selecciona tu alternativa' }}</legend>
 
             <div class="lista-opciones-radios">
               {% for opcion in configuracion.opciones %}
@@ -121,7 +143,6 @@
                     value="{{ opcion.id }}" 
                     required
                   >
-                  <span class="indicador-radio-custom" aria-hidden="true"></span>
                   <span class="texto-opcion-decision">{{ opcion.texto }}</span>
                 </label>
               {% endfor %}
@@ -129,7 +150,7 @@
           </fieldset>
 
           <div class="acciones-formulario-actividad">
-            <button type="submit" class="boton-enviar-actividad">
+            <button type="submit" class="boton-enviar-actividad enlace-accion">
               Confirmar y evaluar decisión →
             </button>
             <a class="enlace-secundario" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
@@ -139,12 +160,22 @@
         </form>
       {% else %}
         <div class="caja-login-requerido">
-          <p>
-            <strong>Para participar en esta actividad y registrar tu resultado:</strong>
-          </p>
-          <div class="acciones-hero">
-            <a class="enlace-accion" href="{{ url_for('auth.login', next=request.path) }}">Iniciar sesión</a>
-            <a class="enlace-secundario" href="{{ url_for('auth.registro') }}">Registrarse</a>
+          <div class="lista-opciones-radios modo-exploratorio" aria-label="Alternativas en modo lectura previa">
+            {% for opcion in configuracion.opciones %}
+              <div class="tarjeta-opcion-decision opcion-deshabilitada">
+                <input type="radio" id="opcion_anonima_{{ opcion.id }}" disabled aria-disabled="true">
+                <span class="texto-opcion-decision">{{ opcion.texto }}</span>
+              </div>
+            {% endfor %}
+          </div>
+          <div class="aviso-registro-actividad">
+            <p>
+              <strong>Para participar en esta actividad y registrar tu resultado:</strong>
+            </p>
+            <div class="acciones-hero">
+              <a class="enlace-accion" href="{{ url_for('auth.login', next=request.path) }}">Iniciar sesión</a>
+              <a class="enlace-secundario" href="{{ url_for('auth.registro') }}">Registrarse</a>
+            </div>
           </div>
         </div>
       {% endif %}

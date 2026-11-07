@@ -32,13 +32,80 @@
   }
 
   .contenedor-cabecera {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
+  }
+
+  .boton-toggle-menu {
+    display: inline-flex;
+  }
+
+  /* Menú móvil colapsable con Progressive Enhancement */
+  .nav-principal.nav-colapsable {
+    display: none;
+    width: 100%;
+    margin-top: 0.5rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--borde);
+  }
+
+  .nav-principal.nav-colapsable.menu-abierto {
+    display: block;
+    animation: slideDownMenu 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes slideDownMenu {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-principal.nav-colapsable.menu-abierto {
+      animation: none;
+    }
   }
 
   .nav-principal ul {
-    gap: 0.35rem 0.75rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .nav-principal a {
+    display: flex;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.98rem;
+    border-radius: 6px;
+  }
+
+  .item-usuario-nav {
+    padding: 0.4rem 0.5rem;
+    border-top: 1px dashed var(--borde);
+    margin-top: 0.25rem;
+    padding-top: 0.6rem;
+  }
+
+  .form-logout {
+    display: block;
+    width: 100%;
+  }
+
+  .boton-logout {
+    display: flex;
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.95rem;
+    text-align: left;
   }
 
   .hero-texto h1 {
@@ -107,6 +174,11 @@
     text-align: center;
   }
 
+  .caja-fin-tema .acciones-fin-tema {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .grid-actividades-tema {
     grid-template-columns: 1fr;
   }
@@ -126,6 +198,15 @@
     padding: 1.25rem 1rem;
   }
 
+  .aviso-simulacion-alerta {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    max-width: none;
+    width: auto;
+    box-sizing: border-box;
+  }
+
   .pie-acciones-resultado {
     flex-direction: column;
     align-items: stretch;
@@ -142,7 +223,8 @@
     gap: 1.25rem;
   }
 
-  .icono-resultado-gran {
+  .icono-resultado-gran,
+  .icono-resultado-evaluacion {
     margin: 0 auto;
   }
 
@@ -164,11 +246,20 @@
     padding: 1.25rem 1rem;
   }
 
+  .pie-formulario-evaluacion,
   .pie-acciones-evaluacion {
     flex-direction: column;
     align-items: stretch;
   }
 
+  .boton-enviar-evaluacion {
+    width: 100%;
+    padding: 0.85rem 1.25rem;
+    font-size: 0.98rem;
+    text-align: center;
+  }
+
+  .pie-formulario-evaluacion a,
   .pie-acciones-evaluacion a {
     text-align: center;
   }
