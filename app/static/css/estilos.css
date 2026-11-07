@@ -15,6 +15,7 @@
 
 /* 4. Componentes UI reutilizables */
 @import "04-components/components.css";
+@import "04-components/modulo.css";
 
 /* 5. Vistas y páginas específicas */
 @import "05-pages/inicio.css";

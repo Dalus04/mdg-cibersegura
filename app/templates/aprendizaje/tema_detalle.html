@@ -1,8 +1,12 @@
 {% extends "base.html" %}
+{% from "parciales/inicio_macros.html" import pictograma, icono_estado, flecha %}
 
 {% block title %}{{ tema.titulo }} · MDG Cibersegura{% endblock %}
 
 {% block content %}
+  {% set variante = (tema.orden - 1) % 4 + 1 %}
+  {% set picto = (tema.orden - 1) % 8 + 1 %}
+
   <nav aria-label="Ruta de navegación">
     <ol class="migas">
       <li><a href="{{ url_for('main.index') }}">Inicio</a></li>
@@ -12,34 +16,23 @@
   </nav>
 
   <article class="tema-detalle">
-    <header class="encabezado-tema-hero">
+    <header class="encabezado-tema-hero tema-t{{ variante }}">
       <div class="texto-encabezado-tema">
         <span class="etiqueta-orden">Tema {{ tema.orden }}</span>
         <h1>{{ tema.titulo }}</h1>
         {% if tema.descripcion %}
           <p class="introduccion-tema">{{ tema.descripcion }}</p>
         {% endif %}
-      </div>
-      <div class="grafico-encabezado-tema">
-        <img 
-          src="{{ url_for('static', filename='img/tema-' ~ ((tema.orden - 1) % 8 + 1) ~ '.jpg') }}" 
-          alt="" 
-          class="imagen-banner-tema"
-          aria-hidden="true"
-          onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/hero.jpg') }}'"
-        >
-      </div>
-    </header>
 
-    <section aria-labelledby="titulo-lecciones" class="seccion-lecciones-tema">
-      <div class="cabecera-seccion-lecciones">
-        <h2 id="titulo-lecciones">Lecciones del tema</h2>
         {% if progreso_tema %}
           <div class="caja-progreso-tema">
             <div class="info-progreso-tema">
-              <span class="texto-resumen-avance"><strong>Tu avance:</strong> {{ progreso_tema.completadas }} de {{ progreso_tema.total }} completadas ({{ progreso_tema.porcentaje }}%)</span>
+              <span class="texto-resumen-avance numeros-tabulares"><strong>Tu avance:</strong> {{ progreso_tema.completadas }} de {{ progreso_tema.total }} completadas ({{ progreso_tema.porcentaje }}%)</span>
               {% if progreso_tema.completado %}
-                <span class="insignia-progreso-completo" role="status">✓ Lecciones completadas</span>
+                <span class="insignia-progreso-completo" role="status">
+                  {{ icono_estado('completado') }}
+                  <span aria-hidden="true">✓</span> Lecciones completadas
+                </span>
               {% endif %}
             </div>
             <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ progreso_tema.porcentaje }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progreso en {{ tema.titulo }}: {{ progreso_tema.porcentaje }}%">
@@ -49,13 +42,30 @@
         {% endif %}
       </div>
 
+      <div class="grafico-encabezado-tema" aria-hidden="true">
+        {{ pictograma(picto, 'emblema-tema-pictograma') }}
+        <span class="emblema-tema-numeral">{{ '%02d' | format(tema.orden) }}</span>
+      </div>
+    </header>
+
+    <section aria-labelledby="titulo-lecciones" class="seccion-lecciones-tema">
+      <header class="cabecera-seccion-lecciones">
+        <div>
+          <span class="insignia-institucional">Etapa 1 · Lecciones teóricas</span>
+          <h2 id="titulo-lecciones">Lecciones del tema</h2>
+        </div>
+      </header>
+
       {% if contenidos %}
+        {% set ns = namespace(siguiente_marcada=false) %}
         <ol class="lista-lecciones">
           {% for contenido in contenidos %}
             {% set es_comp = contenido.id_contenido in completados_ids %}
-            <li class="item-leccion {% if es_comp %}item-leccion-completada{% endif %}">
+            {% set es_siguiente = (not es_comp) and (not ns.siguiente_marcada) %}
+            {% if es_siguiente %}{% set ns.siguiente_marcada = true %}{% endif %}
+            <li class="item-leccion{% if es_comp %} item-leccion-completada{% elif es_siguiente %} item-leccion-siguiente{% endif %}">
               <div class="info-leccion">
-                <span class="orden-leccion" aria-hidden="true">{{ loop.index }}</span>
+                <span class="orden-leccion numeros-tabulares" aria-hidden="true">{{ '%02d' | format(loop.index) }}</span>
                 <div class="cuerpo-item-leccion">
                   <div class="fila-titulo-leccion">
                     <h3>
@@ -65,15 +75,16 @@
                     </h3>
                     {% if es_comp %}
                       <span class="insignia-leccion-completada" role="status">
+                        {{ icono_estado('completado') }}
                         <span aria-hidden="true">✓</span> Completada
                       </span>
                     {% endif %}
                   </div>
                 </div>
               </div>
-              <a class="enlace-accion {% if es_comp %}enlace-repasar{% endif %}" href="{{ url_for('aprendizaje.ver_contenido', id_tema=tema.id_tema, id_contenido=contenido.id_contenido) }}" aria-label="{{ 'Repasar' if es_comp else 'Leer' }} lección {{ loop.index }}: {{ contenido.titulo }}">
-                {% if es_comp %}Repasar lección{% else %}Leer lección{% endif %}
-              </a>
+              <span class="enlace-accion {% if es_comp %}enlace-repasar{% elif not es_siguiente %}enlace-pendiente{% endif %}" aria-hidden="true">
+                {% if es_comp %}Repasar lección{% else %}Leer lección →{% endif %}
+              </span>
             </li>
           {% endfor %}
         </ol>
@@ -85,7 +96,7 @@
     {% if actividades %}
       <section aria-labelledby="titulo-actividades" class="seccion-actividades-tema">
         <header class="cabecera-seccion-actividades">
-          <span class="insignia-institucional">Práctica y simulación</span>
+          <span class="insignia-institucional">Etapa 2 · Práctica y simulación</span>
           <h2 id="titulo-actividades">Actividades y simulaciones del tema</h2>
           <p>Aplica tus conocimientos teóricos en situaciones controladas de seguridad digital.</p>
         </header>
@@ -98,19 +109,19 @@
               <div class="cabecera-tarjeta-actividad">
                 <span class="insignia-tipo-actividad tipo-{{ act.tipo }}">
                   {% if act.tipo == 'simulacion' %}
-                    🛡️ Simulación
+                    {{ pictograma(2, 'icono-tipo-actividad') }} Simulación
                   {% else %}
-                    ⚙️ Taller práctico
+                    {{ pictograma(7, 'icono-tipo-actividad') }} Taller práctico
                   {% endif %}
                 </span>
                 {% if superada %}
                   {% if intento and intento.resultado != 'exitoso' %}
-                    <span class="badge-progreso badge-completado" role="status">✓ Realizado con éxito (Último intento: en práctica)</span>
+                    <span class="badge-progreso badge-completado" role="status">{{ icono_estado('completado') }} <span aria-hidden="true">✓</span> Realizado con éxito (Último intento: en práctica)</span>
                   {% else %}
-                    <span class="badge-progreso badge-completado" role="status">✓ Realizado con éxito</span>
+                    <span class="badge-progreso badge-completado" role="status">{{ icono_estado('completado') }} <span aria-hidden="true">✓</span> Realizado con éxito</span>
                   {% endif %}
                 {% elif intento %}
-                  <span class="badge-progreso badge-alerta" role="status">⚠️ Requiere práctica</span>
+                  <span class="badge-progreso badge-alerta" role="status">{{ icono_estado('alerta') }} Requiere práctica</span>
                 {% endif %}
               </div>
 
@@ -121,7 +132,7 @@
               </h3>
 
               <div class="pie-tarjeta-actividad">
-                <a class="enlace-accion" href="{{ url_for('aprendizaje.ver_actividad', id_tema=tema.id_tema, id_actividad=act.id_actividad) }}" aria-label="{{ 'Repetir' if intento else 'Comenzar' }} actividad: {{ act.titulo }}">
+                <a class="enlace-accion {% if superada %}enlace-secundario-actividad{% endif %}" href="{{ url_for('aprendizaje.ver_actividad', id_tema=tema.id_tema, id_actividad=act.id_actividad) }}" aria-label="{{ 'Repetir' if intento else 'Comenzar' }} actividad: {{ act.titulo }}">
                   {% if intento %}Repetir actividad{% else %}Comenzar actividad →{% endif %}
                 </a>
               </div>
@@ -134,7 +145,7 @@
     {% if evaluacion %}
       <section aria-labelledby="titulo-evaluacion-tema" class="seccion-evaluacion-tema">
         <header class="cabecera-seccion-evaluaciones">
-          <span class="insignia-institucional">Evaluación formativa</span>
+          <span class="insignia-institucional">Etapa 3 · Evaluación formativa</span>
           <h2 id="titulo-evaluacion-tema">Evaluación formal del tema</h2>
           <p>Mide tus competencias de ciberseguridad completando el cuestionario oficial de comprobación.</p>
         </header>
@@ -142,7 +153,7 @@
         <article class="tarjeta-evaluacion-tema">
           <header class="cabecera-tarjeta-eval">
             <h3>{{ evaluacion.titulo }}</h3>
-            <span class="insignia-tipo-evaluacion">Oficial MDG</span>
+            <span class="insignia-tipo-evaluacion">Certificación del módulo · MDG</span>
           </header>
 
           <div class="cuerpo-tarjeta-eval">
@@ -152,33 +163,35 @@
               <p class="descripcion-evaluacion">Cuestionario individual de opción múltiple diseñado para validar los conocimientos adquiridos a lo largo de este módulo formativo.</p>
             {% endif %}
 
-            <div class="detalles-evaluacion-grid">
+            <dl class="detalles-evaluacion-grid numeros-tabulares">
               <div class="info-evaluacion-bloque">
-                <span class="etiqueta-bloque">Preguntas</span>
-                <span class="valor-bloque">{{ evaluacion.preguntas|length }} enunciados</span>
+                <dt class="etiqueta-bloque">Preguntas</dt>
+                <dd class="valor-bloque">{{ evaluacion.preguntas|length }} enunciados</dd>
               </div>
               <div class="info-evaluacion-bloque">
-                <span class="etiqueta-bloque">Puntaje máximo</span>
-                <span class="valor-bloque">{{ evaluacion.puntaje_maximo|round(0)|int }} pts</span>
+                <dt class="etiqueta-bloque">Puntaje máximo</dt>
+                <dd class="valor-bloque">{{ evaluacion.puntaje_maximo|round(0)|int }} pts</dd>
               </div>
               <div class="info-evaluacion-bloque">
-                <span class="etiqueta-bloque">Puntaje mínimo</span>
-                <span class="valor-bloque">{{ evaluacion.puntaje_minimo|round(0)|int }} / {{ evaluacion.puntaje_maximo|round(0)|int }} pts</span>
+                <dt class="etiqueta-bloque">Puntaje mínimo</dt>
+                <dd class="valor-bloque">{{ evaluacion.puntaje_minimo|round(0)|int }} / {{ evaluacion.puntaje_maximo|round(0)|int }} pts</dd>
               </div>
-            </div>
+            </dl>
 
             {% if mejor_intento_eval %}
               <div class="estado-eval-usuario">
                 <div class="badge-calificacion-obtenida {% if mejor_intento_eval.aprobado %}nota-aprobada{% else %}nota-desaprobada{% endif %}" role="status">
-                  <span class="icono-resultado" aria-hidden="true">{% if mejor_intento_eval.aprobado %}🎓{% else %}⚠️{% endif %}</span>
-                  <div>
+                  <span class="icono-resultado" aria-hidden="true">
+                    {{ icono_estado('completado' if mejor_intento_eval.aprobado else 'alerta') }}
+                  </span>
+                  <div class="resumen-calificacion-obtenida">
                     <span class="etiqueta-bloque">Tu mejor calificación:</span>
-                    <div class="nota-destacada">
+                    <div class="nota-destacada numeros-tabulares">
                       {{ mejor_intento_eval.puntaje_obtenido|round(1) }} / {{ evaluacion.puntaje_maximo|round(0)|int }} pts
                     </div>
                   </div>
                   <span class="nota-leyenda">
-                    {% if mejor_intento_eval.aprobado %}✓ Aprobado{% else %}Requiere repaso{% endif %}
+                    {% if mejor_intento_eval.aprobado %}{{ icono_estado('completado') }} ✓ Aprobado{% else %}{{ icono_estado('alerta') }} Requiere repaso{% endif %}
                   </span>
                 </div>
               </div>

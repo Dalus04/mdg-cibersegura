@@ -31,9 +31,9 @@
                 <li><a href="{{ url_for('admin.dashboard') }}" class="enlace-admin"{% if request.endpoint and request.endpoint.startswith('admin.') %} aria-current="page"{% endif %}>Administración</a></li>
               {% endif %}
               <li class="item-usuario-nav">
-                <span class="badge-usuario-nav" title="Sesión iniciada como {{ current_user.nombres }} {{ current_user.apellidos }}">
-                  <span class="avatar-iniciales" aria-hidden="true">{{ current_user.nombres[0] | upper }}</span>
-                  <span class="nombre-usuario-nav">{{ current_user.nombres }}</span>
+                <span class="badge-usuario-nav" title="Sesión activa: {{ current_user.primer_nombre }}">
+                  <span class="avatar-iniciales" aria-hidden="true">{{ current_user.primer_nombre[0] | upper }}</span>
+                  <span class="nombre-usuario-nav">{{ current_user.primer_nombre }}</span>
                   {% if current_user.es_administrador %}
                     <span class="insignia-rol-nav">Admin</span>
                   {% endif %}
@@ -42,7 +42,7 @@
               <li>
                 <form action="{{ url_for('auth.logout') }}" method="post" class="form-logout">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                  <button type="submit" class="boton-logout" title="Cerrar sesión de {{ current_user.nombres }}">
+                  <button type="submit" class="boton-logout" title="Cerrar sesión">
                     <svg class="icono-salida" aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
                     Cerrar sesión
                   </button>

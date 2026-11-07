@@ -59,6 +59,11 @@ class Usuario(UserMixin, db.Model):
     def nombre_completo(self) -> str:
         return f"{self.nombres} {self.apellidos}".strip()
 
+    @property
+    def primer_nombre(self) -> str:
+        partes = (self.nombres or "").strip().split()
+        return partes[0] if partes else "Ciudadano"
+
     def set_password(self, password: str) -> None:
         self.password_hash = generate_password_hash(password)
 

@@ -27,29 +27,63 @@
   .tarjeta-progreso-tema {
     grid-template-columns: 200px 1fr;
   }
-}
 
-/* Tablet: la lámina del visitante pasa a composición horizontal (arte + cifras) */
-@media (min-width: 681px) and (max-width: 960px) {
-  .lamina {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    grid-template-areas:
-      "etiqueta etiqueta"
-      "arte datos";
-    align-items: center;
-    gap: 1rem 2rem;
+  .seccion-modulos-prioritarios .modulos-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .lamina-etiqueta { grid-area: etiqueta; }
-  .lamina-arte { grid-area: arte; padding: 0.5rem 1.5rem; }
-  .lamina-datos { grid-area: datos; padding-top: 0; border-top: 0; }
+  .catalogo .modulos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .catalogo-encabezado {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .catalogo-aviso {
+    max-width: 100%;
+  }
+}
+
+/* Tablet: la lámina del visitante mantiene su estructura compacta en dos filas */
+@media (min-width: 681px) and (max-width: 960px) {
+  .lamina-datos {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 /* Módulos: de 2x2 a una columna de tarjetas horizontales */
 @media (max-width: 760px) {
-  .modulos-grid {
+  .modulos-grid,
+  .seccion-modulos-prioritarios .modulos-grid {
     grid-template-columns: 1fr;
+  }
+
+  .ficha-curricular {
+    flex-direction: column;
+  }
+
+  .ficha-curricular .ficha-sello,
+  .modulo-t2.ficha-curricular .ficha-sello,
+  .modulo-t4.ficha-curricular .ficha-sello {
+    flex: none;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.25rem;
+    border-right: 0;
+    border-bottom: 1px solid var(--borde-sutil);
+  }
+
+  .ficha-curricular .ficha-sello .modulo-numeral {
+    align-self: center;
+  }
+
+  .ficha-curricular .ficha-pictograma {
+    width: 3rem;
+    align-self: center;
   }
 
   .modulo {
@@ -235,14 +269,27 @@
     grid-template-columns: 1fr;
   }
 
-  .metodo li + li {
-    border-left: 0;
-    border-top: 1px solid var(--borde-fuerte);
+  .metodo li {
+    padding: 1.15rem 0;
   }
 
-  .grid-temas {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+  .metodo li + li {
+    border-left: 0;
+    border-top: 1px solid var(--borde-sutil);
+  }
+
+  .catalogo-resumen-datos {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .catalogo-resumen-datos > div {
+    padding: 0.75rem 1rem;
+  }
+
+  .catalogo-subbarra-filtros {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .leccion-lectura {

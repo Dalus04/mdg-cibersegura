@@ -59,15 +59,17 @@ def test_inicio_usuario_autenticado_muestra_widget_progreso(client):
     assert response.status_code == 200
     html = response.get_data(as_text=True)
 
-    # Bienvenida personalizada
+    # Bienvenida personalizada con privacidad (solo primer nombre, sin correo ni apellido)
     assert "¡Hola, Ciudadano!" in html
-    assert "Sesión iniciada como" in html
-    assert "ciudadano@ejemplo.com" in html
+    assert "ciudadano@ejemplo.com" not in html
+    assert "Ciudadano Ejemplo" not in html
 
-    # Widget de progreso ciudadano
+    # Widget de progreso ciudadano y límite de 3 módulos prioritarios en portada autenticada
     assert "Tu avance general" in html
     assert "0%" in html
     assert "Continuar con" in html
+    assert html.count('<article class="modulo ') <= 3
+    assert "Explorar el catálogo completo" in html
 
     # Identidad en cabecera
     assert "badge-usuario-nav" in html
@@ -180,9 +182,15 @@ def test_visitante_ve_cifras_reales_del_catalogo(client):
     )
 
     assert "Programa formativo" in html
+    assert "Acceso gratuito" in html
     assert re.search(r"Módulos</dt>\s*<dd[^>]*>%d</dd>" % n_temas, html)
     assert re.search(r"Lecciones</dt>\s*<dd[^>]*>%d</dd>" % n_lecciones, html)
-    assert html.count('<article class="modulo ') == n_temas
+    # En la portada el visitante también ve los 3 módulos prioritarios compactos con su eje y enlace al catálogo
+    assert html.count('<article class="modulo ') == min(3, n_temas)
+    assert "seccion-modulos-prioritarios" in html
+    assert "modulo-compacto" in html
+    assert "Identidad y Privacidad" in html
+    assert "Explorar el catálogo completo" in html
     # El visitante no ve progreso personal ni la barra de avance
     assert 'role="progressbar"' not in html
     assert "Tu avance general" not in html
@@ -266,3 +274,44 @@ def test_cada_modulo_tiene_un_unico_enlace_con_nombre_visible(client):
         enlaces = re.findall(r"<a [^>]*>(.*?)</a>", art, re.S)
         assert len(enlaces) == 1
         assert enlaces[0].strip()
+
+
+def test_privacidad_sesion_solo_primer_nombre_sin_correo_ni_apellidos(client):
+    """Garantiza que el correo y apellidos no se expongan en vistas ciudadanas y solo se muestre el primer nombre."""
+    client.post(
+        "/registro",
+        data={
+            "nombres": "María Fernanda",
+            "apellidos": "Quispe Huamán",
+            "correo": "mfernanda.privado@example.com",
+            "contrasena": "Password123!",
+            "confirmar_contrasena": "Password123!",
+        },
+    )
+    client.post(
+        "/login",
+        data={
+            "correo": "mfernanda.privado@example.com",
+            "contrasena": "Password123!",
+        },
+        follow_redirects=True,
+    )
+
+    for ruta in ("/", "/temas", "/mi-progreso"):
+        html = client.get(ruta).get_data(as_text=True)
+        assert "mfernanda.privado@example.com" not in html
+        assert "Quispe Huamán" not in html
+        assert "María Fernanda" not in html
+        assert "María" in html
+
+
+def test_inicio_ciudadano_acota_a_tres_modulos_prioritarios(client):
+    """La portada autenticada muestra máximo 3 módulos en foco para no duplicar el catálogo."""
+    login_ciudadano(client)
+    html = client.get("/").get_data(as_text=True)
+    articulos = re.findall(r'<article class="modulo .*?</article>', html, re.S)
+
+    assert len(articulos) == 3
+    assert "seccion-modulos-prioritarios" in html
+    assert "modulo-compacto" in html
+    assert "Explorar el catálogo completo" in html
