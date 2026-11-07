@@ -34,6 +34,10 @@
               <a class="enlace-accion" href="{{ url_for('aprendizaje.ver_contenido', id_tema=tema_siguiente.id_tema, id_contenido=siguiente_leccion.id_contenido) }}">
                 Continuar con «{{ siguiente_leccion.titulo }}» →
               </a>
+            {% elif paso_siguiente %}
+              <a class="enlace-accion" href="{{ paso_siguiente.url }}">
+                {{ paso_siguiente.texto_accion }} →
+              </a>
             {% else %}
               <a class="enlace-accion" href="{{ url_for('aprendizaje.lista_temas') }}">
                 Explorar temas educativos →

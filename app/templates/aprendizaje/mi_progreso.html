@@ -24,13 +24,13 @@
     <h2 id="titulo-metricas-generales" class="sr-only">Resumen cuantitativo de aprendizaje</h2>
     <div class="grid-metricas-progreso">
       
-      <div class="tarjeta-metrica-progreso">
-        <span class="etiqueta-metrica">Avance total</span>
+      <div class="tarjeta-metrica-progreso tarjeta-metrica-principal">
+        <span class="etiqueta-metrica">Avance formativo integral</span>
         <div class="valor-metrica">{{ resumen.porcentaje_global }}%</div>
-        <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ resumen.porcentaje_global }}" aria-valuemin="0" aria-valuemax="100" aria-label="Avance global en la plataforma: {{ resumen.porcentaje_global }}%">
+        <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ resumen.porcentaje_global }}" aria-valuemin="0" aria-valuemax="100" aria-valuetext="{{ resumen.porcentaje_global }} por ciento completado" aria-label="Avance formativo global en la plataforma: {{ resumen.porcentaje_global }}%">
           <div class="barra-progreso-relleno" style="width: {{ resumen.porcentaje_global }}%;"></div>
         </div>
-        <p class="subtexto-metrica">Porcentaje global completado</p>
+        <p class="subtexto-metrica">Ponderado: lecturas, prácticas y evaluaciones</p>
       </div>
 
       <div class="tarjeta-metrica-progreso">
@@ -40,9 +40,9 @@
       </div>
 
       <div class="tarjeta-metrica-progreso">
-        <span class="etiqueta-metrica">Módulos completados</span>
-        <div class="valor-metrica">{{ resumen.temas_completados }} / {{ resumen.total_temas }}</div>
-        <p class="subtexto-metrica">Temas con 100% de lecciones leídas</p>
+        <span class="etiqueta-metrica">Módulos acreditados</span>
+        <div class="valor-metrica">{{ resumen.modulos_completados }} / {{ resumen.total_temas }}</div>
+        <p class="subtexto-metrica">Temas con evaluación aprobada</p>
       </div>
 
       <div class="tarjeta-metrica-progreso">
@@ -69,13 +69,15 @@
 
     <div class="lista-progreso-temas">
       {% for item in resumen.temas %}
-        <article class="tarjeta-progreso-tema estado-{{ item.estado }}">
+        <article class="tarjeta-progreso-tema estado-{{ item.estado_modulo or item.estado }}">
           <div class="contenedor-miniatura-progreso">
             <img 
-              src="{{ url_for('static', filename='img/tema-' ~ item.tema.orden ~ '.jpg') }}" 
-              alt="Ilustración de {{ item.tema.titulo }}" 
+              src="{{ url_for('static', filename='img/tema-' ~ ((item.tema.orden - 1) % 8 + 1) ~ '.jpg') }}" 
+              alt="" 
+              aria-hidden="true"
               class="imagen-miniatura-progreso"
               loading="lazy"
+              onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/hero.jpg') }}'"
             >
           </div>
 
@@ -90,25 +92,31 @@
                 </h3>
               </div>
               <div class="insignia-estado-contenedor">
-                {% if item.estado == 'completado' %}
-                  <span class="badge-progreso badge-completado" role="status">✓ Lecciones completadas</span>
+                {% if item.estado_modulo == 'completado' %}
+                  <span class="badge-progreso badge-completado"><span aria-hidden="true">✓</span> Módulo completado</span>
+                {% elif item.estado == 'completado' %}
+                  <span class="badge-progreso badge-en-progreso"><span aria-hidden="true">✓</span> Lecciones leídas</span>
                 {% elif item.estado == 'en_progreso' %}
-                  <span class="badge-progreso badge-en-progreso" role="status">En progreso</span>
+                  <span class="badge-progreso badge-en-progreso">En progreso</span>
                 {% else %}
-                  <span class="badge-progreso badge-no-iniciado" role="status">No iniciado</span>
+                  <span class="badge-progreso badge-no-iniciado">No iniciado</span>
                 {% endif %}
 
                 {% if item.evaluacion_info %}
                   {% if item.evaluacion_info.aprobado %}
-                    <span class="badge-progreso badge-evaluacion-aprobada" title="Evaluación aprobada con {{ item.evaluacion_info.mejor_intento.puntaje_obtenido|round(1) }} pts">
+                    <a href="{{ url_for('aprendizaje.resultado_evaluacion', id_tema=item.tema.id_tema, id_intento=item.evaluacion_info.ultimo_intento.id_intento_evaluacion) }}" 
+                       class="badge-progreso badge-evaluacion-aprobada badge-evaluacion-enlace" 
+                       aria-label="Ver resultado de evaluación del tema {{ item.tema.orden }}: aprobada con {{ item.evaluacion_info.mejor_intento.puntaje_obtenido|round(1) }} puntos">
                       🎓 Evaluación: {{ item.evaluacion_info.mejor_intento.puntaje_obtenido|round(1) }} pts
-                    </span>
+                    </a>
                   {% elif item.evaluacion_info.mejor_intento %}
-                    <span class="badge-progreso badge-evaluacion-desaprobada" title="Evaluación no superada: {{ item.evaluacion_info.mejor_intento.puntaje_obtenido|round(1) }} pts">
+                    <a href="{{ url_for('aprendizaje.resultado_evaluacion', id_tema=item.tema.id_tema, id_intento=item.evaluacion_info.ultimo_intento.id_intento_evaluacion) }}" 
+                       class="badge-progreso badge-evaluacion-desaprobada badge-evaluacion-enlace" 
+                       aria-label="Ver resultado de evaluación del tema {{ item.tema.orden }}: no superada con {{ item.evaluacion_info.mejor_intento.puntaje_obtenido|round(1) }} puntos">
                       ⚠️ Evaluación: {{ item.evaluacion_info.mejor_intento.puntaje_obtenido|round(1) }} pts
-                    </span>
+                    </a>
                   {% else %}
-                    <span class="badge-progreso badge-evaluacion-pendiente">
+                    <span class="badge-progreso badge-evaluacion-pendiente" aria-label="Evaluación formativa pendiente de rendir">
                       📝 Evaluación pendiente
                     </span>
                   {% endif %}
@@ -121,7 +129,7 @@
                 <span class="contador-avance">{{ item.lecciones_completadas }} de {{ item.total_lecciones }} lecciones</span>
                 <span class="porcentaje-item">{{ item.porcentaje }}%</span>
               </div>
-              <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ item.porcentaje }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progreso en {{ item.tema.titulo }}: {{ item.porcentaje }}%">
+              <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ item.porcentaje }}" aria-valuemin="0" aria-valuemax="100" aria-valuetext="{{ item.porcentaje }} por ciento completado, {{ item.lecciones_completadas }} de {{ item.total_lecciones }} lecciones" aria-label="Progreso en {{ item.tema.titulo }}: {{ item.porcentaje }}%">
                 <div class="barra-progreso-relleno" style="width: {{ item.porcentaje }}%;"></div>
               </div>
               {% if item.total_actividades > 0 %}
@@ -129,9 +137,11 @@
                   <span class="etiqueta-submetrica">Taller / Simulación:</span>
                   <span class="valor-submetrica">
                     {% if item.actividades_completadas >= item.total_actividades %}
-                      <strong class="texto-exito-progreso">✓ Superado ({{ item.actividades_completadas }}/{{ item.total_actividades }})</strong>
+                      <strong class="texto-exito-progreso"><span aria-hidden="true">✓</span> Superado ({{ item.actividades_completadas }}/{{ item.total_actividades }})</strong>
                     {% elif item.actividades_completadas > 0 %}
-                      <span>{{ item.actividades_completadas }} de {{ item.total_actividades }} completadas</span>
+                      <span>{{ item.actividades_completadas }} de {{ item.total_actividades }} superadas</span>
+                    {% elif item.actividades_intentadas > 0 %}
+                      <span class="texto-repaso-progreso"><span aria-hidden="true">⚠️</span> Intento realizado: requiere práctica</span>
                     {% else %}
                       <span class="texto-pendiente-progreso">Pendiente de realizar</span>
                     {% endif %}
@@ -148,22 +158,33 @@
                     Continuar con «{{ item.siguiente_leccion.titulo }}» →
                   </a>
                 </div>
-              {% else %}
+              {% elif item.total_lecciones > 0 %}
                 <div class="accion-recomendada">
-                  <span class="texto-completado-exito">¡Has completado todas las lecciones de este tema!</span>
-                  {% if item.total_actividades > 0 and item.actividades_completadas < item.total_actividades %}
-                    <a class="enlace-accion" href="{{ url_for('aprendizaje.detalle_tema', id_tema=item.tema.id_tema) }}#titulo-actividades">
-                      Desarrollar actividad práctica →
-                    </a>
-                  {% elif item.evaluacion_info and not item.evaluacion_info.aprobado %}
-                    <a class="enlace-accion enlace-evaluacion-destacado" href="{{ url_for('aprendizaje.ver_evaluacion', id_tema=item.tema.id_tema) }}">
-                      Rendir evaluación formal →
+                  {% if item.estado_modulo == 'completado' %}
+                    <span class="texto-completado-exito"><span aria-hidden="true">✓</span> ¡Módulo culminado y acreditado con éxito!</span>
+                    <a class="enlace-secundario" href="{{ url_for('aprendizaje.detalle_tema', id_tema=item.tema.id_tema) }}">
+                      Repasar módulo
                     </a>
                   {% else %}
-                    <a class="enlace-secundario" href="{{ url_for('aprendizaje.detalle_tema', id_tema=item.tema.id_tema) }}">
-                      Repasar lecciones
-                    </a>
+                    <span class="texto-completado-lecciones">Has completado las lecciones teóricas.</span>
+                    {% if item.total_actividades > 0 and item.actividades_completadas < item.total_actividades %}
+                      <a class="enlace-accion" href="{{ url_for('aprendizaje.detalle_tema', id_tema=item.tema.id_tema) }}#titulo-actividades">
+                        Desarrollar actividad práctica →
+                      </a>
+                    {% elif item.evaluacion_info and not item.evaluacion_info.aprobado %}
+                      <a class="enlace-accion enlace-evaluacion-destacado" href="{{ url_for('aprendizaje.ver_evaluacion', id_tema=item.tema.id_tema) }}">
+                        {% if item.evaluacion_info.mejor_intento %}Volver a rendir evaluación →{% else %}Rendir evaluación formal →{% endif %}
+                      </a>
+                    {% else %}
+                      <a class="enlace-secundario" href="{{ url_for('aprendizaje.detalle_tema', id_tema=item.tema.id_tema) }}">
+                        Repasar lecciones
+                      </a>
+                    {% endif %}
                   {% endif %}
+                </div>
+              {% else %}
+                <div class="accion-recomendada">
+                  <span class="texto-sugerencia">Módulo formativo en preparación institucional.</span>
                 </div>
               {% endif %}
             </footer>
