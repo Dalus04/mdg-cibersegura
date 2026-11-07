@@ -182,3 +182,79 @@ def test_mi_progreso_muestra_metricas_de_actividades(client):
 def test_actividad_inexistente_retorna_404(client):
     response = client.get("/temas/1/actividades/9999")
     assert response.status_code == 404
+
+
+def test_accesibilidad_y_estructura_simulador_fase1(client):
+    response = client.get("/temas/2/actividades/2")
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+
+    # 1. Pista opcional colapsable sin spoiler directo
+    assert '<details class="inspeccion-enlace-alerta">' in html
+    assert '<summary class="resumen-inspeccion">' in html
+
+    # 2. Ausencia de nodo fantasma inútil
+    assert "indicador-radio-custom" not in html
+
+
+def test_accesibilidad_resultado_simulador_fase1(client):
+    login_ciudadano(client)
+    resp = client.post(
+        "/temas/2/actividades/2/resolver",
+        data={"opcion_id": "opt_identificar_phishing"},
+        follow_redirects=True,
+    )
+    assert resp.status_code == 200
+    html = resp.get_data(as_text=True)
+
+    # 3. Emoji con aria-hidden en enlace de repetir
+    assert '<span aria-hidden="true">🔄</span> Practicar nuevamente' in html
+
+
+def test_multiples_respuestas_correctas_fase2(client):
+    login_ciudadano(client)
+
+    # Actividad 3: Permisos Móviles (tiene opt_limitar_permisos y opt_desinstalar como correctas)
+    resp_fallo = client.post(
+        "/temas/3/actividades/3/resolver",
+        data={"opcion_id": "opt_aceptar_todo"},
+        follow_redirects=True,
+    )
+    assert resp_fallo.status_code == 200
+    html_fallo = resp_fallo.get_data(as_text=True)
+
+    # Deben explicarse ambas alternativas correctas
+    assert "Alternativa 1 de 2" in html_fallo
+    assert "Alternativa 2 de 2" in html_fallo
+    assert "Conceder únicamente el permiso de Flash/Cámara" in html_fallo
+    assert "Denegar los permisos invasivos y desinstalar la app" in html_fallo
+
+    # Ahora enviar una de las respuestas correctas
+    resp_exito = client.post(
+        "/temas/3/actividades/3/resolver",
+        data={"opcion_id": "opt_limitar_permisos"},
+        follow_redirects=True,
+    )
+    assert resp_exito.status_code == 200
+    html_exito = resp_exito.get_data(as_text=True)
+    assert "¡Excelente decisión defensiva!" in html_exito
+    assert "Otras alternativas que también eran válidas y defensivas" in html_exito
+    assert "Denegar los permisos invasivos y desinstalar la app" in html_exito
+
+
+def test_coherencia_estado_reintentos_tema_detalle_fase2(client):
+    login_ciudadano(client)
+
+    # 1. Superar la actividad 1
+    client.post("/temas/1/actividades/1/resolver", data={"opcion_id": "opt_3"}, follow_redirects=True)
+
+    # 2. Reintentar fallando voluntariamente para practicar
+    client.post("/temas/1/actividades/1/resolver", data={"opcion_id": "opt_1"}, follow_redirects=True)
+
+    # 3. En tema_detalle.html, la acreditación de éxito NO debe borrarse
+    resp = client.get("/temas/1")
+    assert resp.status_code == 200
+    html = resp.get_data(as_text=True)
+
+    assert "Realizado con éxito" in html
+    assert "Último intento: en práctica" in html

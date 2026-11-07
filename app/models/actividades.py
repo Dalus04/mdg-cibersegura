@@ -49,6 +49,18 @@ class Actividad(db.Model):
             .order_by(IntentoActividad.fecha_intento.desc())
         )
 
+    def ha_sido_superada(self, id_usuario: int) -> bool:
+        """Determina si el usuario ha completado exitosamente esta actividad al menos una vez."""
+        return db.session.scalar(
+            select(IntentoActividad.id_intento_actividad)
+            .where(
+                IntentoActividad.id_actividad == self.id_actividad,
+                IntentoActividad.id_usuario == id_usuario,
+                IntentoActividad.resultado == "exitoso",
+            )
+            .limit(1)
+        ) is not None
+
 
 class IntentoActividad(db.Model):
     __tablename__ = "intento_actividad"

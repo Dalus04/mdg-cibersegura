@@ -51,7 +51,26 @@
         </div>
       </div>
 
-      {% if not es_correcta and opcion_correcta %}
+      {% if not es_correcta and opciones_correctas %}
+        {% for opt_correcta in opciones_correctas %}
+          <div class="tarjeta-eleccion-usuario eleccion-correcta">
+            <div class="rotulo-eleccion">
+              <strong>
+                {% if opciones_correctas|length > 1 %}
+                  Decisión preventiva recomendada (Alternativa {{ loop.index }} de {{ opciones_correctas|length }}):
+                {% else %}
+                  Decisión preventiva recomendada:
+                {% endif %}
+              </strong>
+            </div>
+            <p class="texto-eleccion-marcada">«{{ opt_correcta.texto }}»</p>
+            <div class="caja-explicacion-pedagogica">
+              <strong>Por qué es la opción adecuada:</strong>
+              <p>{{ opt_correcta.explicacion }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      {% elif not es_correcta and opcion_correcta %}
         <div class="tarjeta-eleccion-usuario eleccion-correcta">
           <div class="rotulo-eleccion">
             <strong>Decisión preventiva recomendada:</strong>
@@ -61,6 +80,21 @@
             <strong>Por qué es la opción adecuada:</strong>
             <p>{{ opcion_correcta.explicacion }}</p>
           </div>
+        </div>
+      {% endif %}
+
+      {% if es_correcta and opciones_correctas and opciones_correctas|length > 1 %}
+        <div class="caja-indicios-revelados">
+          <h3>Otras alternativas que también eran válidas y defensivas:</h3>
+          <ul class="lista-indicios">
+            {% for opt_c in opciones_correctas %}
+              {% if opt_c.id != opcion_elegida.id %}
+                <li>
+                  <strong>«{{ opt_c.texto }}»:</strong> {{ opt_c.explicacion }}
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
         </div>
       {% endif %}
 
@@ -93,7 +127,7 @@
     <!-- Botones de Acción y Navegación -->
     <footer class="pie-acciones-resultado">
       <a class="enlace-accion" href="{{ url_for('aprendizaje.ver_actividad', id_tema=tema.id_tema, id_actividad=actividad.id_actividad) }}">
-        🔄 Practicar nuevamente
+        <span aria-hidden="true">🔄</span> Practicar nuevamente
       </a>
       <a class="enlace-secundario" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
         Volver a lecciones del tema

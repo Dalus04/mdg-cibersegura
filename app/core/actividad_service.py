@@ -80,6 +80,7 @@ class ActividadService:
             opcion_id=opcion_id,
         )
 
+        opciones_correctas = [o for o in opciones if o.get("es_correcta")]
         opcion_correcta = next((o for o in opciones if o.get("es_correcta")), None)
 
         return True, {
@@ -88,6 +89,7 @@ class ActividadService:
             "configuracion": config,
             "opcion_elegida": opcion_elegida,
             "opcion_correcta": opcion_correcta,
+            "opciones_correctas": opciones_correctas,
             "es_correcta": es_correcta,
             "intento": intento,
         }, None
@@ -134,6 +136,7 @@ class ActividadService:
             }
 
         es_correcta = (intento.resultado == "exitoso")
+        opciones_correctas = [o for o in opciones if o.get("es_correcta")]
         opcion_correcta = next((o for o in opciones if o.get("es_correcta")), None)
 
         return {
@@ -142,6 +145,7 @@ class ActividadService:
             "configuracion": config,
             "opcion_elegida": opcion_elegida,
             "opcion_correcta": opcion_correcta,
+            "opciones_correctas": opciones_correctas,
             "es_correcta": es_correcta,
             "intento": intento,
         }

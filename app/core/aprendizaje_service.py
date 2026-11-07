@@ -149,9 +149,12 @@ class AprendizajeService:
         ).all()
 
         intentos_actividades = {}
+        actividades_superadas = set()
         if id_usuario is not None and actividades:
             for act in actividades:
                 intentos_actividades[act.id_actividad] = act.obtener_ultimo_intento(id_usuario)
+                if act.ha_sido_superada(id_usuario):
+                    actividades_superadas.add(act.id_actividad)
 
         evaluacion = db.session.scalar(
             select(Evaluacion)
@@ -174,6 +177,7 @@ class AprendizajeService:
             "progreso_tema": progreso_tema,
             "actividades": actividades,
             "intentos_actividades": intentos_actividades,
+            "actividades_superadas": actividades_superadas,
             "evaluacion": evaluacion,
             "mejor_intento_eval": mejor_intento_eval,
             "ultimo_intento_eval": ultimo_intento_eval,

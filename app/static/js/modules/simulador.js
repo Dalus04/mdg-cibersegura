@@ -3,12 +3,50 @@
  * MDG Cibersegura - Municipalidad Distrital de Guadalupe
  *
  * Funcionalidades:
- * - Protección contra clics no deseados en enlaces simulados de phishing.
+ * - Protección contra navegación en enlaces simulados de phishing.
  * - Inspección interactiva de URLs sospechosas con retroalimentación visual inmediata.
- * - Realce dinámico de opciones seleccionadas en talleres de decisión.
+ * - Realce dinámico de opciones seleccionadas en talleres y simulaciones de decisión.
  */
 
 import { anunciar } from './accesibilidad.js';
+
+/**
+ * Muestra una alerta flotante accesible de inspección segura.
+ * @param {string} mensaje 
+ */
+function mostrarAvisoSeguridad(mensaje) {
+  let avisoExistente = document.getElementById('aviso-simulacion-temporal');
+  if (!avisoExistente) {
+    avisoExistente = document.createElement('div');
+    avisoExistente.id = 'aviso-simulacion-temporal';
+    avisoExistente.className = 'aviso-simulacion-alerta';
+    avisoExistente.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(avisoExistente);
+  }
+
+  avisoExistente.innerHTML = `
+    <span class="texto-aviso-simulacion">${mensaje}</span>
+    <button type="button" class="btn-cerrar-aviso" aria-label="Cerrar aviso de simulación">×</button>
+  `;
+
+  const btnCerrar = avisoExistente.querySelector('.btn-cerrar-aviso');
+  if (btnCerrar) {
+    btnCerrar.addEventListener('click', () => {
+      clearTimeout(window.__mdgAvisoTimer);
+      avisoExistente.remove();
+    });
+  }
+
+  // Anuncio para tecnologías de asistencia vía anunciador centralizado
+  anunciar(mensaje, 'assertive');
+
+  clearTimeout(window.__mdgAvisoTimer);
+  window.__mdgAvisoTimer = setTimeout(() => {
+    if (avisoExistente && avisoExistente.parentNode) {
+      avisoExistente.remove();
+    }
+  }, 4500);
+}
 
 /**
  * Inicializa la inspección de enlaces sospechosos dentro del simulador de correo.
@@ -35,106 +73,7 @@ function initInspeccionEnlaces() {
 }
 
 /**
- * Muestra una alerta temporal de inspección segura.
- * @param {string} mensaje 
- */
-function mostrarAvisoSeguridad(mensaje) {
-  let avisoExistente = document.getElementById('aviso-simulacion-temporal');
-  if (!avisoExistente) {
-    avisoExistente = document.createElement('div');
-    avisoExistente.id = 'aviso-simulacion-temporal';
-    avisoExistente.setAttribute('role', 'alert');
-    avisoExistente.style.cssText = `
-      position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      background: #0f2a4a;
-      color: #ffffff;
-      padding: 0.85rem 1.25rem;
-      border-radius: 8px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-      font-size: 0.9rem;
-      font-weight: 600;
-      z-index: 1000;
-      max-width: 24rem;
-      animation: fadeIn 0.2s ease;
-    `;
-    document.body.appendChild(avisoExistente);
-  }
-
-  avisoExistente.textContent = mensaje;
-  anunciar(mensaje, 'assertive');
-
-  clearTimeout(window.__mdgAvisoTimer);
-  window.__mdgAvisoTimer = setTimeout(() => {
-    if (avisoExistente && avisoExistente.parentNode) {
-      avisoExistente.remove();
-    }
-  }, 4500);
-}
-
-/**
- * Actualiza el contador dinámico y barra de avance de preguntas respondidas.
- * @param {HTMLFormElement} form
- */
-function actualizarProgresoEvaluacion(form) {
-  if (!form) return;
-  const inputs = form.querySelectorAll('input[type="radio"][name^="pregunta_"]');
-  if (!inputs.length) return;
-
-  const grupos = new Set();
-  const gruposRespondidos = new Set();
-
-  inputs.forEach((i) => {
-    grupos.add(i.name);
-    if (i.checked) {
-      gruposRespondidos.add(i.name);
-    }
-  });
-
-  const total = grupos.size;
-  const respondidas = gruposRespondidos.size;
-
-  const contadorEl = document.getElementById('contador-respondidas');
-  if (contadorEl) {
-    contadorEl.textContent = respondidas;
-  }
-
-  const rellenoEl = document.getElementById('barra-progreso-relleno');
-  if (rellenoEl) {
-    const porcentaje = total > 0 ? Math.round((respondidas / total) * 100) : 0;
-    rellenoEl.style.width = `${porcentaje}%`;
-  }
-
-  const barraAvance = form.querySelector('.barra-avance-eval');
-  if (barraAvance) {
-    barraAvance.setAttribute('aria-valuenow', respondidas);
-  }
-}
-
-/**
- * Inicializa el comportamiento del cuestionario formal de evaluación.
- */
-function initFormularioEvaluacion() {
-  const form = document.getElementById('form-cuestionario-evaluacion');
-  if (!form) return;
-
-  actualizarProgresoEvaluacion(form);
-
-  form.addEventListener('submit', () => {
-    const btn = document.getElementById('btn-enviar-evaluacion');
-    if (btn && !btn.disabled) {
-      setTimeout(() => {
-        btn.disabled = true;
-        btn.setAttribute('aria-busy', 'true');
-        btn.textContent = 'Calificando evaluación... ⏳';
-      }, 10);
-    }
-  });
-}
-
-/**
- * Inicializa la confirmación visual de alternativas seleccionadas.
+ * Inicializa la confirmación visual de alternativas seleccionadas en actividades y cuestionarios.
  */
 function initSeleccionOpciones() {
   const radioInputs = document.querySelectorAll(
@@ -154,34 +93,19 @@ function initSeleccionOpciones() {
         });
       }
 
-      // Agregar a la tarjeta seleccionada
+      // Agregar clase activa a la tarjeta seleccionada (soporte visual para navegadores sin :has)
       const parentCard = input.closest('.tarjeta-opcion-decision, .tarjeta-alternativa-item');
       if (parentCard) {
         parentCard.classList.add('opcion-activa');
-        const textElement = parentCard.querySelector('.texto-opcion-decision, .texto-alternativa');
-        const labelText = (textElement ? textElement.innerText : parentCard.innerText).trim();
-        anunciar(`Opción seleccionada: ${labelText.slice(0, 80)}`, 'polite');
       }
-
-      // Si pertenece a una pregunta marcada como incompleta, remover el estado de error
-      const fieldset = input.closest('.tarjeta-pregunta-evaluacion');
-      if (fieldset) {
-        fieldset.classList.remove('pregunta-incompleta');
-        const aviso = fieldset.querySelector('.aviso-pregunta-requerida');
-        if (aviso) aviso.remove();
-      }
-
-      // Actualizar contador del formulario si es evaluación
-      actualizarProgresoEvaluacion(form);
     });
   });
 }
 
 /**
- * Inicializa las mejoras interactivas de las actividades y evaluaciones.
+ * Inicializa las mejoras interactivas del simulador de ciberseguridad.
  */
 export function initSimulador() {
   initInspeccionEnlaces();
   initSeleccionOpciones();
-  initFormularioEvaluacion();
 }
