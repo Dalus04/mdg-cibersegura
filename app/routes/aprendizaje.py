@@ -9,6 +9,7 @@ from app.core import (
     EvaluacionService,
     ProgresoService,
 )
+from app.models.entities import ProgresoContenido
 
 aprendizaje_bp = Blueprint("aprendizaje", __name__)
 
@@ -26,10 +27,25 @@ def lista_temas():
     id_usuario = current_user.id_usuario if current_user.is_authenticated else None
     temas, progreso_por_tema = AprendizajeService.obtener_catalogo_temas(id_usuario)
 
+    # Con sesión, se reutiliza el resumen integral (lecciones, prácticas y evaluaciones)
+    # para que el catálogo muestre los mismos estados de módulo que la portada.
+    resumen = (
+        ProgresoService.obtener_resumen_progreso_usuario(id_usuario)
+        if id_usuario is not None
+        else None
+    )
+    completados_ids = (
+        ProgresoContenido.obtener_completados_usuario(id_usuario)
+        if id_usuario is not None
+        else set()
+    )
+
     return render_template(
         "aprendizaje/temas.html",
         temas=temas,
         progreso_por_tema=progreso_por_tema,
+        resumen=resumen,
+        completados_ids=completados_ids,
     )
 
 

@@ -19,252 +19,503 @@
   margin-bottom: 2rem;
 }
 
-.grid-temas {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr));
-  gap: 2rem;
-}
-
-.tarjeta-tema {
-  position: relative;
+/* Catálogo: arquitectura editorial con categorías primarias por eje,
+   barra secundaria de refinamiento y cuadrícula 2x2 de fichas modulares. */
+.catalogo {
   display: flex;
   flex-direction: column;
-  background: #ffffff;
-  border: 1px solid var(--borde);
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  cursor: pointer;
+  gap: clamp(1.5rem, 3.2vw, 2.25rem);
 }
 
-.tarjeta-tema:hover,
-.tarjeta-tema:focus-within {
-  transform: translateY(-3px);
-  border-color: var(--enlace);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-}
-
-.contenedor-imagen-tema {
-  width: 100%;
-  aspect-ratio: 16/9;
-  background: #eef4fb;
-  overflow: hidden;
-  border-bottom: 1px solid var(--borde);
-}
-
-.imagen-tarjeta-tema {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.tarjeta-tema:hover .imagen-tarjeta-tema {
-  transform: scale(1.02);
-}
-
-.cuerpo-tarjeta-tema {
-  padding: 1.5rem;
+.catalogo-encabezado {
   display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.cuerpo-tarjeta-tema header h2 {
-  font-size: 1.25rem;
-  margin: 0.25rem 0 0.5rem;
-  line-height: 1.35;
-}
-
-.cuerpo-tarjeta-tema header h2 a {
-  text-decoration: none;
-  color: #0f172a;
-}
-
-.cuerpo-tarjeta-tema header h2 a::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-}
-
-.cuerpo-tarjeta-tema header h2 a:hover,
-.cuerpo-tarjeta-tema header h2 a:focus {
-  color: var(--enlace);
-}
-
-.cuerpo-tarjeta-tema header h2 a:focus-visible {
-  outline: 3px solid var(--foco-anillo, #0284c7);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-.descripcion-tema {
-  font-size: 0.95rem;
-  color: #475569;
-  line-height: 1.55;
-  margin: 0.5rem 0 1.5rem;
-  flex-grow: 1;
-}
-
-.pie-tarjeta {
-  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
   justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-  border-top: 1px solid #f1f5f9;
-  padding-top: 1rem;
+  gap: 1.25rem 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--borde-sutil);
 }
 
-.pie-tarjeta .enlace-accion {
-  position: relative;
-  z-index: 2;
+.catalogo-encabezado-texto {
+  max-width: 44rem;
 }
 
-.indicador-lecciones {
-  font-size: 0.88rem;
+.catalogo-encabezado h1 {
+  margin: 0 0 0.6rem;
+  font-size: clamp(1.9rem, 3.6vw, 2.55rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.catalogo-encabezado .descripcion-seccion {
+  margin: 0;
+}
+
+.catalogo-aviso {
+  margin: 0;
+  padding: 0.7rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--texto-primario);
+  background: var(--superficie-bloque);
+  border: 1px solid var(--borde-sutil);
+  border-left: 3px solid var(--color-primario);
+  border-radius: var(--radio-control);
+  max-width: 24rem;
+}
+
+.catalogo-aviso a {
+  font-weight: 700;
+  color: var(--color-primario);
+}
+
+/* Síntesis compacta de progreso personal en la cabecera (solo autenticados) */
+.catalogo-resumen-datos {
+  display: inline-grid;
+  grid-template-columns: repeat(2, auto);
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--borde-sutil);
+  border-radius: var(--radio-panel);
+  background: var(--superficie-bloque);
+}
+
+.catalogo-resumen-datos > div {
+  padding: 0.75rem 1.15rem;
+  background: var(--superficie-bloque);
+}
+
+.catalogo-resumen-datos > div + div {
+  border-left: 1px solid var(--borde-sutil);
+}
+
+.catalogo-resumen-datos dt {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texto-meta);
+}
+
+.catalogo-resumen-datos dd {
+  margin: 0.1rem 0 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--color-primario);
+}
+
+.catalogo-resumen-datos dd small {
+  font-size: 0.82rem;
   font-weight: 600;
+  letter-spacing: 0;
   color: var(--texto-secundario);
 }
 
-.indicadores-tema-pie {
+/* Sistema de filtrado en dos niveles diferenciados */
+.catalogo-herramientas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+/* Nivel 1: Navegación visual por Eje Temático */
+.catalogo-categorias-primarias {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+}
+
+.navegacion-ejes {
+  display: flex;
   flex-wrap: wrap;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.35rem;
+  background: var(--superficie-tonal);
+  border: 1px solid var(--borde-sutil);
+  border-radius: var(--radio-panel);
 }
 
-.indicador-actividad-badge {
-  background-color: #f3e8ff;
-  color: #6b21a8;
-  border: 1px solid #d8b4fe;
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.indicador-evaluacion-badge {
-  background-color: #e0e7ff;
-  color: #3730a3;
-  border: 1px solid #c7d2fe;
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-/* Indicador de avance en tarjeta de catálogo */
-.indicador-avance-tarjeta {
-  position: relative;
-  z-index: 2;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 0.6rem 0.85rem;
-  margin: 0.75rem 0;
-}
-
-.cabecera-avance-tarjeta {
-  display: flex;
-  justify-content: space-between;
+.boton-eje {
+  --eje-color: var(--color-primario);
+  display: inline-flex;
   align-items: center;
+  gap: 0.45rem;
+  width: auto;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.95rem;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--texto-secundario);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color var(--transicion-rapida), color var(--transicion-rapida), border-color var(--transicion-rapida), box-shadow var(--transicion-rapida);
+}
+
+.boton-eje-t1 { --eje-color: var(--tema-1-acento); }
+.boton-eje-t2 { --eje-color: var(--tema-2-acento); }
+.boton-eje-t3 { --eje-color: var(--tema-3-acento); }
+.boton-eje-t4 { --eje-color: var(--tema-4-acento); }
+
+.punto-eje {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--eje-color);
+  flex-shrink: 0;
+}
+
+.conteo-eje {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.05rem 0.4rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  border-radius: 4px;
+  background: rgba(11, 31, 51, 0.08);
+  color: inherit;
+}
+
+.boton-eje:hover,
+.boton-eje:focus {
+  color: var(--texto-primario);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.boton-eje[aria-pressed="true"] {
+  background: var(--superficie-bloque);
+  color: var(--eje-color);
+  font-weight: 700;
+  border-color: var(--borde-fuerte);
+  box-shadow: 0 1px 2px rgba(11, 31, 51, 0.08);
+}
+
+/* Nivel 2: Sub-barra ligera con contador y chips de refinamiento secundario */
+.catalogo-subbarra-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding: 0 0.15rem;
+}
+
+.grupo-refinamiento {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.65rem;
+}
+
+.etiqueta-filtro {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--texto-meta);
+}
+
+.chips-secundarios {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.boton-chip-filtro {
+  width: auto;
+  min-height: 2.15rem;
+  padding: 0.28rem 0.75rem;
+  font: inherit;
   font-size: 0.82rem;
-  color: #475569;
+  font-weight: 600;
+  color: var(--texto-secundario);
+  background: var(--superficie-bloque);
+  border: 1px solid var(--borde-sutil);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color var(--transicion-rapida), color var(--transicion-rapida), border-color var(--transicion-rapida);
+}
+
+.boton-chip-filtro:hover,
+.boton-chip-filtro:focus {
+  color: var(--texto-primario);
+  border-color: var(--borde-fuerte);
+}
+
+.boton-chip-filtro[aria-pressed="true"] {
+  background: var(--color-primario);
+  color: #ffffff;
+  border-color: var(--color-primario);
+}
+
+.boton-eje:focus-visible,
+.boton-chip-filtro:focus-visible {
+  outline: 3px solid var(--foco-anillo);
+  outline-offset: 2px;
+}
+
+.catalogo-contador {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--texto-meta);
+}
+
+.catalogo-vacio {
+  margin: 1rem 0 0;
+  padding: 2rem;
+  text-align: center;
+  background: var(--superficie-bloque);
+  border: 1px dashed var(--borde-fuerte);
+  border-radius: var(--radio-panel);
+  color: var(--texto-secundario);
   font-weight: 600;
 }
 
-.porcentaje-avance {
-  color: #084c8d;
-  font-weight: 700;
+/* Cuadrícula 2x2 de fichas horizontales compactas (sello lateral + cuerpo) */
+.catalogo .modulos-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.15rem, 2.2vw, 1.5rem);
+}
+
+.ficha-curricular {
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.ficha-curricular[hidden] {
+  display: none !important;
+}
+
+.ficha-curricular .ficha-sello,
+.modulo-t2.ficha-curricular .ficha-sello,
+.modulo-t4.ficha-curricular .ficha-sello {
+  flex: 0 0 7.75rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 0;
+  padding: 1.15rem 1rem;
+  border-bottom: 0;
+  border-right: 1px solid var(--borde-sutil);
+}
+
+.ficha-curricular .ficha-sello .modulo-numeral {
+  align-self: flex-start;
+  font-size: clamp(2.15rem, 3.5vw, 2.65rem);
+}
+
+.ficha-curricular .ficha-pictograma {
+  width: 3.5rem;
+  align-self: flex-end;
+}
+
+.ficha-curricular .ficha-cuerpo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  padding: clamp(1.15rem, 2vw, 1.45rem);
+}
+
+.ficha-descripcion {
+  margin-bottom: 1.1rem;
 }
 
 /* -------------------------------------------------------------
-   DETALLE DEL TEMA Y LISTA DE LECCIONES
+   DETALLE DEL TEMA Y LISTA DE LECCIONES (HOJA DE RUTA EN 3 ETAPAS)
 ------------------------------------------------------------- */
 .encabezado-tema-hero {
+  --acento: var(--tema-1-acento);
+  --arte-fondo: var(--tema-1-fondo);
+  --traza: color-mix(in srgb, var(--acento) 20%, transparent);
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  align-items: center;
-  gap: 2.5rem;
-  background: #ffffff;
-  padding: 2.25rem;
-  border-radius: 12px;
-  border: 1px solid var(--borde);
-  margin-bottom: 2.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+  grid-template-columns: minmax(0, 1.35fr) minmax(240px, 0.85fr);
+  align-items: stretch;
+  gap: clamp(1.5rem, 3.5vw, 2.5rem);
+  background: var(--superficie-bloque);
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border-radius: var(--radio-panel);
+  border: 1px solid var(--borde-sutil);
+  border-left: 4px solid var(--acento);
+  margin-bottom: 2.75rem;
+}
+
+.encabezado-tema-hero.tema-t2 {
+  --acento: var(--tema-2-acento);
+  --arte-fondo: var(--tema-2-fondo);
+}
+
+.encabezado-tema-hero.tema-t3 {
+  --acento: var(--tema-3-acento);
+  --arte-fondo: var(--tema-3-fondo);
+}
+
+.encabezado-tema-hero.tema-t4 {
+  --acento: var(--tema-4-acento);
+  --arte-fondo: var(--tema-4-fondo);
+}
+
+.texto-encabezado-tema {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .texto-encabezado-tema h1 {
-  font-size: 2rem;
-  margin: 0.35rem 0 0.75rem;
+  font-size: clamp(1.65rem, 3vw, 2.15rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin: 0.25rem 0 0.75rem;
 }
 
 .introduccion-tema {
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   color: var(--texto-secundario);
   line-height: 1.6;
   margin: 0;
 }
 
-.imagen-banner-tema {
-  width: 100%;
-  aspect-ratio: 16/9;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid var(--borde);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.seccion-lecciones-tema h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1.25rem;
-}
-
-/* Resumen de avance en detalle del tema */
-.cabecera-seccion-lecciones {
+/* Emblema gráfico CSS/SVG del tema (sustituye miniatura fotográfica) */
+.grafico-encabezado-tema {
+  position: relative;
   display: flex;
-  justify-content: space-between;
   align-items: flex-end;
-  flex-wrap: wrap;
-  gap: 1.25rem;
-  margin-bottom: 1.5rem;
-  border-bottom: 2px solid #e2e8f0;
-  padding-bottom: 0.75rem;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 11.5rem;
+  padding: 1.35rem 1.6rem;
+  background-color: var(--arte-fondo);
+  color: var(--acento);
+  border-radius: var(--radio-control);
+  border: 1px solid var(--borde-sutil);
+  overflow: hidden;
 }
 
-.cabecera-seccion-lecciones h2 {
-  margin: 0;
+.grafico-encabezado-tema::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
+/* 1 · Retícula ortogonal + anillos de verificación (Azul Cívico) */
+.encabezado-tema-hero.tema-t1 .grafico-encabezado-tema::before {
+  background-image:
+    radial-gradient(circle at 88% 12%, transparent 0 34px, var(--traza) 34px 35px, transparent 35px 54px, var(--traza) 54px 55px, transparent 55px),
+    linear-gradient(var(--traza) 1px, transparent 1px),
+    linear-gradient(90deg, var(--traza) 1px, transparent 1px);
+  background-size: auto, 24px 24px, 24px 24px;
+}
+
+/* 2 · Líneas de escaneo horizontales (Bronce) */
+.encabezado-tema-hero.tema-t2 .grafico-encabezado-tema::before {
+  background-image: repeating-linear-gradient(0deg, var(--traza) 0 1px, transparent 1px 12px);
+}
+
+/* 3 · Malla de puntos (Esmeralda) */
+.encabezado-tema-hero.tema-t3 .grafico-encabezado-tema::before {
+  background-image: radial-gradient(var(--traza) 1.8px, transparent 2.2px);
+  background-size: 16px 16px;
+}
+
+/* 4 · Ondas concéntricas de señal (Petróleo) */
+.encabezado-tema-hero.tema-t4 .grafico-encabezado-tema::before {
+  background-image: repeating-radial-gradient(circle at 12% 115%, var(--traza) 0 1.5px, transparent 1.5px 20px);
+}
+
+.encabezado-tema-hero.tema-t2 .grafico-encabezado-tema,
+.encabezado-tema-hero.tema-t4 .grafico-encabezado-tema {
+  flex-direction: row-reverse;
+}
+
+.emblema-tema-pictograma {
+  position: relative;
+  flex-shrink: 0;
+  width: clamp(5rem, 9vw, 6.75rem);
+  height: auto;
+}
+
+.emblema-tema-numeral {
+  position: relative;
+  align-self: flex-start;
+  font-family: var(--fuente-tecnica);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(3rem, 6vw, 4.25rem);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  color: color-mix(in srgb, var(--acento) 45%, transparent);
+}
+
+/* Resumen de avance integrado en la cabecera del módulo */
 .caja-progreso-tema {
-  background-color: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  padding: 0.75rem 1.2rem;
-  min-width: 280px;
-  max-width: 380px;
-  flex: 1;
+  margin-top: 1.35rem;
+  padding-top: 1.15rem;
+  border-top: 1px solid var(--borde-sutil);
+  width: 100%;
 }
 
 .info-progreso-tema {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.75rem;
-  font-size: 0.85rem;
-  color: #334155;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  font-size: 0.9rem;
+  color: var(--texto-secundario);
+  margin-bottom: 0.35rem;
+}
+
+.texto-resumen-avance strong {
+  color: var(--texto-primario);
+}
+
+.insignia-progreso-completo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background-color: var(--estado-exito-fondo);
+  color: var(--estado-exito-texto);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--estado-exito-texto) 28%, transparent);
+}
+
+/* Etapa 1 — Índice numerado de lecciones */
+.cabecera-seccion-lecciones {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--borde-sutil);
+  padding-bottom: 0.85rem;
+}
+
+.cabecera-seccion-lecciones h2 {
+  font-size: 1.5rem;
+  margin: 0.2rem 0 0;
 }
 
 .lista-lecciones {
   list-style: none;
   padding: 0;
   margin: 0 0 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .item-leccion {
@@ -273,61 +524,82 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1.25rem;
-  background: #ffffff;
-  border: 1px solid var(--borde);
-  border-radius: 8px;
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 0.85rem;
-  transition: all 0.15s ease-in-out;
-  cursor: pointer;
+  gap: 1rem 1.5rem;
+  background: var(--superficie-bloque);
+  border: 1px solid var(--borde-sutil);
+  border-left: 4px solid var(--borde-fuerte);
+  border-radius: var(--radio-panel);
+  padding: 1.15rem 1.5rem;
+  transition: border-color var(--transicion-rapida), background-color var(--transicion-rapida);
 }
 
 .item-leccion:hover,
 .item-leccion:focus-within {
-  border-color: var(--enlace);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
-}
-
-.item-leccion .enlace-accion {
-  position: relative;
-  z-index: 2;
+  border-color: var(--color-primario);
 }
 
 .item-leccion-completada {
-  border-left: 4px solid #16a34a;
-  background-color: #fbfdfc;
+  border-left: 4px solid var(--estado-exito-texto);
+}
+
+.item-leccion-completada:hover,
+.item-leccion-completada:focus-within {
+  border-left-color: var(--estado-exito-texto);
+}
+
+.item-leccion-siguiente {
+  border-color: var(--color-primario);
+  border-left: 4px solid var(--color-primario);
+  background-color: color-mix(in srgb, var(--estado-curso-fondo) 40%, var(--superficie-bloque));
 }
 
 .info-leccion {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1.15rem;
+  flex: 1;
+  min-width: 220px;
 }
 
 .orden-leccion {
-  font-size: 1.2rem;
+  font-family: var(--fuente-tecnica);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem;
   font-weight: 700;
-  color: var(--enlace);
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 50%;
-  background: #eef4fb;
-  display: flex;
+  color: var(--color-primario);
+  min-width: 2.35rem;
+  height: 2.35rem;
+  border-radius: var(--radio-control);
+  background: var(--superficie-tonal);
+  border: 1px solid var(--borde-sutil);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
+.item-leccion-completada .orden-leccion {
+  background: var(--estado-exito-fondo);
+  color: var(--estado-exito-texto);
+  border-color: color-mix(in srgb, var(--estado-exito-texto) 28%, transparent);
+}
+
+.item-leccion-siguiente .orden-leccion {
+  background: var(--color-primario);
+  color: #ffffff;
+  border-color: var(--color-primario);
+}
+
 .cuerpo-item-leccion h3 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.08rem;
+  line-height: 1.35;
 }
 
 .fila-titulo-leccion {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem 0.75rem;
   flex-wrap: wrap;
 }
 
@@ -338,36 +610,40 @@
 .insignia-leccion-completada {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  background-color: #dcfce7;
-  color: #166534;
-  font-size: 0.75rem;
+  gap: 0.3rem;
+  background-color: var(--estado-exito-fondo);
+  color: var(--estado-exito-texto);
+  font-size: 0.76rem;
   font-weight: 700;
   padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  border: 1px solid #86efac;
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--estado-exito-texto) 28%, transparent);
 }
 
-.enlace-repasar {
+.item-leccion .enlace-accion {
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.enlace-repasar,
+.enlace-pendiente {
   background-color: transparent !important;
-  color: #084c8d !important;
-  border: 1px solid #084c8d !important;
+  color: var(--color-primario) !important;
+  border: 1.5px solid var(--borde-fuerte) !important;
 }
 
-.enlace-repasar:hover,
-.enlace-repasar:focus {
-  background-color: #084c8d !important;
-  color: #ffffff !important;
-}
-
-.enlace-repasar:focus-visible {
-  outline: 3px solid var(--foco-anillo, #0284c7) !important;
-  outline-offset: 2px !important;
+.item-leccion:hover .enlace-repasar,
+.item-leccion:focus-within .enlace-repasar,
+.item-leccion:hover .enlace-pendiente,
+.item-leccion:focus-within .enlace-pendiente {
+  background-color: var(--superficie-tonal) !important;
+  border-color: var(--color-primario) !important;
+  color: var(--color-primario) !important;
 }
 
 .cuerpo-item-leccion h3 a {
   text-decoration: none;
-  color: #0f172a;
+  color: var(--texto-primario);
 }
 
 .cuerpo-item-leccion h3 a::after {
@@ -377,101 +653,153 @@
   z-index: 1;
 }
 
-.cuerpo-item-leccion h3 a:hover,
+.item-leccion:hover .cuerpo-item-leccion h3 a,
 .cuerpo-item-leccion h3 a:focus {
-  color: var(--enlace);
+  color: var(--color-primario);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .cuerpo-item-leccion h3 a:focus-visible {
-  outline: 3px solid var(--foco-anillo, #0284c7);
+  outline: none;
+}
+
+.cuerpo-item-leccion h3 a:focus-visible::after {
+  border-radius: var(--radio-panel);
+  outline: 3px solid var(--foco-anillo);
   outline-offset: 2px;
-  border-radius: 4px;
 }
 
 .pie-navegacion-tema {
-  margin-top: 1.5rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--borde-sutil);
 }
 
 /* -------------------------------------------------------------
-   LECTURA DE LECCIÓN (OPTIMIZADA PARA LEGIBILIDAD)
+   LECTURA DE LECCIÓN (EDITORIAL DE ALTA LEGIBILIDAD — FASE 3)
 ------------------------------------------------------------- */
 .leccion-lectura {
+  --acento: var(--tema-1-acento);
+  --arte-fondo: var(--tema-1-fondo);
   max-width: var(--ancho-lectura);
   margin-left: auto;
   margin-right: auto;
-  background: #ffffff;
-  padding: 2.5rem 3rem;
-  border-radius: 12px;
-  border: 1px solid var(--borde);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  background: var(--superficie-bloque);
+  padding: clamp(1.75rem, 4vw, 3rem);
+  border-radius: var(--radio-panel);
+  border: 1px solid var(--borde-sutil);
+  border-top: 4px solid var(--acento);
+}
+
+.leccion-lectura.tema-t2 {
+  --acento: var(--tema-2-acento);
+  --arte-fondo: var(--tema-2-fondo);
+}
+
+.leccion-lectura.tema-t3 {
+  --acento: var(--tema-3-acento);
+  --arte-fondo: var(--tema-3-fondo);
+}
+
+.leccion-lectura.tema-t4 {
+  --acento: var(--tema-4-acento);
+  --arte-fondo: var(--tema-4-fondo);
+}
+
+.encabezado-leccion {
+  margin-bottom: 2rem;
 }
 
 .metadatos-leccion {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem;
-  font-size: 0.88rem;
+  gap: 0.5rem 0.75rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.85rem;
 }
 
 .etiqueta-tema {
-  color: var(--enlace);
-  background: #eef4fb;
-  padding: 0.2rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  color: var(--acento);
+  background: var(--arte-fondo);
+  border: 1px solid color-mix(in srgb, var(--acento) 25%, transparent);
+  padding: 0.2rem 0.65rem;
   border-radius: 4px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: border-color var(--transicion-rapida), color var(--transicion-rapida);
+}
+
+.etiqueta-tema:hover,
+.etiqueta-tema:focus {
+  color: var(--acento);
+  border-color: var(--acento);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .contador-leccion {
-  color: var(--texto-secundario);
+  font-family: var(--fuente-tecnica);
+  font-variant-numeric: tabular-nums;
+  color: var(--texto-meta);
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  background: var(--superficie-tonal);
+  border-radius: 4px;
+  border: 1px solid var(--borde-sutil);
 }
 
 .tiempo-lectura {
-  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--fuente-tecnica);
+  font-variant-numeric: tabular-nums;
+  color: var(--texto-secundario);
   font-size: 0.82rem;
   font-weight: 600;
-  background: #f1f5f9;
+  background: var(--superficie-tonal);
   padding: 0.2rem 0.6rem;
   border-radius: 4px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--borde-sutil);
+}
+
+.tiempo-lectura .icono-reloj {
+  flex-shrink: 0;
+  color: var(--texto-meta);
 }
 
 .encabezado-leccion h1 {
-  font-size: 2rem;
-  margin: 0.5rem 0 1.25rem;
-  line-height: 1.3;
+  font-size: clamp(1.65rem, 3.2vw, 2.15rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin: 0.35rem 0 0;
+  padding-bottom: 1.15rem;
+  line-height: 1.22;
+  color: var(--texto-primario);
+  border-bottom: 2px solid var(--acento);
 }
 
-.contenedor-banner-leccion {
-  margin: 1.5rem 0 2rem;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid var(--borde);
-}
-
-.imagen-banner-leccion {
-  width: 100%;
-  aspect-ratio: 16/9;
-  object-fit: cover;
-  display: block;
-}
-
+/* Lienzo de lectura optimizado */
 .cuerpo-leccion {
   font-size: 1.08rem;
   line-height: 1.75;
-  color: #1e293b;
+  color: var(--texto-primario);
   margin-bottom: 2.5rem;
-  max-width: 68ch;
+  max-width: 66ch;
 }
 
 .subtitulo-leccion {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #0f172a;
-  margin: 2rem 0 0.85rem;
-  padding-bottom: 0.35rem;
-  border-bottom: 2px solid #e2e8f0;
+  color: var(--texto-primario);
+  margin: 2.25rem 0 0.85rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--borde-sutil);
 }
 
 .lista-leccion {
@@ -480,22 +808,24 @@
 }
 
 .lista-leccion li {
-  margin-bottom: 0.65rem;
-  line-height: 1.65;
-  color: #1e293b;
+  margin-bottom: 0.75rem;
+  padding-left: 0.2rem;
+  line-height: 1.7;
+  color: var(--texto-primario);
 }
 
 .lista-leccion li::marker {
-  color: var(--enlace);
+  color: var(--color-primario);
   font-weight: 700;
 }
 
 .parrafo-leccion {
   margin-bottom: 1.5rem;
   white-space: pre-line;
+  color: var(--texto-primario);
 }
 
-/* Caja de marcar/desmarcar lección en lectura */
+/* Bloque de registro de progreso al final de la lección */
 .seccion-marcar-progreso {
   margin: 2.5rem 0 1.5rem;
 }
@@ -504,44 +834,59 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
-  padding: 1.35rem 1.75rem;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  gap: 1.25rem 1.5rem;
+  padding: 1.35rem 1.6rem;
+  border-radius: var(--radio-panel);
+  border: 1px solid var(--borde-sutil);
   flex-wrap: wrap;
 }
 
 .caja-estado-progreso.pendiente {
-  background-color: #ffffff;
-  border-color: #cbd5e1;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+  background-color: var(--superficie-bloque);
+  border-color: var(--borde-sutil);
+  border-left: 4px solid var(--color-primario);
 }
 
 .caja-estado-progreso.completado {
-  background-color: #f0fdf4;
-  border-color: #86efac;
+  background-color: var(--estado-exito-fondo);
+  border-color: color-mix(in srgb, var(--estado-exito-texto) 28%, transparent);
+  border-left: 4px solid var(--estado-exito-texto);
 }
 
 .caja-estado-progreso.anonimo {
-  background-color: #f8fafc;
-  border-color: #e2e8f0;
+  background-color: var(--superficie-tonal);
+  border-color: var(--borde-sutil);
   text-align: center;
   justify-content: center;
   font-size: 0.95rem;
+  color: var(--texto-secundario);
+}
+
+.caja-estado-progreso.anonimo p {
+  margin: 0;
+}
+
+.caja-estado-progreso.anonimo a {
+  font-weight: 700;
+  color: var(--color-primario);
 }
 
 .icono-estado-progreso {
-  font-size: 1.75rem;
-  font-weight: 900;
-  color: #16a34a;
-  background-color: #dcfce7;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: flex;
+  color: var(--estado-exito-texto);
+  background-color: var(--superficie-bloque);
+  border: 1px solid color-mix(in srgb, var(--estado-exito-texto) 28%, transparent);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radio-control);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.icono-estado-progreso .icono-estado {
+  width: 1.2rem;
+  height: 1.2rem;
 }
 
 .texto-estado-progreso {
@@ -550,84 +895,103 @@
 }
 
 .estado-destacado {
-  margin: 0 0 0.25rem;
-  font-size: 1.05rem;
-  color: #0f172a;
+  margin: 0 0 0.2rem;
+  font-size: 1.02rem;
+  color: var(--texto-primario);
+}
+
+.caja-estado-progreso.completado .estado-destacado {
+  color: var(--estado-exito-texto);
 }
 
 .subtexto-progreso {
   margin: 0;
-  font-size: 0.88rem;
-  color: #475569;
+  font-size: 0.9rem;
+  color: var(--texto-secundario);
 }
 
 .fecha-progreso {
   margin: 0;
+  font-family: var(--fuente-tecnica);
   font-size: 0.82rem;
-  color: #166534;
+  font-weight: 600;
+  color: var(--estado-exito-texto);
 }
 
 .form-estado-progreso {
   margin: 0;
 }
 
-.boton-completar {
-  background-color: #084c8d;
+.form-estado-progreso .boton-completar {
+  width: auto;
+  background-color: var(--color-primario);
   color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  padding: 0.75rem 1.4rem;
+  border: 2px solid var(--color-primario);
+  border-radius: var(--radio-control);
+  padding: 0.65rem 1.35rem;
+  min-height: 2.75rem;
   font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.15s ease;
+  transition: background-color var(--transicion-rapida), border-color var(--transicion-rapida);
   white-space: nowrap;
 }
 
-.boton-completar:hover,
-.boton-completar:focus {
-  background-color: #063868;
-  transform: translateY(-1px);
+.form-estado-progreso .boton-completar:hover,
+.form-estado-progreso .boton-completar:focus {
+  background-color: var(--color-primario-hover);
+  border-color: var(--color-primario-hover);
 }
 
-.boton-completar:focus-visible {
-  outline: 3px solid var(--foco-anillo, #0284c7);
+.form-estado-progreso .boton-completar:focus-visible {
+  outline: 3px solid var(--foco-anillo);
   outline-offset: 2px;
 }
 
-.boton-desmarcar {
-  background-color: transparent;
-  color: #475569;
-  border: 1px solid #94a3b8;
-  border-radius: 6px;
-  padding: 0.5rem 0.9rem;
-  font-size: 0.82rem;
+.form-estado-progreso .boton-desmarcar {
+  width: auto;
+  background-color: var(--superficie-bloque);
+  color: var(--texto-secundario);
+  border: 1.5px solid var(--borde-fuerte);
+  border-radius: var(--radio-control);
+  padding: 0.5rem 0.95rem;
+  min-height: 2.5rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color var(--transicion-rapida), color var(--transicion-rapida), border-color var(--transicion-rapida);
 }
 
-.boton-desmarcar:hover,
-.boton-desmarcar:focus {
-  background-color: #f1f5f9;
-  color: #0f172a;
-  border-color: #475569;
+.form-estado-progreso .boton-desmarcar:hover,
+.form-estado-progreso .boton-desmarcar:focus {
+  background-color: var(--superficie-tonal);
+  color: var(--texto-primario);
+  border-color: var(--color-primario);
 }
 
-.boton-desmarcar:focus-visible {
-  outline: 3px solid var(--foco-anillo, #0284c7);
+.form-estado-progreso .boton-desmarcar:focus-visible {
+  outline: 3px solid var(--foco-anillo);
   outline-offset: 2px;
 }
 
-/* Navegación entre lecciones */
+/* Navegación secuencial inferior entre lecciones */
 .navegacion-lecciones {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 1.25rem;
-  border-top: 2px solid var(--borde);
+  border-top: 1px solid var(--borde-sutil);
   padding-top: 1.75rem;
-  margin-top: 2.5rem;
+  margin-top: 2.25rem;
+}
+
+.navegacion-lecciones.fin-de-lecciones {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.navegacion-lecciones.fin-de-lecciones .control-navegacion.siguiente {
+  grid-column: 1 / -1;
+  justify-self: stretch;
 }
 
 .control-navegacion.anterior {
@@ -645,88 +1009,101 @@
 .boton-nav {
   display: flex;
   flex-direction: column;
+  gap: 0.2rem;
   text-decoration: none;
-  padding: 0.65rem 1rem;
+  padding: 0.7rem 1.1rem;
   border: 1px solid var(--borde-fuerte);
-  border-radius: 6px;
-  max-width: 15rem;
-  background: #ffffff;
-  transition: all 0.15s;
+  border-radius: var(--radio-control);
+  max-width: 17rem;
+  background: var(--superficie-bloque);
+  transition: background-color var(--transicion-rapida), border-color var(--transicion-rapida);
+}
+
+.control-navegacion.siguiente .boton-nav {
+  text-align: right;
 }
 
 .boton-nav:hover,
 .boton-nav:focus {
-  background: #f8fafc;
-  border-color: var(--enlace);
-  transform: translateY(-1px);
+  background: var(--superficie-tonal);
+  border-color: var(--color-primario);
 }
 
 .boton-nav:focus-visible {
-  outline: 3px solid var(--foco-anillo, #0284c7);
+  outline: 3px solid var(--foco-anillo);
   outline-offset: 2px;
 }
 
 .boton-nav .direccion {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  color: var(--enlace);
+  letter-spacing: 0.05em;
+  color: var(--color-primario);
   text-transform: uppercase;
-  margin-bottom: 0.2rem;
 }
 
 .boton-nav .titulo-nav {
-  font-size: 0.9rem;
-  color: var(--texto);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--texto-primario);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .enlace-indice {
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  font-size: 0.92rem;
+  font-weight: 700;
   text-decoration: none;
-  padding: 0.5rem 0.85rem;
-  color: #334155;
-  border-radius: 4px;
+  padding: 0.5rem 0.9rem;
+  color: var(--color-primario);
+  border: 1px solid transparent;
+  border-radius: var(--radio-control);
+  transition: background-color var(--transicion-rapida), border-color var(--transicion-rapida);
 }
 
 .enlace-indice:hover,
 .enlace-indice:focus {
-  background: #eef4fb;
-  color: var(--enlace);
+  background: var(--superficie-tonal);
+  border-color: var(--borde-sutil);
+  color: var(--color-primario-hover);
 }
 
 .enlace-indice:focus-visible {
-  outline: 3px solid var(--foco-anillo, #0284c7);
+  outline: 3px solid var(--foco-anillo);
   outline-offset: 2px;
 }
 
+/* Panel de culminación de lecturas al llegar a la última lección */
 .caja-fin-tema {
-  text-align: right;
-  background: #f8fafc;
-  border: 1px solid var(--borde);
-  border-radius: 10px;
-  padding: 1.25rem 1.5rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  text-align: left;
+  background: var(--superficie-tonal);
+  border: 1px solid var(--borde-sutil);
+  border-left: 4px solid var(--estado-exito-texto);
+  border-radius: var(--radio-panel);
+  padding: 1.35rem 1.6rem;
 }
 
 .caja-fin-tema .titulo-fin-tema {
   margin: 0 0 0.25rem;
-  color: var(--exito);
+  color: var(--estado-exito-texto);
   font-size: 1.05rem;
 }
 
 .caja-fin-tema .subtexto-fin-tema {
-  margin: 0 0 1rem;
+  margin: 0 0 1.1rem;
   color: var(--texto-secundario);
-  font-size: 0.88rem;
-  line-height: 1.45;
+  font-size: 0.92rem;
+  line-height: 1.5;
 }
 
 .caja-fin-tema .acciones-fin-tema {
   display: flex;
   gap: 0.75rem;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: center;
   flex-wrap: wrap;
 }

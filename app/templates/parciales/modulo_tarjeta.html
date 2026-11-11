@@ -1,0 +1,207 @@
+{#
+  Tarjeta de módulo temático, compartida por la portada (/) y el catálogo (/temas).
+  - resumen: salida de ProgresoService (solo si hay sesión); sin ella la tarjeta es «de visitante».
+  - tema_siguiente: tema del siguiente paso del ciudadano (resalta la tarjeta).
+  - avance_etiquetado: antepone «Avance:» y usa el formato x/y (catálogo).
+  Los estados se derivan de datos reales; el color nunca se usa solo (icono + texto).
+#}
+{% from "parciales/inicio_macros.html" import pictograma, icono_estado, flecha %}
+
+{% set MAPA_EJES = {
+  1: ('identidad', 'Identidad y Privacidad', 1),
+  2: ('fraude', 'Prevención de Fraude', 2),
+  3: ('identidad', 'Identidad y Privacidad', 1),
+  4: ('redes', 'Redes e IA', 3),
+  5: ('fraude', 'Prevención de Fraude', 2),
+  6: ('fraude', 'Prevención de Fraude', 2),
+  7: ('redes', 'Redes e IA', 3),
+  8: ('familia', 'Entorno Familiar', 4),
+} %}
+{% set FALLBACK_EJES = [
+  ('identidad', 'Identidad y Privacidad', 1),
+  ('fraude', 'Prevención de Fraude', 2),
+  ('redes', 'Redes e IA', 3),
+  ('familia', 'Entorno Familiar', 4),
+] %}
+
+{% macro tarjeta_modulo(tema, resumen=none, tema_siguiente=none, avance_etiquetado=false, compacta=false) %}
+  {% set estados = {
+    'completado': ('Módulo completado', 'completado', 'exito'),
+    'evaluacion_pendiente': ('Evaluación pendiente', 'curso', 'curso'),
+    'evaluacion_desaprobada': ('Evaluación por repasar', 'alerta', 'alerta'),
+    'en_progreso': ('En curso', 'curso', 'curso'),
+    'no_iniciado': ('Sin iniciar', 'pendiente', 'neutro'),
+  } %}
+  {% set eje_info = MAPA_EJES.get(tema.orden, FALLBACK_EJES[(tema.orden - 1) % 4]) %}
+  {% set variante = eje_info[2] %}
+  {% set picto = (tema.orden - 1) % 8 + 1 %}
+  {% set n_lecc = tema.contenidos | selectattr('estado', 'equalto', 'publicado') | list | length %}
+  {% set n_prac = tema.actividades | selectattr('estado', 'equalto', 'publicado') | list | length %}
+  {% set hay_eval = (tema.evaluaciones | selectattr('estado', 'equalto', 'publicado') | list | length) > 0 %}
+  {% set coincidencias = (resumen.temas | selectattr('tema.id_tema', 'equalto', tema.id_tema) | list) if resumen else [] %}
+  {% set item = coincidencias[0] if coincidencias else none %}
+  {% set es_actual = (resumen is not none) and (tema_siguiente is not none) and tema_siguiente.id_tema == tema.id_tema %}
+  {% if item %}
+    {# El servicio marca «en_progreso» también a módulos sin evaluación y sin actividad
+       del usuario; en pantalla solo se muestra «En curso» si hay avance real. #}
+    {% set hay_avance = item.lecciones_completadas > 0 or item.actividades_intentadas > 0 or (item.evaluacion_info and item.evaluacion_info.mejor_intento) %}
+    {% set clave_estado = item.estado_modulo %}
+    {% if clave_estado == 'en_progreso' and not hay_avance %}{% set clave_estado = 'no_iniciado' %}{% endif %}
+    {% set est = estados.get(clave_estado, estados['no_iniciado']) %}
+    {% if clave_estado == 'evaluacion_pendiente' and item.siguiente_paso and item.siguiente_paso.tipo == 'actividad' %}
+      {% set est = ('Práctica pendiente', 'curso', 'curso') %}
+    {% endif %}
+  {% endif %}
+
+  <article class="modulo modulo-t{{ variante }}{% if compacta %} modulo-compacto{% endif %}{% if item %} modulo-{{ clave_estado }}{% endif %}{% if es_actual %} modulo-actual{% endif %}">
+    <div class="modulo-arte" aria-hidden="true">
+      {{ pictograma(picto, 'modulo-pictograma') }}
+      <span class="modulo-numeral">{{ '%02d' | format(tema.orden) }}</span>
+    </div>
+
+    <div class="modulo-cuerpo">
+      <div class="modulo-cabecera">
+        <p class="etiqueta-orden modulo-orden">Tema {{ tema.orden }} · {{ eje_info[1] }}</p>
+        {% if item %}
+          <p class="estado estado-{{ est[2] }}">{{ icono_estado(est[1]) }}{{ est[0] }}</p>
+        {% endif %}
+      </div>
+
+      <h3 class="modulo-titulo">
+        <a href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}" class="enlace-tarjeta-tema">{{ tema.titulo }}</a>
+      </h3>
+      <p class="modulo-descripcion">{{ tema.descripcion }}</p>
+
+      <div class="modulo-pie">
+        {% if item and item.total_lecciones > 0 %}
+          <div class="modulo-progreso">
+            <div class="modulo-progreso-fila">
+              {% if avance_etiquetado %}
+                <span class="numeros-tabulares">Avance: {{ item.lecciones_completadas }}/{{ item.total_lecciones }} lecciones</span>
+              {% else %}
+                <span class="numeros-tabulares">{{ item.lecciones_completadas }} de {{ item.total_lecciones }} lecciones</span>
+              {% endif %}
+              <span class="numeros-tabulares">{{ item.porcentaje }}%</span>
+            </div>
+            <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ item.porcentaje }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progreso de lecciones en {{ tema.titulo }}: {{ item.porcentaje }}%">
+              <div class="barra-progreso-relleno" style="width: {{ item.porcentaje }}%;"></div>
+            </div>
+            {% if item.total_actividades > 0 or item.evaluacion_info %}
+              <p class="modulo-pasos">
+                {% if item.total_actividades > 0 %}Práctica: {{ item.actividades_completadas }} de {{ item.total_actividades }} superadas{% endif %}
+                {% if item.total_actividades > 0 and item.evaluacion_info %} · {% endif %}
+                {% if item.evaluacion_info %}Evaluación: {% if item.evaluacion_info.aprobado %}aprobada{% elif item.evaluacion_info.mejor_intento %}por repasar{% else %}pendiente{% endif %}{% endif %}
+              </p>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <div class="modulo-pie-barra">
+          <ul class="modulo-meta">
+            {% if n_lecc %}<li>{{ n_lecc }} {{ 'lección' if n_lecc == 1 else 'lecciones' }}</li>{% endif %}
+            {% if n_prac %}<li>{{ n_prac }} {{ 'práctica' if n_prac == 1 else 'prácticas' }}</li>{% endif %}
+            {% if hay_eval %}<li>Evaluación</li>{% endif %}
+            {% if not n_lecc and not n_prac and not hay_eval %}<li>Contenido en preparación</li>{% endif %}
+          </ul>
+          <p class="modulo-cta" aria-hidden="true">
+            {% if es_actual %}Tu siguiente paso{% elif item and clave_estado == 'completado' %}Repasar módulo{% elif item and clave_estado != 'no_iniciado' %}Continuar módulo{% else %}Ver módulo{% endif %}
+            {{ flecha() }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </article>
+{% endmacro %}
+
+{#
+  Ficha curricular estructurada para el catálogo (/temas).
+  Presenta el módulo en composición horizontal compacta (sello lateral + cuerpo)
+  en cuadrícula 2x2, reservando el listado individual de lecciones para la
+  página de detalle del módulo (/temas/<id>).
+#}
+{% macro ficha_curricular(tema, resumen=none, tema_siguiente=none, completados_ids=none) %}
+  {% set estados = {
+    'completado': ('Módulo completado', 'completado', 'exito', 'completado'),
+    'evaluacion_pendiente': ('Evaluación pendiente', 'curso', 'curso', 'activo'),
+    'evaluacion_desaprobada': ('Evaluación por repasar', 'alerta', 'alerta', 'activo'),
+    'en_progreso': ('En curso', 'curso', 'curso', 'activo'),
+    'no_iniciado': ('Sin iniciar', 'pendiente', 'neutro', 'pendiente'),
+  } %}
+  {% set eje_info = MAPA_EJES.get(tema.orden, FALLBACK_EJES[(tema.orden - 1) % 4]) %}
+  {% set variante = eje_info[2] %}
+  {% set picto = (tema.orden - 1) % 8 + 1 %}
+  {% set lecciones_pub = tema.contenidos | selectattr('estado', 'equalto', 'publicado') | sort(attribute='orden') | list %}
+  {% set n_lecc = lecciones_pub | length %}
+  {% set n_prac = tema.actividades | selectattr('estado', 'equalto', 'publicado') | list | length %}
+  {% set hay_eval = (tema.evaluaciones | selectattr('estado', 'equalto', 'publicado') | list | length) > 0 %}
+  {% set coincidencias = (resumen.temas | selectattr('tema.id_tema', 'equalto', tema.id_tema) | list) if resumen else [] %}
+  {% set item = coincidencias[0] if coincidencias else none %}
+  {% set es_actual = (resumen is not none) and (tema_siguiente is not none) and tema_siguiente.id_tema == tema.id_tema %}
+  {% set grupo_filtro = 'pendiente' %}
+  {% if item %}
+    {% set hay_avance = item.lecciones_completadas > 0 or item.actividades_intentadas > 0 or (item.evaluacion_info and item.evaluacion_info.mejor_intento) %}
+    {% set clave_estado = item.estado_modulo %}
+    {% if clave_estado == 'en_progreso' and not hay_avance %}{% set clave_estado = 'no_iniciado' %}{% endif %}
+    {% set est = estados.get(clave_estado, estados['no_iniciado']) %}
+    {% set grupo_filtro = est[3] %}
+    {% if clave_estado == 'evaluacion_pendiente' and item.siguiente_paso and item.siguiente_paso.tipo == 'actividad' %}
+      {% set est = ('Práctica pendiente', 'curso', 'curso', 'activo') %}
+    {% endif %}
+  {% endif %}
+
+  <article class="modulo ficha-curricular modulo-t{{ variante }}{% if item %} modulo-{{ clave_estado }}{% endif %}{% if es_actual %} modulo-actual{% endif %}" data-eje="{{ eje_info[0] }}" data-estado-filtro="{{ grupo_filtro }}" data-practica="{{ 'si' if n_prac else 'no' }}" data-evaluacion="{{ 'si' if hay_eval else 'no' }}">
+    <div class="ficha-sello modulo-arte" aria-hidden="true">
+      <span class="modulo-numeral">{{ '%02d' | format(tema.orden) }}</span>
+      {{ pictograma(picto, 'modulo-pictograma ficha-pictograma') }}
+    </div>
+
+    <div class="ficha-cuerpo modulo-cuerpo">
+      <div class="modulo-cabecera ficha-cabecera">
+        <p class="etiqueta-orden modulo-orden">Tema {{ tema.orden }} · {{ eje_info[1] }}</p>
+        {% if item %}
+          <p class="estado estado-{{ est[2] }}">{{ icono_estado(est[1]) }}{{ est[0] }}</p>
+        {% endif %}
+      </div>
+
+      <h3 class="modulo-titulo">
+        <a href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}" class="enlace-tarjeta-tema">{{ tema.titulo }}</a>
+      </h3>
+      <p class="modulo-descripcion ficha-descripcion">{{ tema.descripcion }}</p>
+
+      <div class="modulo-pie ficha-pie">
+        {% if item and item.total_lecciones > 0 %}
+          <div class="modulo-progreso ficha-progreso">
+            <div class="modulo-progreso-fila">
+              <span class="numeros-tabulares">Avance: {{ item.lecciones_completadas }}/{{ item.total_lecciones }} lecciones</span>
+              <span class="numeros-tabulares">{{ item.porcentaje }}%</span>
+            </div>
+            <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ item.porcentaje }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progreso de lecciones en {{ tema.titulo }}: {{ item.porcentaje }}%">
+              <div class="barra-progreso-relleno" style="width: {{ item.porcentaje }}%;"></div>
+            </div>
+            {% if item.total_actividades > 0 or item.evaluacion_info %}
+              <p class="modulo-pasos">
+                {% if item.total_actividades > 0 %}Práctica: {{ item.actividades_completadas }} de {{ item.total_actividades }} superadas{% endif %}
+                {% if item.total_actividades > 0 and item.evaluacion_info %} · {% endif %}
+                {% if item.evaluacion_info %}Evaluación: {% if item.evaluacion_info.aprobado %}aprobada{% elif item.evaluacion_info.mejor_intento %}por repasar{% else %}pendiente{% endif %}{% endif %}
+              </p>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <div class="modulo-pie-barra">
+          <ul class="modulo-meta ficha-meta">
+            {% if n_lecc %}<li>{{ n_lecc }} {{ 'lección' if n_lecc == 1 else 'lecciones' }}</li>{% endif %}
+            {% if n_prac %}<li>{{ n_prac }} {{ 'práctica' if n_prac == 1 else 'prácticas' }}</li>{% endif %}
+            {% if hay_eval %}<li>Evaluación</li>{% endif %}
+            {% if not n_lecc and not n_prac and not hay_eval %}<li>Contenido en preparación</li>{% endif %}
+          </ul>
+          <p class="modulo-cta ficha-cta" aria-hidden="true">
+            {% if es_actual %}Tu siguiente paso{% elif item and clave_estado == 'completado' %}Repasar módulo{% elif item and clave_estado != 'no_iniciado' %}Continuar módulo{% else %}Ver módulo{% endif %}
+            {{ flecha() }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </article>
+{% endmacro %}
+

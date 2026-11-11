@@ -62,7 +62,7 @@ def login():
         if not exito:
             flash(error or MENSAJE_CREDENCIALES, "error")
         elif login_user(usuario, remember=form.recordarme.data):
-            flash(f"Bienvenido o bienvenida, {usuario.nombres}.", "exito")
+            flash(f"Bienvenido o bienvenida, {usuario.primer_nombre}.", "exito")
             next_page = request.args.get("next")
             if _es_url_segura(next_page):
                 return redirect(next_page)

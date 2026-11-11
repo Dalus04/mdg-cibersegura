@@ -10,13 +10,12 @@
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  background: #eef4fb;
-  color: var(--enlace);
-  padding: 0.25rem 0.7rem;
-  border-radius: 20px;
+  letter-spacing: 0.06em;
+  background: var(--superficie-tonal);
+  color: var(--color-primario);
+  padding: 0.25rem 0.65rem;
+  border-radius: 4px;
   margin-bottom: 0.5rem;
-  border: 1px solid #d0e1f9;
 }
 
 .etiqueta-orden {
@@ -24,8 +23,8 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   font-weight: 700;
-  letter-spacing: 0.05em;
-  color: #64748b;
+  letter-spacing: 0.06em;
+  color: var(--texto-meta);
   margin-bottom: 0.25rem;
 }
 
@@ -78,41 +77,43 @@ body:has(.contenedor-formulario-auth) .mensajes {
   text-decoration: none;
   font-weight: 600;
   padding: 0.55rem 1.15rem;
-  border-radius: 6px;
+  min-height: 2.75rem;
+  border-radius: var(--radio-control);
   font-size: 0.95rem;
-  transition: all 0.15s ease-in-out;
+  transition: background-color var(--transicion-rapida), border-color var(--transicion-rapida), color var(--transicion-rapida);
   cursor: pointer;
 }
 
 .enlace-accion {
-  background: var(--enlace);
+  background: var(--color-primario);
   color: #ffffff;
-  border: 2px solid var(--enlace);
-  box-shadow: 0 2px 4px rgba(8, 76, 141, 0.15);
+  border: 2px solid var(--color-primario);
 }
 
 .enlace-accion:hover,
 .enlace-accion:focus {
-  background: var(--enlace-hover);
-  border-color: var(--enlace-hover);
+  background: var(--color-primario-hover);
+  border-color: var(--color-primario-hover);
   color: #ffffff;
 }
 
 .enlace-accion:focus-visible,
 .enlace-secundario:focus-visible {
-  outline: 3px solid var(--foco-anillo, #0284c7);
+  outline: 3px solid var(--foco-anillo);
   outline-offset: 2px;
 }
 
 .enlace-secundario {
-  background: #ffffff;
-  color: var(--enlace);
-  border: 2px solid var(--enlace);
+  background: transparent;
+  color: var(--texto-primario);
+  border: 2px solid var(--borde-fuerte);
 }
 
 .enlace-secundario:hover,
 .enlace-secundario:focus {
-  background: #eef4fb;
+  background: var(--superficie-tonal);
+  border-color: var(--color-primario);
+  color: var(--color-primario);
 }
 
 /* Formularios (Login, Registro y campos reutilizables) */
@@ -347,7 +348,7 @@ button[type="submit"]:focus-visible {
 .barra-progreso-contenedor {
   width: 100%;
   height: 8px;
-  background-color: #e2e8f0;
+  background-color: var(--borde-sutil);
   border-radius: 999px;
   overflow: hidden;
   margin: 0.4rem 0;
@@ -355,9 +356,15 @@ button[type="submit"]:focus-visible {
 
 .barra-progreso-relleno {
   height: 100%;
-  background: linear-gradient(90deg, #084c8d, #0284c7);
+  background: var(--color-primario);
   border-radius: 999px;
-  transition: width 0.35s ease-in-out;
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barra-progreso-relleno {
+    transition: none;
+  }
 }
 
 .insignia-progreso-completo {

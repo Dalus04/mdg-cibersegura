@@ -1,129 +1,217 @@
 {% extends "base.html" %}
+{% from "parciales/inicio_macros.html" import pictograma, flecha %}
+{% from "parciales/modulo_tarjeta.html" import tarjeta_modulo %}
 
 {% block title %}Inicio · MDG Cibersegura{% endblock %}
 
 {% block content %}
-  <section class="seccion-hero" aria-labelledby="hero-titulo">
-    <div class="hero-texto">
-      <span class="insignia-institucional">Seguridad digital ciudadana</span>
-      <h1 id="hero-titulo">MDG Cibersegura</h1>
-      <p class="subtitulo-inicio">
-        Plataforma educativa de capacitación en ciberseguridad para la ciudadanía de la Municipalidad Distrital de Guadalupe.
-      </p>
+  {# ---- Datos derivados del catálogo real (sin valores fijos) ---- #}
+  {% set totales = namespace(lecciones=0, practicas=0, evaluaciones=0) %}
+  {% for t in temas %}
+    {% set totales.lecciones = totales.lecciones + (t.contenidos | selectattr('estado', 'equalto', 'publicado') | list | length) %}
+    {% set totales.practicas = totales.practicas + (t.actividades | selectattr('estado', 'equalto', 'publicado') | list | length) %}
+    {% set totales.evaluaciones = totales.evaluaciones + (t.evaluaciones | selectattr('estado', 'equalto', 'publicado') | list | length) %}
+  {% endfor %}
 
-      {% if current_user.is_authenticated %}
-        <div class="tarjeta-bienvenida tarjeta-bienvenida-ciudadano">
-          <div class="cabecera-bienvenida">
-            <div>
-              <h2>¡Hola, {{ current_user.nombres }}!</h2>
-              <p class="datos-sesion">Sesión iniciada como <strong>{{ current_user.nombres }} {{ current_user.apellidos }}</strong> ({{ current_user.correo }}). Tienes acceso a todos los recursos formativos.</p>
-            </div>
-            {% if resumen and resumen.total_lecciones > 0 %}
-              <div class="indicador-avance-global">
-                <span class="etiqueta-avance-global">Tu avance general</span>
-                <span class="valor-avance-global">{{ resumen.porcentaje_global }}%</span>
-                <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ resumen.porcentaje_global }}" aria-valuemin="0" aria-valuemax="100" aria-label="Avance global en la plataforma: {{ resumen.porcentaje_global }}%">
-                  <div class="barra-progreso-relleno" style="width: {{ resumen.porcentaje_global }}%;"></div>
-                </div>
-                <span class="resumen-lecciones-avance">{{ resumen.lecciones_completadas }} de {{ resumen.total_lecciones }} lecciones</span>
-              </div>
+  <div class="inicio">
+    {% if current_user.is_authenticated %}
+      {# =====================  CIUDADANO AUTENTICADO  ===================== #}
+      <section class="portada portada-ciudadano" aria-labelledby="hero-titulo">
+        <div class="portada-principal">
+          <p class="kicker">Portal ciudadano · Seguridad digital</p>
+          <h1 id="hero-titulo" class="portada-saludo">¡Hola, {{ current_user.primer_nombre }}!</h1>
+          <p class="portada-subtitulo-sesion">Tu centro personal de continuidad formativa. Retoma tu actividad pendiente o consulta el pulso de tus módulos.</p>
+
+          {# Siguiente paso: lo resuelve el servidor (lección, taller o evaluación) #}
+          {% if siguiente_leccion and tema_siguiente %}
+            {% set paso_tipo = 'leccion' %}
+            {% set paso_etiqueta = 'Continúa tu lectura' %}
+            {% set paso_titulo = siguiente_leccion.titulo %}
+            {% set paso_url = url_for('aprendizaje.ver_contenido', id_tema=tema_siguiente.id_tema, id_contenido=siguiente_leccion.id_contenido) %}
+            {% set paso_texto = 'Continuar con la lección' %}
+          {% elif paso_siguiente %}
+            {% set paso_tipo = paso_siguiente.tipo %}
+            {% set paso_etiqueta = 'Taller práctico pendiente' if paso_siguiente.tipo == 'actividad' else 'Evaluación pendiente' %}
+            {% set paso_titulo = tema_siguiente.titulo %}
+            {% set paso_url = paso_siguiente.url %}
+            {% set paso_texto = 'Realizar taller práctico' if paso_siguiente.tipo == 'actividad' else 'Rendir evaluación' %}
+          {% else %}
+            {% set paso_tipo = 'libre' %}
+            {% set paso_etiqueta = 'Ruta al día' %}
+            {% set paso_titulo = 'No tienes pasos pendientes en este momento' %}
+            {% set paso_url = url_for('aprendizaje.lista_temas') %}
+            {% set paso_texto = 'Explorar temas educativos' %}
+          {% endif %}
+
+          <div class="paso-activo paso-activo-{{ paso_tipo }}">
+            <p class="paso-activo-etiqueta">Tu siguiente paso · {{ paso_etiqueta }}</p>
+            {% if tema_siguiente and paso_tipo != 'libre' %}
+              <p class="paso-activo-contexto"><span class="numeros-tabulares">Tema {{ tema_siguiente.orden }}</span>{% if paso_tipo == 'leccion' %} · {{ tema_siguiente.titulo }}{% endif %}</p>
             {% endif %}
-          </div>
-          <div class="acciones-hero">
-            {% if siguiente_leccion and tema_siguiente %}
-              <a class="enlace-accion" href="{{ url_for('aprendizaje.ver_contenido', id_tema=tema_siguiente.id_tema, id_contenido=siguiente_leccion.id_contenido) }}">
-                Continuar con «{{ siguiente_leccion.titulo }}» →
-              </a>
-            {% elif paso_siguiente %}
-              <a class="enlace-accion" href="{{ paso_siguiente.url }}">
-                {{ paso_siguiente.texto_accion }} →
-              </a>
-            {% else %}
-              <a class="enlace-accion" href="{{ url_for('aprendizaje.lista_temas') }}">
-                Explorar temas educativos →
-              </a>
-            {% endif %}
-            <a class="enlace-secundario" href="{{ url_for('aprendizaje.mi_progreso') }}">
-              Ver mi progreso
-            </a>
-            {% if current_user.es_administrador %}
-              <a class="enlace-admin-hero" href="{{ url_for('admin.dashboard') }}">
-                Consola de administración
-              </a>
-            {% endif %}
-          </div>
-        </div>
-      {% else %}
-        <div class="tarjeta-bienvenida">
-          <h2>Aprende a protegerte en el entorno digital</h2>
-          <p>
-            Aprende sobre contraseñas seguras, detección de enlaces fraudulentos (phishing),
-            protección de tus datos personales y navegación segura en internet.
-          </p>
-          <div class="acciones-hero">
-            <a class="enlace-accion" href="{{ url_for('aprendizaje.lista_temas') }}">
-              Explorar temas educativos →
-            </a>
-            <a class="enlace-secundario" href="{{ url_for('auth.registro') }}">
-              Crear una cuenta
-            </a>
-          </div>
-        </div>
-      {% endif %}
-    </div>
-
-    <div class="hero-grafico">
-      <img 
-        src="{{ url_for('static', filename='img/hero.jpg') }}" 
-        alt="Ilustración institucional de capacitación ciudadana en ciberseguridad para la comunidad de Guadalupe" 
-        class="imagen-hero"
-      >
-    </div>
-  </section>
-
-  <section class="seccion-destacada" aria-labelledby="ejes-titulo">
-    <header class="encabezado-destacado">
-      <h2 id="ejes-titulo">Módulos educativos prioritarios</h2>
-      <p>Capacitación práctica y preventiva frente a las amenazas digitales más comunes.</p>
-    </header>
-
-    <div class="grid-resumen-temas">
-      {% for tema in temas %}
-        <article class="tarjeta-resumen-tema">
-          <a href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}" class="enlace-tarjeta-tema">
-            <div class="contenedor-miniatura-inicio">
-              <img 
-                src="{{ url_for('static', filename='img/tema-' ~ tema.orden ~ '.jpg') }}" 
-                alt="Ilustración representativa de {{ tema.titulo }}" 
-                class="miniatura-tema" 
-                loading="lazy"
-              >
-            </div>
-            <div class="cuerpo-resumen-tema">
-              <span class="etiqueta-orden">Tema {{ tema.orden }}</span>
-              <h3>{{ tema.titulo }}</h3>
-              <p>{{ tema.descripcion }}</p>
-              {% if current_user.is_authenticated and tema.id_tema in progreso_por_tema %}
-                {% set prog = progreso_por_tema[tema.id_tema] %}
-                <div class="indicador-progreso-mini">
-                  <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ prog.porcentaje }}" aria-valuemin="0" aria-valuemax="100" aria-label="Progreso en {{ tema.titulo }}: {{ prog.porcentaje }}%">
-                    <div class="barra-progreso-relleno" style="width: {{ prog.porcentaje }}%;"></div>
-                  </div>
-                  <span class="texto-avance-mini">
-                    {% if prog.completado %}
-                      <span class="texto-completado-badge">✓ Completado</span>
-                    {% else %}
-                      {{ prog.porcentaje }}% completado ({{ prog.completadas }}/{{ prog.total }})
-                    {% endif %}
-                  </span>
-                </div>
+            <h2 class="paso-activo-titulo">{{ paso_titulo }}</h2>
+            <div class="acciones-hero">
+              <a class="enlace-accion" href="{{ paso_url }}">{{ paso_texto }} {{ flecha() }}</a>
+              <a class="enlace-secundario" href="{{ url_for('aprendizaje.mi_progreso') }}">Ver mi progreso</a>
+              {% if current_user.es_administrador %}
+                <a class="enlace-admin-hero" href="{{ url_for('admin.dashboard') }}">Consola de administración</a>
               {% endif %}
             </div>
-          </a>
-        </article>
-      {% else %}
-        <p>No se encontraron temas educativos disponibles en este momento.</p>
-      {% endfor %}
-    </div>
-  </section>
+          </div>
+        </div>
+
+        <aside class="panel-avance" aria-labelledby="avance-titulo">
+          <h2 id="avance-titulo" class="panel-avance-etiqueta">Tu avance general</h2>
+          <p class="panel-avance-valor numeros-tabulares">{{ resumen.porcentaje_global }}%</p>
+          <div class="barra-progreso-contenedor" role="progressbar" aria-valuenow="{{ resumen.porcentaje_global }}" aria-valuemin="0" aria-valuemax="100" aria-label="Avance global en la plataforma: {{ resumen.porcentaje_global }}%">
+            <div class="barra-progreso-relleno" style="width: {{ resumen.porcentaje_global }}%;"></div>
+          </div>
+          <dl class="panel-avance-datos">
+            <div>
+              <dt>Lecciones</dt>
+              <dd class="numeros-tabulares">{{ resumen.lecciones_completadas }} de {{ resumen.total_lecciones }}</dd>
+            </div>
+            <div>
+              <dt>Prácticas</dt>
+              <dd class="numeros-tabulares">{% if resumen.total_actividades %}{{ resumen.actividades_completadas }} de {{ resumen.total_actividades }}{% else %}Sin prácticas{% endif %}</dd>
+            </div>
+            <div>
+              <dt>Evaluaciones</dt>
+              <dd class="numeros-tabulares">{% if resumen.total_evaluaciones %}{{ resumen.evaluaciones_aprobadas }} de {{ resumen.total_evaluaciones }}{% else %}Sin evaluaciones{% endif %}</dd>
+            </div>
+            <div>
+              <dt>Módulos completados</dt>
+              <dd class="numeros-tabulares">{{ resumen.modulos_completados }} de {{ resumen.total_temas }}</dd>
+            </div>
+          </dl>
+        </aside>
+      </section>
+    {% else %}
+      {# =====================  VISITANTE  ===================== #}
+      <section class="portada portada-visitante" aria-labelledby="hero-titulo">
+        <div class="portada-principal">
+          <p class="kicker">Programa municipal · Seguridad digital ciudadana</p>
+          <h1 id="hero-titulo" class="portada-titulo">MDG Cibersegura</h1>
+          <p class="portada-lead">Aprende a proteger tu identidad, tus cuentas y tu dinero en internet.</p>
+          <p class="portada-texto">
+            Plataforma educativa de la Municipalidad Distrital de Guadalupe con módulos prácticos sobre contraseñas seguras, detección de enlaces fraudulentos (phishing), billeteras digitales e inteligencia artificial.
+          </p>
+          <div class="acciones-hero">
+            <a class="enlace-accion" href="{{ url_for('aprendizaje.lista_temas') }}">Explorar temas educativos {{ flecha() }}</a>
+            <a class="enlace-secundario" href="{{ url_for('auth.registro') }}">Crear una cuenta</a>
+          </div>
+        </div>
+
+        <aside class="lamina" aria-labelledby="lamina-titulo">
+          <div class="lamina-cabecera">
+            <div class="lamina-identidad">
+              <div class="lamina-arte" aria-hidden="true">
+                {{ pictograma(1, 'lamina-pictograma') }}
+              </div>
+              <div>
+                <h2 id="lamina-titulo" class="lamina-etiqueta">Programa formativo</h2>
+                <p class="lamina-subtitulo">Currículo ciudadano abierto</p>
+              </div>
+            </div>
+            <span class="lamina-sello">Acceso gratuito</span>
+          </div>
+          <dl class="lamina-datos">
+            <div>
+              <dt>Módulos</dt>
+              <dd class="numeros-tabulares">{{ temas|length }}</dd>
+            </div>
+            <div>
+              <dt>Lecciones</dt>
+              <dd class="numeros-tabulares">{{ totales.lecciones }}</dd>
+            </div>
+            {% if totales.practicas %}
+              <div>
+                <dt>Prácticas</dt>
+                <dd class="numeros-tabulares">{{ totales.practicas }}</dd>
+              </div>
+            {% endif %}
+            {% if totales.evaluaciones %}
+              <div>
+                <dt>Evaluaciones</dt>
+                <dd class="numeros-tabulares">{{ totales.evaluaciones }}</dd>
+              </div>
+            {% endif %}
+          </dl>
+        </aside>
+      </section>
+
+      <section class="metodo-banda" aria-labelledby="metodo-titulo">
+        <h2 id="metodo-titulo" class="sr-only">Cómo funciona la capacitación</h2>
+        <ol class="metodo">
+          <li>
+            <span class="metodo-num" aria-hidden="true">01</span>
+            <div>
+              <p class="metodo-pilar">Aprende · Consulta libre</p>
+              <h3>Lectura guiada</h3>
+              <p>Lecciones breves con casos reales sobre billeteras digitales, redes sociales y trámites en línea.</p>
+            </div>
+          </li>
+          <li>
+            <span class="metodo-num" aria-hidden="true">02</span>
+            <div>
+              <p class="metodo-pilar">Practica · Entorno controlado</p>
+              <h3>Práctica controlada</h3>
+              <p>Talleres y simuladores interactivos de correos y mensajes sospechosos, sin riesgo para tus datos.</p>
+            </div>
+          </li>
+          <li>
+            <span class="metodo-num" aria-hidden="true">03</span>
+            <div>
+              <p class="metodo-pilar">Acredita · Con tu cuenta</p>
+              <h3>Autoevaluación</h3>
+              <p>Evaluaciones certificables por módulo con retroalimentación detallada y registro de tu progreso.</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+    {% endif %}
+
+    {# =====================  MÓDULOS EN FOCO (ambos estados: 3 prioritarios compactos)  ===================== #}
+    <section class="seccion-modulos seccion-modulos-prioritarios" aria-labelledby="ejes-titulo">
+      <header class="modulos-encabezado">
+        <div>
+          {% if current_user.is_authenticated %}
+            <p class="kicker">Foco de aprendizaje</p>
+            <h2 id="ejes-titulo">Módulos educativos prioritarios</h2>
+            <p>Selección curada de tus módulos activos y siguientes pasos recomendados.</p>
+          {% else %}
+            <p class="kicker">Ruta inicial recomendada</p>
+            <h2 id="ejes-titulo">Módulos educativos prioritarios</h2>
+            <p>Comienza por los 3 pilares esenciales de protección digital ciudadana o explora el temario completo.</p>
+          {% endif %}
+        </div>
+        {% if current_user.is_authenticated and resumen %}
+          <p class="modulos-resumen numeros-tabulares">{{ resumen.modulos_completados }} de {{ resumen.total_temas }} módulos completados</p>
+        {% elif temas %}
+          <p class="modulos-resumen numeros-tabulares">3 esenciales de {{ temas|length }} módulos</p>
+        {% endif %}
+      </header>
+
+      <div class="modulos-grid">
+        {% set lista_portada = temas_prioritarios if temas_prioritarios is defined else temas[:3] %}
+        {% for tema in lista_portada %}
+          {{ tarjeta_modulo(tema, resumen, tema_siguiente, false, true) }}
+        {% else %}
+          <p>No se encontraron temas educativos disponibles en este momento.</p>
+        {% endfor %}
+      </div>
+
+      {% if temas and (temas | length) > (lista_portada | length) %}
+        <footer class="pie-seccion-modulos">
+          <p class="pie-modulos-texto">
+            Mostrando <strong class="numeros-tabulares">{{ lista_portada | length }}</strong> de los <strong class="numeros-tabulares">{{ temas | length }}</strong> módulos del plan formativo ciudadano.
+          </p>
+          <div class="pie-modulos-acciones">
+            <a class="enlace-secundario enlace-catalogo-completo" href="{{ url_for('aprendizaje.lista_temas') }}">
+              Explorar el catálogo completo ({{ temas | length }} temas) {{ flecha() }}
+            </a>
+          </div>
+        </footer>
+      {% endif %}
+    </section>
+  </div>
 {% endblock %}

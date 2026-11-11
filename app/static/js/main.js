@@ -6,12 +6,16 @@
  */
 
 import { initAccesibilidad } from './modules/accesibilidad.js';
+import { initCatalogoFiltros } from './modules/catalogo-filtros.js';
 import { initEvaluaciones } from './modules/evaluaciones.js';
 import { initSimulador } from './modules/simulador.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Inicialización de accesibilidad global
   initAccesibilidad();
+
+  // Inicialización de filtros del catálogo curricular
+  initCatalogoFiltros();
 
   // Inicialización de simulaciones y actividades interactivas
   initSimulador();

@@ -1,8 +1,11 @@
 {% extends "base.html" %}
+{% from "parciales/inicio_macros.html" import icono_estado %}
 
 {% block title %}{{ contenido.titulo }} · {{ tema.titulo }} · MDG Cibersegura{% endblock %}
 
 {% block content %}
+  {% set variante = (tema.orden - 1) % 4 + 1 %}
+
   <nav aria-label="Ruta de navegación">
     <ol class="migas">
       <li><a href="{{ url_for('main.index') }}">Inicio</a></li>
@@ -12,27 +15,29 @@
     </ol>
   </nav>
 
-  <article class="leccion-lectura">
+  <article class="leccion-lectura tema-t{{ variante }}">
     <header class="encabezado-leccion">
       <div class="metadatos-leccion">
-        <span class="etiqueta-tema">{{ tema.titulo }}</span>
-        <span class="contador-leccion">Lección {{ indice }} de {{ total_lecciones }}</span>
+        <a class="etiqueta-tema" href="{{ url_for('aprendizaje.detalle_tema', id_tema=tema.id_tema) }}">
+          Tema {{ tema.orden }} · {{ tema.titulo }}
+        </a>
+        <span class="contador-leccion numeros-tabulares">Lección {{ indice }} de {{ total_lecciones }}</span>
         {% if minutos_lectura %}
-          <span class="tiempo-lectura" aria-label="Tiempo estimado de lectura: {{ minutos_lectura }} {{ 'minuto' if minutos_lectura == 1 else 'minutos' }}">
-            ⏱️ {{ minutos_lectura }} min de lectura
+          <span class="tiempo-lectura numeros-tabulares" aria-label="Tiempo estimado de lectura: {{ minutos_lectura }} {{ 'minuto' if minutos_lectura == 1 else 'minutos' }}">
+            <svg class="icono-reloj" aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="8" cy="8" r="6"/>
+              <path d="M8 4.5V8l2.5 1.5"/>
+            </svg>
+            {{ minutos_lectura }} min de lectura
+          </span>
+        {% endif %}
+        {% if esta_completada %}
+          <span class="insignia-leccion-completada" role="status">
+            {{ icono_estado('completado') }} ✓ Lección completada
           </span>
         {% endif %}
       </div>
       <h1>{{ contenido.titulo }}</h1>
-      <div class="contenedor-banner-leccion">
-        <img 
-          src="{{ url_for('static', filename='img/tema-' ~ ((tema.orden - 1) % 8 + 1) ~ '.jpg') }}" 
-          alt="" 
-          class="imagen-banner-leccion"
-          aria-hidden="true"
-          onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/hero.jpg') }}'"
-        >
-      </div>
     </header>
 
     <div class="cuerpo-leccion">
@@ -67,11 +72,13 @@
       {% if current_user.is_authenticated %}
         {% if esta_completada %}
           <div class="caja-estado-progreso completado">
-            <div class="icono-estado-progreso" aria-hidden="true">✓</div>
+            <div class="icono-estado-progreso" aria-hidden="true">
+              {{ icono_estado('completado') }}
+            </div>
             <div class="texto-estado-progreso">
               <p class="estado-destacado"><strong>Has completado esta lección formativa</strong></p>
               {% if fecha_completado %}
-                <p class="fecha-progreso">Registrado el {{ fecha_completado.strftime('%d/%m/%Y') }}</p>
+                <p class="fecha-progreso numeros-tabulares">Registrado el {{ fecha_completado.strftime('%d/%m/%Y') }}</p>
               {% endif %}
             </div>
             <form action="{{ url_for('aprendizaje.desmarcar_completado', id_tema=tema.id_tema, id_contenido=contenido.id_contenido) }}" method="post" class="form-estado-progreso">
@@ -106,7 +113,7 @@
       {% endif %}
     </section>
 
-    <nav class="navegacion-lecciones" aria-label="Navegación entre lecciones">
+    <nav class="navegacion-lecciones{% if not siguiente %} fin-de-lecciones{% endif %}" aria-label="Navegación entre lecciones">
       <div class="control-navegacion anterior">
         {% if anterior %}
           <a class="boton-nav" href="{{ url_for('aprendizaje.ver_contenido', id_tema=tema.id_tema, id_contenido=anterior.id_contenido) }}" rel="prev">

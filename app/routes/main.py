@@ -14,6 +14,7 @@ def index():
     siguiente_leccion = None
     tema_siguiente = None
     paso_siguiente = None
+    temas_prioritarios = temas[:3]
 
     if current_user.is_authenticated:
         resumen = ProgresoService.obtener_resumen_progreso_usuario(current_user.id_usuario)
@@ -42,9 +43,47 @@ def index():
                     tema_siguiente = tema_obj
                     break
 
+        # Selección curada de hasta 3 módulos prioritarios para la portada autenticada
+        items_resumen = resumen.get("temas", [])
+        activos = []
+        completados = []
+        pendientes = []
+        for item in items_resumen:
+            hay_avance = (
+                item["lecciones_completadas"] > 0
+                or item["actividades_intentadas"] > 0
+                or (item["evaluacion_info"] and item["evaluacion_info"]["mejor_intento"] is not None)
+            )
+            estado_mod = item["estado_modulo"]
+            if estado_mod == "completado":
+                completados.append(item["tema"])
+            elif hay_avance and estado_mod in ("en_progreso", "evaluacion_pendiente", "evaluacion_desaprobada"):
+                activos.append(item["tema"])
+            else:
+                pendientes.append(item["tema"])
+
+        seleccion = []
+        for t in activos[:2]:
+            seleccion.append(t)
+        if completados and len(seleccion) < 3:
+            seleccion.append(completados[-1])
+        for t in pendientes:
+            if len(seleccion) >= 3:
+                break
+            if t not in seleccion:
+                seleccion.append(t)
+        for t in activos[2:] + completados[:-1]:
+            if len(seleccion) >= 3:
+                break
+            if t not in seleccion:
+                seleccion.append(t)
+
+        temas_prioritarios = sorted(seleccion, key=lambda x: x.orden)
+
     return render_template(
         "index.html",
         temas=temas,
+        temas_prioritarios=temas_prioritarios,
         progreso_por_tema=progreso_por_tema,
         resumen=resumen,
         siguiente_leccion=siguiente_leccion,

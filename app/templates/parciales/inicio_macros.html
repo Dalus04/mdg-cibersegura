@@ -1,0 +1,80 @@
+{#
+  Macros gráficas de la portada: pictogramas SVG propios por eje temático e
+  iconos de estado. Todos son decorativos (aria-hidden): el significado siempre
+  se transmite también con texto visible.
+  Pictogramas: trazo uniforme de 2.5 sobre rejilla de 64x64.
+#}
+
+{% macro pictograma(numero, clase="") %}
+  <svg class="pictograma {{ clase }}" aria-hidden="true" focusable="false" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    {% if numero == 1 %}
+      {# Contraseñas y 2FA: escudo con cerradura #}
+      <path d="M32 6 54 14v16c0 14-9 23-22 28C19 53 10 44 10 30V14z"/>
+      <circle cx="32" cy="28" r="5"/>
+      <path d="M32 33v10"/>
+      <path d="M32 38h5"/>
+    {% elif numero == 2 %}
+      {# Phishing: ventana de navegador inspeccionada con lupa #}
+      <rect x="6" y="10" width="46" height="34" rx="4"/>
+      <path d="M6 20h46"/>
+      <path d="M12 15h.01M17 15h.01"/>
+      <path d="M13 29h20M13 36h12"/>
+      <circle cx="44" cy="40" r="9" fill="var(--arte-fondo, #fff)"/>
+      <path d="m51 47 8 8"/>
+    {% elif numero == 3 %}
+      {# Datos personales: documento de identidad con candado #}
+      <rect x="8" y="10" width="38" height="44" rx="4"/>
+      <circle cx="25" cy="26" r="6"/>
+      <path d="M15 44c0-6 4-9 10-9s10 3 10 9"/>
+      <rect x="38" y="38" width="20" height="16" rx="3" fill="var(--arte-fondo, #fff)"/>
+      <path d="M43 38v-4a5 5 0 0 1 10 0v4"/>
+    {% elif numero == 4 %}
+      {# Navegación segura: señal Wi-Fi con nodo protegido #}
+      <path d="M8 24c13-13 35-13 48 0"/>
+      <path d="M16 33c9-9 23-9 32 0"/>
+      <path d="M24 42c5-5 11-5 16 0"/>
+      <circle cx="32" cy="51" r="3" fill="currentColor"/>
+    {% elif numero == 5 %}
+      {# Compras y billeteras digitales: billetera con tarjeta #}
+      <rect x="6" y="16" width="48" height="36" rx="5"/>
+      <path d="M12 16l32-8 3 8"/>
+      <rect x="36" y="28" width="22" height="12" rx="3" fill="var(--arte-fondo, #fff)"/>
+      <circle cx="43" cy="34" r="1.5" fill="currentColor"/>
+    {% elif numero == 6 %}
+      {# Ingeniería social y llamadas: teléfono con alerta #}
+      <path d="M17 8h9l4 12-6 4c3 6 7 10 13 13l4-6 12 4v8c0 3-2 5-5 5C27 48 14 35 13 13c0-3 2-5 4-5z" transform="translate(0 4)"/>
+      <path d="M40 10a14 14 0 0 1 14 14"/>
+      <path d="M40 18a6 6 0 0 1 6 6"/>
+    {% elif numero == 7 %}
+      {# IA y deepfakes: circuito integrado #}
+      <rect x="16" y="16" width="32" height="32" rx="6"/>
+      <circle cx="32" cy="32" r="6"/>
+      <path d="M24 8v8M32 8v8M40 8v8M24 48v8M32 48v8M40 48v8M8 24h8M8 32h8M8 40h8M48 24h8M48 32h8M48 40h8"/>
+    {% else %}
+      {# Seguridad familiar: dos figuras protegiéndose #}
+      <circle cx="22" cy="20" r="7"/>
+      <path d="M8 50c0-10 6-16 14-16s14 6 14 16"/>
+      <circle cx="46" cy="29" r="5"/>
+      <path d="M38 50c0-7 3-12 8-12s8 5 8 12"/>
+    {% endif %}
+  </svg>
+{% endmacro %}
+
+{% macro icono_estado(tipo) %}
+  <svg class="icono-estado" aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    {% if tipo == 'completado' %}
+      <path d="m3 8.5 3.2 3L13 4.5"/>
+    {% elif tipo == 'alerta' %}
+      <path d="M8 2 1.5 13.5h13z"/><path d="M8 7v3M8 12h.01"/>
+    {% elif tipo == 'curso' %}
+      <circle cx="8" cy="8" r="6"/><path d="M8 2v12" /><path d="M8 2a6 6 0 0 1 0 12z" fill="currentColor"/>
+    {% else %}
+      <circle cx="8" cy="8" r="6"/>
+    {% endif %}
+  </svg>
+{% endmacro %}
+
+{% macro flecha() %}
+  <svg class="flecha" aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h11M9 4l4 4-4 4"/></svg>
+{% endmacro %}
+

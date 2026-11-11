@@ -107,7 +107,9 @@ def test_login_exitoso(client):
     assert response.status_code == 200
     html = response.get_data(as_text=True)
     assert "Bienvenido o bienvenida, Carlos." in html
-    assert "Sesión iniciada como Carlos Gómez" in html
+    assert "¡Hola, Carlos!" in html
+    assert "carlos@example.com" not in html
+    assert "Gómez" not in html
 
 
 def test_login_credenciales_invalidas(client):
@@ -255,7 +257,8 @@ def test_login_usuario_semilla_administrador(client):
     assert response.status_code == 200
     html = response.get_data(as_text=True)
     assert "Bienvenido o bienvenida, Administrador." in html
-    assert "admin@guadalupe.gob.pe" in html
+    assert "¡Hola, Administrador!" in html
+    assert "admin@guadalupe.gob.pe" not in html
 
 
 def test_login_usuario_semilla_ciudadano(client):
@@ -267,7 +270,8 @@ def test_login_usuario_semilla_ciudadano(client):
     assert response.status_code == 200
     html = response.get_data(as_text=True)
     assert "Bienvenido o bienvenida, Ciudadano." in html
-    assert "ciudadano@ejemplo.com" in html
+    assert "¡Hola, Ciudadano!" in html
+    assert "ciudadano@ejemplo.com" not in html
 
 
 def test_login_con_opcion_recordarme(client):

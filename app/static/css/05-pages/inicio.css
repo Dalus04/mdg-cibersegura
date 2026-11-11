@@ -1,268 +1,434 @@
 /* ==========================================================================
    05-PAGES / INICIO.CSS
-   Estilos específicos de la página de inicio (Hero y resumen de ejes temáticos).
+   Página de inicio: portada (visitante / ciudadano) y módulos en cuadrícula.
+   Responsive específico de esta página en 06-responsive/responsive.css.
    ========================================================================== */
 
-/* -------------------------------------------------------------
-   PÁGINA DE INICIO (HERO & RESUMEN DE EJES)
-------------------------------------------------------------- */
-.seccion-hero {
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  align-items: center;
-  gap: 2.5rem;
-  margin-bottom: 3.5rem;
-  background: #ffffff;
-  padding: 2.5rem;
-  border-radius: 12px;
-  border: 1px solid var(--borde);
-  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05);
-}
-
-.hero-texto h1 {
-  font-size: 2.35rem;
-  letter-spacing: -0.02em;
-  margin: 0.35rem 0 0.85rem;
-  color: #0f172a;
-}
-
-.subtitulo-inicio {
-  font-size: 1.15rem;
-  color: var(--texto-secundario);
-  margin-bottom: 1.5rem;
-  line-height: 1.5;
-}
-
-.tarjeta-bienvenida {
-  background: var(--fondo-suave);
-  border: 1px solid var(--borde);
-  border-radius: 10px;
-  padding: 1.35rem;
-  margin-top: 1rem;
-}
-
-.tarjeta-bienvenida-ciudadano {
-  background: linear-gradient(135deg, #f8fafc 0%, #edf4fc 100%);
-  border: 1px solid #dbeafe;
-}
-
-.cabecera-bienvenida {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 1.25rem;
-  margin-bottom: 1.25rem;
-}
-
-.tarjeta-bienvenida h2 {
-  font-size: 1.25rem;
-  margin-bottom: 0.35rem;
-}
-
-.tarjeta-bienvenida p {
-  margin: 0 0 1rem;
-  color: #334155;
-  font-size: 0.95rem;
-}
-
-.datos-sesion {
-  font-size: 0.92rem;
-  color: #475569;
-  margin: 0.25rem 0 0 !important;
-}
-
-.indicador-avance-global {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 0.75rem 1.15rem;
-  min-width: 200px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-}
-
-.etiqueta-avance-global {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #64748b;
-  margin-bottom: 0.2rem;
-}
-
-.valor-avance-global {
-  display: block;
-  font-size: 1.65rem;
-  font-weight: 800;
-  color: #084c8d;
-  line-height: 1.1;
-  margin-bottom: 0.35rem;
-}
-
-.resumen-lecciones-avance {
-  display: block;
-  font-size: 0.8rem;
-  color: #64748b;
-  font-weight: 500;
-  margin-top: 0.25rem;
-}
-
+/* Utilidad compartida con otras vistas (actividad, evaluación): se mantiene
+   su definición base y los ajustes de la portada se acotan más abajo. */
 .acciones-hero {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
 }
 
-.enlace-admin-hero {
+.inicio {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+/* -------------------------------------------------------------
+   PORTADA (estructura común)
+------------------------------------------------------------- */
+.portada {
+  display: grid;
+  grid-template-columns: minmax(0, 7.5fr) minmax(300px, 4.5fr);
+  gap: clamp(1.75rem, 4.5vw, 3.75rem);
+  align-items: center;
+}
+
+.portada-ciudadano {
+  align-items: stretch;
+}
+
+.portada .acciones-hero {
+  margin-top: 1.75rem;
+}
+
+.datos-sesion,
+.portada-subtitulo-sesion {
+  margin: 0.4rem 0 1.35rem;
+  max-width: 38rem;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--texto-secundario);
+}
+
+/* -------------------------------------------------------------
+   PORTADA · VISITANTE
+------------------------------------------------------------- */
+.portada-visitante {
+  align-items: center;
+}
+
+.portada-titulo {
+  margin: 0 0 0.75rem;
+  font-size: clamp(2.25rem, 4.4vw, 3.35rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.06;
+  color: var(--color-primario);
+}
+
+.portada-lead {
+  margin: 0 0 0.85rem;
+  max-width: 34rem;
+  font-size: clamp(1.18rem, 2.1vw, 1.45rem);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--texto-primario);
+}
+
+.portada-texto {
+  margin: 0;
+  max-width: 36rem;
+  font-size: 1.02rem;
+  line-height: 1.62;
+  color: var(--texto-secundario);
+}
+
+/* Lámina de programa: superficie institucional contenida y equilibrada */
+.lamina {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: clamp(1.35rem, 2.5vw, 1.85rem);
+  border-radius: var(--radio-panel);
+  background-color: var(--superficie-inversa);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+  color: var(--texto-sobre-inversa);
+}
+
+.lamina-cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.lamina-identidad {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.lamina-etiqueta {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-sobre-inversa);
+}
+
+.lamina-subtitulo {
+  margin: 0.15rem 0 0;
+  font-size: 0.82rem;
+  color: var(--texto-sobre-inversa-suave);
+}
+
+.lamina-sello {
+  display: inline-block;
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  color: var(--texto-sobre-inversa);
+  background: rgba(143, 193, 232, 0.16);
+  border: 1px solid rgba(143, 193, 232, 0.45);
+}
+
+.lamina-arte {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.92rem;
+  width: 3.1rem;
+  height: 3.1rem;
+  border-radius: 8px;
+  background: rgba(143, 193, 232, 0.12);
+  border: 1px solid rgba(143, 193, 232, 0.3);
+  flex-shrink: 0;
+}
+
+.lamina-pictograma {
+  width: 2rem;
+  height: auto;
+  color: var(--acento-azul-claro);
+  stroke-width: 2.2;
+}
+
+.lamina-datos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem 1.25rem;
+  margin: 0;
+  padding-top: 1.15rem;
+  border-top: 1px solid rgba(197, 209, 222, 0.28);
+}
+
+.lamina-datos dt {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texto-sobre-inversa-suave);
+}
+
+.lamina-datos dd {
+  margin: 0.15rem 0 0;
+  font-family: var(--fuente-tecnica);
+  font-size: clamp(1.5rem, 2.4vw, 1.85rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--texto-sobre-inversa);
+}
+
+/* Banda de metodología: abierta y editorial, sin encajonamiento gris */
+.metodo-banda {
+  border-top: 1px solid var(--borde-sutil);
+  border-bottom: 1px solid var(--borde-sutil);
+  background: transparent;
+}
+
+.metodo {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.metodo li {
+  display: flex;
+  gap: 1rem;
+  padding: 1.65rem 1.5rem;
+}
+
+.metodo li:first-child {
+  padding-left: 0;
+}
+
+.metodo li:last-child {
+  padding-right: 0;
+}
+
+.metodo li + li {
+  border-left: 1px solid var(--borde-sutil);
+}
+
+.metodo-num {
+  font-family: var(--fuente-tecnica);
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-primario);
+}
+
+.metodo-pilar {
+  margin: 0 0 0.2rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-primario);
+}
+
+.metodo h3 {
+  margin: 0 0 0.3rem;
+  font-size: 1.0625rem;
+}
+
+.metodo p {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  color: var(--texto-secundario);
+}
+
+/* -------------------------------------------------------------
+   PORTADA · CIUDADANO AUTENTICADO
+------------------------------------------------------------- */
+.portada-saludo {
+  margin: 0;
+  font-size: clamp(1.8rem, 3.4vw, 2.55rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.paso-activo {
+  --paso-acento: var(--color-primario);
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  background: var(--superficie-bloque);
+  border: 1px solid var(--borde-sutil);
+  border-left: 4px solid var(--paso-acento);
+  border-radius: var(--radio-panel);
+}
+
+.paso-activo-actividad {
+  --paso-acento: var(--acento-cobre);
+}
+
+.paso-activo-evaluacion {
+  --paso-acento: var(--tema-4-acento);
+}
+
+.paso-activo-etiqueta {
+  margin: 0 0 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--paso-acento);
+}
+
+.paso-activo-contexto {
+  margin: 0 0 0.35rem;
+  font-family: var(--fuente-tecnica);
+  font-size: 0.85rem;
+  color: var(--texto-meta);
+}
+
+.paso-activo-titulo {
+  margin: 0;
+  font-size: clamp(1.2rem, 2.2vw, 1.55rem);
+  line-height: 1.25;
+}
+
+/* Acceso institucional del administrador: enlace terciario, no un botón más */
+.enlace-admin-hero {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.25rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: #854d0e;
-  background: #fef9c3;
-  border: 1.5px solid #fde047;
-  padding: 0.55rem 1rem;
-  border-radius: 6px;
-  text-decoration: none;
-  transition: all 0.15s ease-in-out;
+  color: var(--acento-cobre);
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 .enlace-admin-hero:hover,
 .enlace-admin-hero:focus {
-  background: #fef08a;
-  color: #713f12;
+  color: var(--estado-alerta-texto);
 }
 
-.imagen-hero {
-  width: 100%;
-  aspect-ratio: 16/9;
-  object-fit: cover;
-  border-radius: 10px;
-  border: 1px solid var(--borde);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-}
-
-.seccion-destacada {
-  margin-top: 2rem;
-}
-
-.encabezado-destacado h2 {
-  font-size: 1.65rem;
-  margin-bottom: 0.35rem;
-}
-
-.encabezado-destacado p {
-  color: var(--texto-secundario);
-  margin: 0 0 1.75rem;
-}
-
-.grid-resumen-temas {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  gap: 1.5rem;
-}
-
-/* Tarjetas de temas enlazadas y accesibles */
-.tarjeta-resumen-tema,
-.item-resumen-tema {
-  background: #ffffff;
-  border: 1px solid var(--borde);
-  border-radius: 10px;
-  overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+/* Panel de avance: equilibrado en escala respecto al paso activo */
+.panel-avance {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  border-radius: var(--radio-panel);
+  background: var(--superficie-bloque);
+  border: 1px solid var(--borde-sutil);
 }
 
-.tarjeta-resumen-tema:hover,
-.item-resumen-tema:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-  border-color: #cbd5e1;
-}
-
-.enlace-tarjeta-tema {
-  text-decoration: none;
-  color: inherit;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.enlace-tarjeta-tema:focus-visible {
-  outline: 3px solid var(--foco-anillo, #0284c7);
-  outline-offset: 3px;
-  border-radius: 10px;
-}
-
-.contenedor-miniatura-inicio {
-  width: 100%;
-  aspect-ratio: 16/9;
-  overflow: hidden;
-  background-color: #f1f5f9;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.miniatura-tema {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.tarjeta-resumen-tema:hover .miniatura-tema {
-  transform: scale(1.03);
-}
-
-.cuerpo-resumen-tema {
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.cuerpo-resumen-tema h3 {
-  font-size: 1.08rem;
-  margin: 0.25rem 0 0.45rem;
-  color: #0f172a;
-  line-height: 1.35;
-}
-
-.cuerpo-resumen-tema p {
-  font-size: 0.88rem;
-  color: var(--texto-secundario);
-  margin: 0 0 1rem;
-  line-height: 1.45;
-  flex: 1;
-}
-
-.indicador-progreso-mini {
-  margin-top: auto;
-  padding-top: 0.5rem;
-  border-top: 1px solid #f1f5f9;
-}
-
-.texto-avance-mini {
-  display: block;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #64748b;
-  margin-top: 0.25rem;
-}
-
-.texto-completado-badge {
-  color: #15803d;
+.panel-avance-etiqueta {
+  margin: 0;
+  font-size: 0.78rem;
   font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-meta);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .tarjeta-resumen-tema,
-  .tarjeta-resumen-tema:hover,
-  .miniatura-tema,
-  .tarjeta-resumen-tema:hover .miniatura-tema {
-    transform: none;
-    transition: none;
-  }
+.panel-avance-valor {
+  margin: 0.25rem 0 0.55rem;
+  font-size: clamp(2.1rem, 4vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  color: var(--color-primario);
+}
+
+.panel-avance .barra-progreso-contenedor {
+  height: 8px;
+  margin: 0;
+  background: var(--superficie-tonal);
+}
+
+.panel-avance-datos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.95rem 1.25rem;
+  margin: 1.25rem 0 0;
+  padding-top: 1.15rem;
+  border-top: 1px solid var(--borde-sutil);
+}
+
+.panel-avance-datos dt {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--texto-meta);
+}
+
+.panel-avance-datos dd {
+  margin: 0.15rem 0 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--texto-primario);
+}
+
+/* -------------------------------------------------------------
+   MÓDULOS · ENCABEZADO Y PIE
+------------------------------------------------------------- */
+.modulos-encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.15rem;
+  border-bottom: 1px solid var(--borde-sutil);
+}
+
+.modulos-encabezado h2 {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.5rem, 2.8vw, 1.95rem);
+  letter-spacing: -0.025em;
+}
+
+.modulos-encabezado p {
+  margin: 0;
+  color: var(--texto-secundario);
+}
+
+.modulos-encabezado .modulos-resumen {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--texto-primario);
+}
+
+.pie-seccion-modulos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--borde-sutil);
+}
+
+.pie-modulos-texto {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--texto-secundario);
+}
+
+.pie-modulos-texto strong {
+  color: var(--texto-primario);
+}
+
+.pie-modulos-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.enlace-catalogo-completo {
+  background: var(--superficie-bloque);
 }
